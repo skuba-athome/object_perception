@@ -1,0 +1,9 @@
+8 1
+my-cup 3
+my-phone 1
+my-book 1
+my-eye-drop 1
+my-stuff 1
+my-objectA 9
+my-objectB 14
+my-objectC 10
