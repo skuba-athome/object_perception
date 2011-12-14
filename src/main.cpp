@@ -13,12 +13,24 @@
 #include <iostream>
 #include <vector>
 
+//
+#include<ros/ros.h>
+#include<sensor_msgs/Image.h>
+#include<std_msgs/String.h>
+
 using namespace std;
 
 int gROI_x1 = 0;
 int gROI_y1 = 0;
 int gROI_x2 = 640;
 int gROI_y2 = 480;
+
+char *imgLibDir = "./img-lib";
+
+char *queryFile = "query.000.bmp";
+char fileName[1024];
+int numSaveFrame = 0;
+int numObj = 0;
 
 typedef struct {
 	int numObj;
@@ -28,6 +40,12 @@ typedef struct {
 	cv::Mat desc_mat; // surf descriptor
 	cv::Mat ind_mat;  // label(ID)
 }IndexBook;
+
+IplImage *grayImg  = cvCreateImage(cvSize(640, 480), 8, 1);	
+IplImage *inFrame  = cvCreateImage(cvSize(640, 480), 8, 3);
+IplImage *markImg  = cvCreateImage(cvSize(640, 480), 8, 3);
+void convertmsg2img(const sensor_msgs::ImageConstPtr& msg);
+
 
 // mouse callback
 void on_mouse( int event, int x, int y, int flags, void* param )
@@ -475,6 +493,7 @@ void test(IndexBook *indexBook, char *queryFile)
 	for(int obj = 0; obj < indexBook->numObj; obj++) {
 		sumDist[obj] = 0.0f;
 		numNN[obj]   = 0;
+
 	}
 	for (int i=0;i<m_indices.rows;++i) {
 		// compare 1st and 2nd distance
@@ -531,29 +550,89 @@ void test(IndexBook *indexBook, char *queryFile)
 	cvWaitKey();
 }
 
-int main()
+void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 {
-	char *imgLibDir = "./img-lib";
-	char *queryFile = "query.000.bmp";
+	
+	int curObj = 0;
+	int inKey = 0;
+	bool editLib = false;
+	IndexBook *indexBook = load_index(imgLibDir);
+	convertmsg2img(msg);
+	cvCvtColor(inFrame, grayImg, CV_BGR2GRAY);
+	//cvCvtColor(grayImg, markImg, CV_GRAY2RGB);
+	findObjectAndMark(grayImg, markImg, indexBook, inFrame);
+	//output
+	cvDrawRect(markImg, cvPoint(gROI_x1,gROI_y1), cvPoint(gROI_x2,gROI_y2), CV_RGB(0,255,0));
+	cvPutText(markImg, indexBook->label[curObj], cvPoint(gROI_x1,gROI_y1), &cvFont(1.5,2), CV_RGB(255,255,255));
+
+	cvShowImage("input", markImg);
+
+	inKey = cvWaitKey(1);
+	if(inKey == 27){
+		exit(0);
+	}
+	else if(inKey == 32){
+		printf("fetch\n");
+		int picID = indexBook->numPic[curObj];
+		char *picName = indexBook->label[curObj];
+		cvSetImageROI(inFrame, cvRect(gROI_x1, gROI_y1, gROI_x2 - gROI_x1, gROI_y2 - gROI_y1));
+		
+		sprintf(fileName,"%s/%s/%03d.bmp",imgLibDir,picName,picID);
+		cvSaveImage(fileName, inFrame);
+		cvResetImageROI(inFrame);
+		editLib = true;
+
+		sprintf(fileName,"gray-%03d.bmp",numSaveFrame);
+		cvSaveImage(fileName, markImg);
+		
+		indexBook->numPic[curObj]++;
+		numSaveFrame++;
+	}
+	else if(inKey == 2555904){
+		curObj = (curObj+1)%indexBook->numObj;
+	}
+	else if(inKey == 2424832){
+		curObj = (curObj+(indexBook->numObj-1))%indexBook->numObj;
+	}
+	else if(inKey >= 0){
+		printf("key = %d\n", inKey);
+	}
+
+	if(editLib) {
+		write_edited(imgLibDir, indexBook);
+	}
+
+}
+
+int main(int argc , char *argv[])
+{
+
 	float nnRatio   = 0.3f;
 	bool reindexing = true;
-	bool camera_running = true;
+//	bool camera_running = true;
 	CvCapture* capture = 0;
 	int frameWidth  = 0;
 	int frameHeight = 0;
 	
-	char fileName[1024];
-	int numSaveFrame = 0;
-	int inKey = 0;
-	int numObj = 0;
+	IndexBook *indexBook = load_index(imgLibDir);
 
 	if(reindexing || !is_updated(imgLibDir)) {
 		printf("[Initialize] : reindexing\n");
 		do_index(imgLibDir, KDTreeIndex);
 	}
 
+	printf("[Initialize] : reading index\n");
+	write_updated(imgLibDir, indexBook);
+	ros::init(argc,argv,"objects");
+	ros::NodeHandle n;
+	
+	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,kinectCallBack);
+	printf("ros : spin\n");
+	cvNamedWindow("input", 1 );
+	cvSetMouseCallback("input", on_mouse);
+	ros::spin();
+/*
 	if(camera_running) {
-		cvNamedWindow("input", 1 );
 		capture = cvCreateCameraCapture(CV_CAP_ANY+0);
 		cvSetMouseCallback("input", on_mouse);
 	}
@@ -566,9 +645,7 @@ int main()
 	frameHeight = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
 
 	
-	printf("[Initialize] : reading index\n");
-	IndexBook *indexBook = load_index(imgLibDir);
-	write_updated(imgLibDir, indexBook);
+
 
 	if(!camera_running) {
 		test(indexBook, "test-img/query.000.bmp");
@@ -578,65 +655,14 @@ int main()
 		test(indexBook, "test-img/query.004.jpg");
 		exit(0);
 	}
-
-	IplImage *grayImg  = cvCreateImage(cvSize(frameWidth, frameHeight), 8, 1);
-	IplImage *markImg  = cvCreateImage(cvSize(frameWidth, frameHeight), 8, 3);
-	int curObj = 0;
-	bool editLib = false;
-	while(camera_running)
+*/
+}
+void convertmsg2img(const sensor_msgs::ImageConstPtr& msg)
+{
+	for(int i=0;i<640*480;i++)
 	{
-		IplImage *inFrame = cvQueryFrame(capture);
-		
-		cvCvtColor(inFrame, grayImg, CV_BGR2GRAY);
-
-		//cvCvtColor(grayImg, markImg, CV_GRAY2RGB);
-
-		findObjectAndMark(grayImg, markImg, indexBook, inFrame);
-
-		//output
-		cvDrawRect(markImg, cvPoint(gROI_x1,gROI_y1), cvPoint(gROI_x2,gROI_y2), CV_RGB(0,255,0));
-		cvPutText(markImg, indexBook->label[curObj], cvPoint(gROI_x1,gROI_y1), &cvFont(1.5,2), CV_RGB(255,255,255));
-		cvShowImage("input", markImg);
-
-		inKey = cvWaitKey(1);
-		if(inKey == 27){
-			break;
-		}
-		else if(inKey == 32){
-			printf("fetch\n");
-			int picID = indexBook->numPic[curObj];
-			char *picName = indexBook->label[curObj];
-			cvSetImageROI(inFrame, cvRect(gROI_x1, gROI_y1, gROI_x2 - gROI_x1, gROI_y2 - gROI_y1));
-			
-			sprintf(fileName,"%s/%s/%03d.bmp",imgLibDir,picName,picID);
-			cvSaveImage(fileName, inFrame);
-			cvResetImageROI(inFrame);
-			editLib = true;
-
-			sprintf(fileName,"gray-%03d.bmp",numSaveFrame);
-			cvSaveImage(fileName, markImg);
-			
-			indexBook->numPic[curObj]++;
-			numSaveFrame++;
-		}
-		else if(inKey == 2555904){
-			curObj = (curObj+1)%indexBook->numObj;
-		}
-		else if(inKey == 2424832){
-			curObj = (curObj+(indexBook->numObj-1))%indexBook->numObj;
-		}
-		else if(inKey >= 0){
-			printf("key = %d\n", inKey);
-		}
-	}
-
-	if(editLib) {
-		write_edited(imgLibDir, indexBook);
-	}
-
-	cvReleaseImage(&grayImg);
-	cvReleaseImage(&markImg);
-	cvDestroyAllWindows();
-	cvReleaseCapture(&capture);
-	return 0;
+		inFrame->imageData[i*3] = msg->data[i*3+2];
+		inFrame->imageData[i*3+1] = msg->data[i*3+1];
+		inFrame->imageData[i*3+2] = msg->data[i*3];	
+	}				
 }
