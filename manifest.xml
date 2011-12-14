@@ -1,0 +1,18 @@
+<package>
+  <description brief="objects">
+
+     objects
+
+  </description>
+  <author>xcerx</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/objects</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="opencv2"/>
+  <depend package="sensor_msgs"/>
+  <depend package="std_msgs"/>
+</package>
+
+
