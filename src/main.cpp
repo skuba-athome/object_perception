@@ -68,14 +68,18 @@ void controlCallBack(const std_msgs::String::ConstPtr& msg)
 {
 	ROS_INFO("get command : %s\n",msg->data.c_str());
 	IndexBook *indexBook = load_index(imgLibDir);
+	int check = 1;
 	for(int obj = 0; obj < indexBook->numObj; obj++){
 		//fprintf(fp, "%s %d\n", indexBook->label[obj], indexBook->numPic[obj]);
 		if(!strcmp(indexBook->label[obj],msg->data.c_str()))
 		{
 			get_dest = 1;
 			strcpy((char*)msg->data.c_str(),obj_label);
+			check = 0;
+			break;
 		}
 	}
+	ROS_INFO("I don't know : %s\n",msg->data.c_str());
 }
 
 
@@ -534,6 +538,7 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	//convertmsg2img(msg);
 	cvCvtColor(inFrame, grayImg, CV_BGR2GRAY);
 	//cvCvtColor(grayImg, markImg, CV_GRAY2RGB);
+	if(get_dest)
 	findObjectAndMark(grayImg, markImg, indexBook, inFrame);
 	//output
 	cvDrawRect(markImg, cvPoint(gROI_x1,gROI_y1), cvPoint(gROI_x2,gROI_y2), CV_RGB(0,255,0));
