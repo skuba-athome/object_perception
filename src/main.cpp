@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include <iostream>
 #include <vector>
@@ -17,8 +18,15 @@
 #include<ros/ros.h>
 #include<sensor_msgs/Image.h>
 #include<std_msgs/String.h>
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <geometry_msgs/Vector3.h>
 
 using namespace std;
+using namespace cv;
+using namespace cv_bridge;
+
+#define TOPIC_CONTROL "/cmd_state"
 
 int gROI_x1 = 0;
 int gROI_y1 = 0;
@@ -31,7 +39,15 @@ char *queryFile = "query.000.bmp";
 char fileName[1024];
 int numSaveFrame = 0;
 int numObj = 0;
+float dist[480][640];
+int canPrintDepth = 0;
+double min_range_;
+double max_range_;
+int curObj = 0;
 
+cv::Mat depthImg ;
+cv_bridge::CvImagePtr bridge;
+ros::Publisher vector_pub; // = n2.advertise<geometry_msgs::Vector3>("object_point", 1000);
 typedef struct {
 	int numObj;
 	char **label;
@@ -40,12 +56,67 @@ typedef struct {
 	cv::Mat desc_mat; // surf descriptor
 	cv::Mat ind_mat;  // label(ID)
 }IndexBook;
-
-IplImage *grayImg  = cvCreateImage(cvSize(640, 480), 8, 1);	
 IplImage *inFrame  = cvCreateImage(cvSize(640, 480), 8, 3);
-IplImage *markImg  = cvCreateImage(cvSize(640, 480), 8, 3);
-void convertmsg2img(const sensor_msgs::ImageConstPtr& msg);
 
+int get_dest = 0;
+char obj_label[20];
+
+void convertmsg2img(const sensor_msgs::ImageConstPtr& msg);
+IndexBook* load_index(char* dirpath);
+
+void controlCallBack(const std_msgs::String::ConstPtr& msg)
+{
+	ROS_INFO("get command : %s\n",msg->data.c_str());
+	IndexBook *indexBook = load_index(imgLibDir);
+	for(int obj = 0; obj < indexBook->numObj; obj++){
+		//fprintf(fp, "%s %d\n", indexBook->label[obj], indexBook->numPic[obj]);
+		if(!strcmp(indexBook->label[obj],msg->data.c_str()))
+		{
+			get_dest = 1;
+			strcpy((char*)msg->data.c_str(),obj_label);
+		}
+	}
+}
+
+
+
+void DepthToWorld(float * x, float * y, float depth)
+{
+    static const double fx_d = 1.0 / 5.9421434211923247e+02;
+    static const double fy_d = 1.0 / 5.9104053696870778e+02;
+    static const double cx_d = 3.3930780975300314e+02;
+    static const double cy_d = 2.4273913761751615e+02;
+    *x = float( (*x - cx_d) * depth * fx_d);
+    *y = float( (*y - cy_d) * depth * fy_d);
+}
+
+
+void depthCb( const sensor_msgs::ImageConstPtr& image )
+{
+    canPrintDepth = 0;
+    try
+    {
+        bridge = cv_bridge::toCvCopy(image, "32FC1");
+    }
+    catch (cv_bridge::Exception& e)
+    {
+        ROS_ERROR("Failed to transform depth image.");
+        return;
+    }
+   // printf("%d %d \n", bridge->image.cols,bridge->image.rows);
+    depthImg = Mat(bridge->image.rows,bridge->image.cols, CV_8UC1);
+    for(int i = 0; i < bridge->image.rows; i++)
+    {
+        float* Di = bridge->image.ptr<float>(i);
+        char* Ii = depthImg.ptr<char>(i);
+        for(int j = 0; j < bridge->image.cols; j++)
+        {
+            Ii[j] = (char) (255*((Di[j]-min_range_)/(max_range_-min_range_)));
+            dist[i][j] = Di[j];
+        }
+    }
+    canPrintDepth = 1;
+}
 
 // mouse callback
 void on_mouse( int event, int x, int y, int flags, void* param )
@@ -167,6 +238,7 @@ void do_index(char* dirpath, IndexType indexType=LinearIndex)
 			cvStartReadSeq(descList[obj][p], &desc_reader);
 			for(int s = 0; s < descList[obj][p]->total; s++ ) {
 				const float* descriptor = (const float*)desc_reader.ptr;
+				
 				CV_NEXT_SEQ_ELEM(desc_reader.seq->elem_size, desc_reader);
 
 				memcpy(desc_ptr, descriptor, length*sizeof(float));
@@ -279,7 +351,7 @@ typedef struct {
 // mrkImg must have 3 channels(BGR)
 void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IndexBook *indexBook, IplImage *colorImg=0)
 {
-	float nnRatio   = 0.3f;
+	float nnRatio   = 0.36f; // default is 0.3
 	IplImage *queryImg = srcImg;
 	IplImage *markImg  = mrkimg;
 	cvCvtColor(queryImg, markImg, CV_GRAY2RGB);
@@ -337,38 +409,6 @@ void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IndexBook *indexBook,
 			sumDist[c.objID] += dists_ptr[2*i];
 		}
 	}
-	//for (int i=0;i<m_indices.rows;++i) {
-	//	if (dists_ptr[10*i] < 0.6*dists_ptr[10*i+9]) {
-	//		int *objNNCount = new int[indexBook->numObj];
-	//		int maxCount = -1;
-	//		int maxObj   = -1;
-	//		for(int o = 0; o < indexBook->numObj; o++){
-	//			objNNCount[o] = 0;
-	//		}
-	//		for(int p = 0; p < 10; p++){
-	//			if(dists_ptr[10*i + p] < 0.3) {
-	//				int objID = *(indexBook->ind_mat.ptr<int>(indices_ptr[10*i + p]));
-	//				printf("%f\n", dists_ptr[10*i + p]);
-	//				objNNCount[ objID ] += 1;
-	//				if(objNNCount[objID] > maxCount) {
-	//					maxCount = objNNCount[objID];
-	//					maxObj   = objID;
-	//				}
-	//			}
-	//		}
-	//		if(maxCount > 4) {
-	//			CorrespondPoint c;
-	//			c.dstID = i;
-	//			c.srcID = indices_ptr[10*i];
-	//			c.dist  = dists_ptr[10*i];
-	//			c.objID = maxObj;
-	//			correspondList.push_back(c);
-	//			numAll++;
-	//			numNN[c.objID]++;
-	//			sumDist[c.objID] += dists_ptr[10*i];
-	//		}
-	//	}
-	//}
 
 	CorrespondPoint *correspond = new CorrespondPoint[numAll];
 	int i = 0;
@@ -378,14 +418,14 @@ void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IndexBook *indexBook,
 
 
 	for(int obj = 0; obj < indexBook->numObj; obj++) {
-		//printf("%12s : %6d/%6d : %10.4f : %8.4f : %8.4f\n", indexBook->label[obj]
-        //                                               , numNN[obj], indexBook->index->size()
-		//											     , (float)indexBook->index->size()/(numNN[obj]+1)
-		//												 , sumDist[obj]
-		//												 , sumDist[obj]/(numNN[obj]+1));
-		if(numNN[obj] > 5) {
+
+		if(numNN[obj] > 5) { // default is 5  check for have objecy in sence
 			float sum_x = 0.0f;
 			float sum_y = 0.0f;
+			int max = -1;
+			int avg_x;
+			int avg_y;
+			float max_dist = 1000;
 			for(int p = 0; p < numAll; p++) {
 				if(correspond[p].objID != obj) {
 					continue;
@@ -397,167 +437,101 @@ void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IndexBook *indexBook,
 				unsigned char r_val = colorImg->imageData[yy*colorImg->width*colorImg->nChannels + xx*colorImg->nChannels + 2];
 				unsigned char g_val = colorImg->imageData[yy*colorImg->width*colorImg->nChannels + xx*colorImg->nChannels + 1];
 				unsigned char b_val = colorImg->imageData[yy*colorImg->width*colorImg->nChannels + xx*colorImg->nChannels + 0];
-
-
-				if(obj == 6){
-					sum_x += surf->pt.x;
-					sum_y += surf->pt.y;
-					cvCircle(markImg, cvPoint(xx,yy), 1, colors[obj], 2);
-					//printf("%s : (%3d, %3d, %3d) %.1f %.1f\n", colorImg->channelSeq, r_val, g_val, b_val,surf->pt.x,surf->pt.y);
-				}else if(obj == 7){
-					sum_x += surf->pt.x;
-					sum_y += surf->pt.y;
-					cvCircle(markImg, cvPoint(xx,yy), 1, colors[obj], 2);
-					printf("%s : (%3d, %3d, %3d) %.1f %.1f\n", colorImg->channelSeq, r_val, g_val, b_val,surf->pt.x,surf->pt.y);
-				}else{
-					sum_x += surf->pt.x;
-					sum_y += surf->pt.y;				
+				int sum_group = 0;
+				float r_group = 50.0f; // radius
+				float max_dist_tmp = -1;
+				for(int p2 = 0; p2 < numAll; p2++) {
+					if(correspond[p2].objID != obj || p2 == p) {
+						continue;
+					}
+					CvSURFPoint *surf2 = (CvSURFPoint*)cvGetSeqElem(keypoints, correspond[p2].dstID);
+					
+					if( sqrt( pow(xx-surf2->pt.x,2)+pow(xx-surf2->pt.x,2) ) < r_group  
+						//&& dist[(int)surf2->pt.y][(int)surf2->pt.x] <= 2.0f
+					)
+					{
+						if( sqrt( pow(xx-surf2->pt.x,2)+pow(xx-surf2->pt.x,2) ) > max_dist)
+						{
+							max_dist_tmp= sqrt( pow(xx-surf2->pt.x,2)+pow(xx-surf2->pt.x,2) );
+						}
+						sum_group++;
+					}
 				}
 
+				if(sum_group > max || ( sum_group == max && max_dist > max_dist_tmp )) { 
+					max_dist = max_dist_tmp;
+					max = sum_group; 
+					avg_x = xx;
+					avg_y = yy;
+				}
+
+				//if( dist[yy][xx] <= 2.0f){
+				//	sum_x += surf->pt.x;
+				//	sum_y += surf->pt.y;		
+					cvCircle(markImg, cvPoint(xx,yy), 1, colors[obj], 2);		
+				//}
+			
 				
 				//printf("%.1f %.1f\n",surf->pt.x,surf->pt.y);
 			}
-			int avg_x = cvRound(sum_x/(numNN[obj]+1));
-			int avg_y = cvRound(sum_y/(numNN[obj]+1));
-			//int avg_x = cvRound(sum_x);
-			//int avg_y = cvRound(sum_y);
 			cvCircle(markImg, cvPoint(avg_x,avg_y), 1, colors[obj], 2);
-			cvPutText(markImg, indexBook->label[obj], cvPoint(avg_x,avg_y), &cvFont(1.0, 2), colors[obj]);
 
-
-
-		}
-	}
-	//printf("-----------------------------------------------\n");
-
-	//for(int p = 0; p < numAll; p++) {
-	//	CvSURFPoint *surf = (CvSURFPoint*)cvGetSeqElem(keypoints, correspond[p].dstID);
-	//	cvCircle(markImg, cvPoint(surf->pt.x,surf->pt.y), 1, colors[correspond[p].objID], 2);
-	//}
-
-	delete correspond;
-	delete queryVector;
-}
-
-void test(IndexBook *indexBook, char *queryFile)
-{
-	float nnRatio   = 0.3f;
-	printf(" >> query from : %s\n", queryFile);
-	IplImage *queryImg = cvLoadImage(queryFile, CV_LOAD_IMAGE_GRAYSCALE);
-	IplImage *markImg  = cvCreateImage(cvSize(queryImg->width, queryImg->height), queryImg->depth, 3);
-	cvCvtColor(queryImg, markImg, CV_GRAY2RGB);
-
-	CvScalar colors[] = 
-	{
-		{{0,0,255}},
-		{{255,0,0}},
-		{{0,255,0}},
-		{{0,128,255}},
-		{{0,255,255}},
-		{{255,128,0}},
-		{{255,255,0}},
-		{{255,0,255}},
-		{{255,255,255}}
-	};
-
-	// extract surf
-	CvMemStorage *storage = cvCreateMemStorage(0);
-	CvSURFParams  params  = cvSURFParams(500, 1);
-	CvSeq *keypoints = 0;
-	CvSeq *desc      = 0;
-	cvExtractSURF(queryImg, 0, &keypoints, &desc, storage, params);
-
-	//// mark surf
-	//CvSeqReader seqReader;
-	//cvStartReadSeq(keypoints, &seqReader );
-	//for(int i = 0; i < desc->total; i++ ) {
-	//	CvSURFPoint* surf = (CvSURFPoint*)seqReader.ptr;
-	//	cvCircle(markImg, cvPoint(surf->pt.x,surf->pt.y), 1, colors[0], 2);
-	//	CV_NEXT_SEQ_ELEM( seqReader.seq->elem_size, seqReader );
-	//}
-
-
-	// create query matrix
-	cv::Mat *queryVector = createSurfMat(desc);
-
-	cv::Mat m_indices(queryVector->rows, 2, CV_32S);
-	cv::Mat m_dists(queryVector->rows, 2, CV_32F);
-	indexBook->index->knnSearch(*queryVector, m_indices, m_dists, 2, cv::flann::SearchParams(2));
-
-	vector<CorrespondPoint> correspondList;
-	int* indices_ptr = m_indices.ptr<int>(0);
-	float* dists_ptr = m_dists.ptr<float>(0);
-	float *sumDist =  new float[indexBook->numObj];
-	int *numNN =  new int[indexBook->numObj];
-	int numAll = 0;
-	for(int obj = 0; obj < indexBook->numObj; obj++) {
-		sumDist[obj] = 0.0f;
-		numNN[obj]   = 0;
-
-	}
-	for (int i=0;i<m_indices.rows;++i) {
-		// compare 1st and 2nd distance
-		if (dists_ptr[2*i] < nnRatio*dists_ptr[2*i+1]) {
-			// store point
-			CorrespondPoint c;
-			c.dstID = i;
-			c.srcID = indices_ptr[2*i];
-			c.dist  = dists_ptr[2*i];
-			c.objID = *(indexBook->ind_mat.ptr<int>(c.srcID));
-			correspondList.push_back(c);
-
-			numAll++;
-			numNN[c.objID]++;
-			sumDist[c.objID] += dists_ptr[2*i];
-		}
-	}
-
-	CorrespondPoint *correspond = new CorrespondPoint[numAll];
-	int i = 0;
-	for(vector<CorrespondPoint>::iterator it = correspondList.begin(); it != correspondList.end(); it++){
-		correspond[i++] = *it;
-	}
-
-	for(int obj = 0; obj < indexBook->numObj; obj++) {
-		printf("%12s : %6d/%6d : %10.4f : %8.4f : %8.4f\n", indexBook->label[obj]
-                                                       , numNN[obj], indexBook->index->size()
-													     , (float)indexBook->index->size()/(numNN[obj]+1)
-														 , sumDist[obj]
-														 , sumDist[obj]/(numNN[obj]+1));
-		if(numNN[obj] >= 1) {
-			float sum_x = 0.0f;
-			float sum_y = 0.0f;
-			for(int p = 0; p < numAll; p++) {
-				if(correspond[p].objID != obj) {
-					continue;
+			if(max> 5){
+				if(get_dest)
+				{
+					if(dist[avg_y][avg_x] < 2)
+					{
+						float tmp_z = dist[avg_y][avg_x];
+						float tmp_x = avg_x;
+						float tmp_y = avg_y;
+						DepthToWorld(&tmp_x,&tmp_y,tmp_z);
+						printf("%s  -> x:%d y:%d z:%.2f\n",indexBook->label[obj],avg_x,avg_y,dist[avg_y][avg_x]);
+						printf("%s  -> x:%.2f y:%.2f z:%.2f\n",indexBook->label[obj],tmp_x,tmp_y,tmp_z);
+						geometry_msgs::Vector3 vector;
+						vector.x = tmp_x;
+						vector.y = tmp_y;
+						vector.z = tmp_z;						
+						vector_pub.publish(vector);
+					}
 				}
-				CvSURFPoint *surf = (CvSURFPoint*)cvGetSeqElem(keypoints, correspond[p].dstID);
-				sum_x += surf->pt.x;
-				sum_y += surf->pt.y;
-				//cvCircle(markImg, cvPoint(surf->pt.x,surf->pt.y), 1, colors[obj], 2);
+				cvPutText(markImg, indexBook->label[obj], cvPoint(avg_x,avg_y), &cvFont(1.0, 2), colors[obj]);
 			}
-			int avg_x = cvRound(sum_x/(numNN[obj]+1));
-			int avg_y = cvRound(sum_y/(numNN[obj]+1));
-			cvCircle(markImg, cvPoint(avg_x,avg_y), 1, colors[obj], 2);
-			cvPutText(markImg, indexBook->label[obj], cvPoint(avg_x,avg_y), &cvFont(1.0, 2), colors[obj]);
 		}
 	}
 
 	delete correspond;
 	delete queryVector;
-	cvShowImage("input", markImg);
-	cvSaveImage("result.jpg", markImg);
-	cvWaitKey();
 }
 
 void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 {
-	
-	int curObj = 0;
 	int inKey = 0;
 	bool editLib = false;
+	IplImage *grayImg  = cvCreateImage(cvSize(640, 480), 8, 1);	
+	IplImage *markImg  = cvCreateImage(cvSize(640, 480), 8, 3);
+	
+//if(canPrintDepth) cv::imshow("win2",depthImg);
 	IndexBook *indexBook = load_index(imgLibDir);
-	convertmsg2img(msg);
+
+	for(int i=0;i<640*480;i++)
+	{
+		
+		if(dist[i/640][i%640] < 2 || 1 )
+		{
+			//printf("%d %d %.2f\n",i/480,i%480,dist[i/480][i%480]);
+			inFrame->imageData[i*3] = msg->data[i*3+2];
+			inFrame->imageData[i*3+1] = msg->data[i*3+1];
+			inFrame->imageData[i*3+2] = msg->data[i*3];
+		}
+		else
+		{
+			inFrame->imageData[i*3] = 255;
+			inFrame->imageData[i*3+1] = 0;
+			inFrame->imageData[i*3+2] = 255;
+		}	
+	}		
+	
+	//convertmsg2img(msg);
 	cvCvtColor(inFrame, grayImg, CV_BGR2GRAY);
 	//cvCvtColor(grayImg, markImg, CV_GRAY2RGB);
 	findObjectAndMark(grayImg, markImg, indexBook, inFrame);
@@ -594,6 +568,9 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	else if(inKey == 2424832){
 		curObj = (curObj+(indexBook->numObj-1))%indexBook->numObj;
 	}
+	else if(inKey == 'a'){
+		get_dest = 1;
+	}
 	else if(inKey >= 0){
 		printf("key = %d\n", inKey);
 	}
@@ -601,6 +578,9 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	if(editLib) {
 		write_edited(imgLibDir, indexBook);
 	}
+
+	cvReleaseImage(&grayImg);
+	cvReleaseImage(&markImg);
 
 }
 
@@ -614,6 +594,7 @@ int main(int argc , char *argv[])
 	int frameWidth  = 0;
 	int frameHeight = 0;
 	
+	  
 	IndexBook *indexBook = load_index(imgLibDir);
 
 	if(reindexing || !is_updated(imgLibDir)) {
@@ -623,39 +604,25 @@ int main(int argc , char *argv[])
 
 	printf("[Initialize] : reading index\n");
 	write_updated(imgLibDir, indexBook);
+
 	ros::init(argc,argv,"objects");
 	ros::NodeHandle n;
+	ros::NodeHandle nh("~");
 	
+	nh.param("min_range", min_range_, 0.5);
+	nh.param("max_range", max_range_, 5.5);
+
 	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,kinectCallBack);
+	ros::Subscriber subDepth = n.subscribe("/camera/depth/image",1,depthCb);
+	ros::Subscriber sub2 = n.subscribe(TOPIC_CONTROL, 1, controlCallBack);
+	vector_pub = n.advertise<geometry_msgs::Vector3>("object_point", 1000);
+	
+
 	printf("ros : spin\n");
 	cvNamedWindow("input", 1 );
 	cvSetMouseCallback("input", on_mouse);
 	ros::spin();
-/*
-	if(camera_running) {
-		capture = cvCreateCameraCapture(CV_CAP_ANY+0);
-		cvSetMouseCallback("input", on_mouse);
-	}
-	
-	if(!capture && camera_running) {
-		fprintf(stderr, "[ERROR][Initialize] : can not find device\n");
-		exit(1);
-	}
-	frameWidth  = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
-	frameHeight = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
 
-	
-
-
-	if(!camera_running) {
-		test(indexBook, "test-img/query.000.bmp");
-		test(indexBook, "test-img/query.001.bmp");
-		test(indexBook, "test-img/query.002.bmp");
-		test(indexBook, "test-img/query.003.jpg");
-		test(indexBook, "test-img/query.004.jpg");
-		exit(0);
-	}
-*/
 }
 void convertmsg2img(const sensor_msgs::ImageConstPtr& msg)
 {
