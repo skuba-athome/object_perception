@@ -44,7 +44,6 @@ int canPrintDepth = 0;
 double min_range_;
 double max_range_;
 int curObj = 0;
-
 cv::Mat depthImg ;
 cv_bridge::CvImagePtr bridge;
 ros::Publisher vector_pub; // = n2.advertise<geometry_msgs::Vector3>("object_point", 1000);
@@ -58,27 +57,35 @@ typedef struct {
 }IndexBook;
 IplImage *inFrame  = cvCreateImage(cvSize(640, 480), 8, 3);
 
+IndexBook *indexBook;
 int get_dest = 0;
-char obj_label[20];
+char obj_label[30];
 
 void convertmsg2img(const sensor_msgs::ImageConstPtr& msg);
 IndexBook* load_index(char* dirpath);
 
+float g_x , g_y  , g_z ;
+int g_c ;
+
 void controlCallBack(const std_msgs::String::ConstPtr& msg)
 {
 	ROS_INFO("get command : %s\n",msg->data.c_str());
-	IndexBook *indexBook = load_index(imgLibDir);
 	int check = 1;
 	for(int obj = 0; obj < indexBook->numObj; obj++){
 		//fprintf(fp, "%s %d\n", indexBook->label[obj], indexBook->numPic[obj]);
 		if(!strcmp(indexBook->label[obj],msg->data.c_str()))
 		{
 			get_dest = 1;
-			strcpy((char*)msg->data.c_str(),obj_label);
+			strcpy(obj_label,(char*)msg->data.c_str());
 			check = 0;
+			g_c = 0.0f;
+			g_x = 0.0f;
+			g_y = 0.0f;
+			g_z = 0.0f;
 			break;
 		}
 	}
+	if(check)
 	ROS_INFO("I don't know : %s\n",msg->data.c_str());
 }
 
@@ -291,8 +298,8 @@ IndexBook* load_index(char* dirpath)
 	char indFilePath[1024];
 	int  objNumPic, updated;
 
-	IndexBook *indexBook = new IndexBook;
-	
+	//IndexBook *indexBook = new IndexBook;
+	indexBook = new IndexBook;
 	sprintf(regPath, "%s/registry.txt", dirpath);
 	FILE *regFp = fopen(regPath, "r");
 
@@ -322,7 +329,7 @@ IndexBook* load_index(char* dirpath)
 	sprintf(treeFilePath, "%s/tree.ind", dirpath);
 	indexBook->index = new cv::flann::Index(indexBook->desc_mat, cv::flann::SavedIndexParams(treeFilePath));
 
-	return indexBook;
+	//return indexBook;
 }
 
 /// create (new) a [#desc]x128 matrix
@@ -353,21 +360,21 @@ typedef struct {
 }CorrespondPoint;
 
 // mrkImg must have 3 channels(BGR)
-void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IndexBook *indexBook, IplImage *colorImg=0)
+void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IplImage *colorImg=0)
 {
-	float nnRatio   = 0.36f; // default is 0.3
+	float nnRatio   = 0.33f; // default is 0.3
 	IplImage *queryImg = srcImg;
 	IplImage *markImg  = mrkimg;
 	cvCvtColor(queryImg, markImg, CV_GRAY2RGB);
 
 	CvScalar colors[] = 
 	{
-		{{0,0,255}},
-		{{255,0,0}},
-		{{0,255,0}},
-		{{0,128,255}},
-		{{0,255,255}},
-		{{255,128,0}},
+		{{0,0,255}}, // red
+		{{255,0,0}}, // blue
+		{{0,255,0}}, // green
+		{{0,128,255}}, // 
+		{{0,255,255}}, // 
+		{{255,128,0}}, // 
 		{{255,255,0}},
 		{{255,0,255}},
 		{{255,255,255}}
@@ -423,7 +430,7 @@ void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IndexBook *indexBook,
 
 	for(int obj = 0; obj < indexBook->numObj; obj++) {
 
-		if(numNN[obj] > 5) { // default is 5  check for have objecy in sence
+		if(numNN[obj] > 3) { // default is 5  check for have objecy in sence
 			float sum_x = 0.0f;
 			float sum_y = 0.0f;
 			int max = -1;
@@ -442,7 +449,7 @@ void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IndexBook *indexBook,
 				unsigned char g_val = colorImg->imageData[yy*colorImg->width*colorImg->nChannels + xx*colorImg->nChannels + 1];
 				unsigned char b_val = colorImg->imageData[yy*colorImg->width*colorImg->nChannels + xx*colorImg->nChannels + 0];
 				int sum_group = 0;
-				float r_group = 50.0f; // radius
+				float r_group = 42.5f; // radius
 				float max_dist_tmp = -1;
 				for(int p2 = 0; p2 < numAll; p2++) {
 					if(correspond[p2].objID != obj || p2 == p) {
@@ -480,22 +487,36 @@ void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IndexBook *indexBook,
 			}
 			cvCircle(markImg, cvPoint(avg_x,avg_y), 1, colors[obj], 2);
 
-			if(max> 5){
-				if(get_dest)
+			if(max> 3){
+				if(get_dest  && !strcmp(obj_label,indexBook->label[obj]))
 				{
-					if(dist[avg_y][avg_x] < 2)
+					printf("%s , %s %.2f\n",obj_label,indexBook->label[obj],dist[avg_y][avg_x]);
+					if(dist[avg_y][avg_x] < 1.25 )// || dist[avg_y][avg_x] != dist[avg_y][avg_x])
 					{
 						float tmp_z = dist[avg_y][avg_x];
 						float tmp_x = avg_x;
 						float tmp_y = avg_y;
 						DepthToWorld(&tmp_x,&tmp_y,tmp_z);
-						printf("%s  -> x:%d y:%d z:%.2f\n",indexBook->label[obj],avg_x,avg_y,dist[avg_y][avg_x]);
+					//	printf("%s  -> x:%d y:%d z:%.2f\n",indexBook->label[obj],avg_x,avg_y,dist[avg_y][avg_x]);
 						printf("%s  -> x:%.2f y:%.2f z:%.2f\n",indexBook->label[obj],tmp_x,tmp_y,tmp_z);
-						geometry_msgs::Vector3 vector;
-						vector.x = tmp_x;
-						vector.y = tmp_y;
-						vector.z = tmp_z;						
-						vector_pub.publish(vector);
+						g_x += tmp_x;
+						g_y += tmp_y;
+						g_z += tmp_z;
+						g_c++;
+						if(g_c == 10)
+						{
+							geometry_msgs::Vector3 vector;
+							vector.x = g_x/g_c;
+							vector.y = g_y/g_c;
+							vector.z = g_z/g_c;
+							printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
+							vector_pub.publish(vector);
+							get_dest = 0;
+							g_c = 0;
+							g_x = 0;
+							g_y = 0;
+							g_z = 0;
+						}
 					}
 				}
 				cvPutText(markImg, indexBook->label[obj], cvPoint(avg_x,avg_y), &cvFont(1.0, 2), colors[obj]);
@@ -515,12 +536,12 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	IplImage *markImg  = cvCreateImage(cvSize(640, 480), 8, 3);
 	
 //if(canPrintDepth) cv::imshow("win2",depthImg);
-	IndexBook *indexBook = load_index(imgLibDir);
+	//IndexBook *indexBook = load_index(imgLibDir);
 
 	for(int i=0;i<640*480;i++)
 	{
 		
-		if(dist[i/640][i%640] < 2 || 1 )
+		if(dist[i/640][i%640] < 1.25)
 		{
 			//printf("%d %d %.2f\n",i/480,i%480,dist[i/480][i%480]);
 			inFrame->imageData[i*3] = msg->data[i*3+2];
@@ -538,13 +559,17 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	//convertmsg2img(msg);
 	cvCvtColor(inFrame, grayImg, CV_BGR2GRAY);
 	//cvCvtColor(grayImg, markImg, CV_GRAY2RGB);
-	if(get_dest)
-	findObjectAndMark(grayImg, markImg, indexBook, inFrame);
+	if(1){
+		findObjectAndMark(grayImg, markImg, inFrame);
 	//output
-	cvDrawRect(markImg, cvPoint(gROI_x1,gROI_y1), cvPoint(gROI_x2,gROI_y2), CV_RGB(0,255,0));
-	cvPutText(markImg, indexBook->label[curObj], cvPoint(gROI_x1,gROI_y1), &cvFont(1.5,2), CV_RGB(255,255,255));
+		cvDrawRect(markImg, cvPoint(gROI_x1,gROI_y1), cvPoint(gROI_x2,gROI_y2), CV_RGB(0,255,0));
+		cvPutText(markImg, indexBook->label[curObj], cvPoint(gROI_x1,gROI_y1), &cvFont(1.5,2), CV_RGB(255,255,255));
 
-	cvShowImage("input", markImg);
+		cvShowImage("input", markImg);
+	}else
+	{
+		cvShowImage("input", grayImg);
+	}
 
 	inKey = cvWaitKey(1);
 	if(inKey == 27){
@@ -575,6 +600,7 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	}
 	else if(inKey == 'a'){
 		get_dest = 1;
+		strcpy(obj_label,"oishi");
 	}
 	else if(inKey >= 0){
 		printf("key = %d\n", inKey);
@@ -584,9 +610,10 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 		write_edited(imgLibDir, indexBook);
 	}
 
+	//write_updated(imgLibDir, indexBook);
 	cvReleaseImage(&grayImg);
 	cvReleaseImage(&markImg);
-
+//	delete indexBook;
 }
 
 int main(int argc , char *argv[])
@@ -597,11 +624,9 @@ int main(int argc , char *argv[])
 //	bool camera_running = true;
 	CvCapture* capture = 0;
 	int frameWidth  = 0;
-	int frameHeight = 0;
-	
-	  
-	IndexBook *indexBook = load_index(imgLibDir);
+	int frameHeight = 0;  
 
+	load_index(imgLibDir);
 	if(reindexing || !is_updated(imgLibDir)) {
 		printf("[Initialize] : reindexing\n");
 		do_index(imgLibDir, KDTreeIndex);

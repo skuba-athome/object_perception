@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-import roslib; roslib.load_manifest('control_skuba')
+import roslib; roslib.load_manifest('objects')
 import rospy
 import serial 
 from std_msgs.msg import String
+from geometry_msgs.msg import Vector3
 import sys
 import time
 import threading
@@ -16,35 +17,12 @@ se.open()
 #======================
 #print " \x01 \x02 \x03 \x04"
 print se
-def fwd(s): #forward
-	se.write("\x01\x7F\x08\x00%c\x00\x0F"%s)
-
-def bwd(s): #backward
-	se.write("\x01\x7F\x0A\x00%c\x00\x0F"%s)
-def sl(s): #shift left
-	print "shift left %d"%s
-	se.write("\x01\x7F\x0C%c\x00\x00\x0F"%s)
-def sr(s): #shift right
-	print "shift right %d"%s
-	se.write("\x01\x7F\x08%c\x00\x00\x0F"%s)
-
-def tl(s): #turn left
-	print "shift left %d"%s
-	se.write("\x01\x7F\x08\x00\x00%c\x0F"%s)
-
-def tr(s): #turn right
-	print "shift right %d"%s
-	se.write("\x01\x7F\x09\x00\x00%c\x0F"%s)
-
 def callback(data):
-	tmp = data.data.split()
-	if(tmp[0]=='f') : fwd(int(tmp[1]))
-	if(tmp[0]=='b') : bwd(int(tmp[1]))
-	if(tmp[0]=='sl') : sl(int(tmp[1]))
-	if(tmp[0]=='sr') : sr(int(tmp[1]))
-	if(tmp[0]=='tr') : tr(int(tmp[1]))
-	if(tmp[0]=='tl') : tl(int(tmp[1]))
-	rospy.loginfo(rospy.get_name()+"I heard %s",data.data)
+	send_x = int(data.z * 100)	
+	send_y = int(data.x * 100) + 55
+	send_z = int(data.y * 100) + 25
+	se.write("\x01\x7F%c"%send_x+"%c"%send_y+"%c"%send_z+"\x0F")
+	rospy.loginfo(rospy.get_name()+"I heard " + str(send_x) + " " + str(send_y) + " " + str(send_z) )
 
 def read():
 	while True:
@@ -52,11 +30,11 @@ def read():
 		print tmp
 
 def listener():
-	rospy.init_node('serial_skuba', anonymous=True)
-	rospy.Subscriber("control_module", String, callback)
-	recieve = threading.Thread(target = read)
-	recieve.setDaemon(True)
-	recieve.start()
+	rospy.init_node('control_hand', anonymous=True)
+	rospy.Subscriber("object_point", Vector3, callback)
+#	recieve = threading.Thread(target = read)
+#	recieve.setDaemon(True)
+#	recieve.start()
 	rospy.spin()
 
 if __name__ == '__main__':

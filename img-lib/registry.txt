@@ -1,6 +1,4 @@
-5 1
-oishi 13
+3 1
 ball 8
-my-cup 65
+oishi 70
 my-objectA 11
-my-objectB 0
