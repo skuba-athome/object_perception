@@ -362,7 +362,7 @@ typedef struct {
 // mrkImg must have 3 channels(BGR)
 void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IplImage *colorImg=0)
 {
-	float nnRatio   = 0.33f; // default is 0.3
+	float nnRatio   = 0.375f; // default is 0.3
 	IplImage *queryImg = srcImg;
 	IplImage *markImg  = mrkimg;
 	cvCvtColor(queryImg, markImg, CV_GRAY2RGB);
@@ -509,6 +509,7 @@ void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IplImage *colorImg=0)
 							vector.x = g_x/g_c;
 							vector.y = g_y/g_c;
 							vector.z = g_z/g_c;
+							printf("debug : g_y=>%.2f\n",g_y);
 							printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
 							vector_pub.publish(vector);
 							get_dest = 0;
