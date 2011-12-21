@@ -27,8 +27,8 @@ using namespace cv_bridge;
 
 #define TOPIC_CONTROL "/cmd_state"
 #define MANUAL_MODE  1
-#define min_y 70
-#define max_y 170
+#define min_y 370
+#define max_y 420
 
 float dist[480][640];
 int canPrintDepth = 0;
@@ -365,15 +365,22 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 		vector_pub.publish(vector);
 	}
 }
-
+int	notBlackorWhite(int i)
+{
+	if( (unsigned char)inFrame->imageData[i*3] == 0 
+		&& (unsigned char)inFrame->imageData[i*3+1] == 0 
+		&& (unsigned char)inFrame->imageData[i*3+2] == 0 
+		) return 0;
+	if( (unsigned char)inFrame->imageData[i*3] == 255 
+		&& (unsigned char)inFrame->imageData[i*3+1] == 255 
+		&& (unsigned char)inFrame->imageData[i*3+2] == 255 
+		) return 0;
+	return 1;
+}
 int isRed(const IplImage *img,int i)
 {
 	if( (unsigned char)img->imageData[i*3] < 10
-//		&& img->imageData[i*3+1] > 50
-//		&& img->imageData[i*3+2] > 50 
-		&& inFrame->imageData[i*3] !=0
-		&& inFrame->imageData[i*3+1] !=0
-		&& inFrame->imageData[i*3+2] !=0
+		&& notBlackorWhite(i)
 	)
 		return 1;
 	return 0;
@@ -382,9 +389,7 @@ int isGreen(const IplImage *img,int i)
 {
 	if( (unsigned char)img->imageData[i*3] >= 30
 		&& (unsigned char)img->imageData[i*3] <= 85 
-		&& inFrame->imageData[i*3] !=0
-		&& inFrame->imageData[i*3+1] !=0
-		&& inFrame->imageData[i*3+2] !=0
+		&& notBlackorWhite(i)
 	)
 		return 1;
 	return 0;
@@ -392,14 +397,13 @@ int isGreen(const IplImage *img,int i)
 int isBlue(const IplImage *img,int i)
 {
 	if( (unsigned char)img->imageData[i*3] >= 85
-		&& (unsigned char)img->imageData[i*3] <= 160
-		&& inFrame->imageData[i*3] !=0
-		&& inFrame->imageData[i*3+1] !=0
-		&& inFrame->imageData[i*3+2] !=0
+		&& (unsigned char)img->imageData[i*3] <= 200
+		&& notBlackorWhite(i)
 	)
 		return 1;
 	return 0;
 }
+
 /*
 	color : 1 = coke(red) , 2 = prinles(green) , 3 = numtip(blue)
 */
