@@ -27,6 +27,7 @@ using namespace cv;
 using namespace cv_bridge;
 
 #define TOPIC_CONTROL "/cmd_state"
+#define MANUAL_MODE  1
 
 int gROI_x1 = 0;
 int gROI_y1 = 0;
@@ -133,9 +134,27 @@ void depthCb( const sensor_msgs::ImageConstPtr& image )
 void on_mouse( int event, int x, int y, int flags, void* param )
 {
 	if(event == CV_EVENT_LBUTTONUP) {
-		printf("%d, %d\n", x, y);
-		gROI_x1 = x;
-		gROI_y1 = y;
+		if( !MANUAL_MODE )
+		{
+			printf("%d, %d\n", x, y);
+			gROI_x1 = x;
+			gROI_y1 = y;
+		}
+		else
+		{
+			geometry_msgs::Vector3 vector;
+			float tx,ty,tz;
+			tx = x;
+			ty = y;
+			tz = dist[y][x];
+			printf("%.2f %.2f %f\n",tx,ty,tz);
+			DepthToWorld(&tx,&ty,tz);
+			vector.x = tx;
+			vector.y = ty;
+			vector.z = tz;
+			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
+			vector_pub.publish(vector);
+		}
 	}
 	else if(event == CV_EVENT_RBUTTONUP) {
 		printf("%d, %d\n", x, y);
@@ -362,7 +381,7 @@ typedef struct {
 // mrkImg must have 3 channels(BGR)
 void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IplImage *colorImg=0)
 {
-	float nnRatio   = 0.375f; // default is 0.3
+	float nnRatio   = 0.35f; // default is 0.3
 	IplImage *queryImg = srcImg;
 	IplImage *markImg  = mrkimg;
 	cvCvtColor(queryImg, markImg, CV_GRAY2RGB);
@@ -445,6 +464,7 @@ void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IplImage *colorImg=0)
 
 				int xx = surf->pt.x;
 				int yy = surf->pt.y;
+				if ( dist[yy][xx] > 1.25f ) continue ;
 				unsigned char r_val = colorImg->imageData[yy*colorImg->width*colorImg->nChannels + xx*colorImg->nChannels + 2];
 				unsigned char g_val = colorImg->imageData[yy*colorImg->width*colorImg->nChannels + xx*colorImg->nChannels + 1];
 				unsigned char b_val = colorImg->imageData[yy*colorImg->width*colorImg->nChannels + xx*colorImg->nChannels + 0];
@@ -452,13 +472,13 @@ void findObjectAndMark(IplImage *srcImg, IplImage *mrkimg, IplImage *colorImg=0)
 				float r_group = 42.5f; // radius
 				float max_dist_tmp = -1;
 				for(int p2 = 0; p2 < numAll; p2++) {
-					if(correspond[p2].objID != obj || p2 == p) {
+					if(correspond[p2].objID != obj || p2 == p ) {
 						continue;
 					}
-					CvSURFPoint *surf2 = (CvSURFPoint*)cvGetSeqElem(keypoints, correspond[p2].dstID);
 					
+					CvSURFPoint *surf2 = (CvSURFPoint*)cvGetSeqElem(keypoints, correspond[p2].dstID);
 					if( sqrt( pow(xx-surf2->pt.x,2)+pow(xx-surf2->pt.x,2) ) < r_group  
-						//&& dist[(int)surf2->pt.y][(int)surf2->pt.x] <= 2.0f
+				//		&& dist[(int)surf2->pt.y][(int)surf2->pt.x] <= 1.25f
 					)
 					{
 						if( sqrt( pow(xx-surf2->pt.x,2)+pow(xx-surf2->pt.x,2) ) > max_dist)
