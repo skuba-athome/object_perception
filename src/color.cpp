@@ -28,7 +28,7 @@ using namespace cv_bridge;
 #define TOPIC_CONTROL "/cmd_state"
 #define MANUAL_MODE  1
 #define min_y 370
-#define max_y 420
+#define max_y 460
 
 float dist[480][640];
 int canPrintDepth = 0;
@@ -43,8 +43,8 @@ int get_dest = 0;
 
 void convertmsg2img(const sensor_msgs::ImageConstPtr& msg);
 
-float g_x , g_y  , g_z ;
-int g_c ;
+float g_x = 0 , g_y =0  , g_z=0 ;
+int g_c=0 ;
 int cut_y= 240;
 IplImage* convertImageRGBtoHSV(const IplImage *imageRGB)
 {
@@ -344,7 +344,8 @@ void on_mouse_HSV(int event , int x , int y , int flags , void *param )
 {
 	if(event == CV_EVENT_LBUTTONUP )
 	{
-		printf("%d %d %d\n",inFrameHSV->imageData[(y*640+x)*3],inFrameHSV->imageData[(y*640+x)*3+1],inFrameHSV->imageData[(y*640+x)*3+2]);
+		printf("%d %d %d\n",(unsigned char)inFrameHSV->imageData[(y*640+x)*3],(unsigned char)inFrameHSV->imageData[(y*640+x)*3+1],(unsigned char)inFrameHSV->imageData[(y*640+x)*3+2]);
+
 	}
 }
 void on_mouse( int event, int x, int y, int flags, void* param )
@@ -375,11 +376,14 @@ int	notBlackorWhite(int i)
 		&& (unsigned char)inFrame->imageData[i*3+1] == 255 
 		&& (unsigned char)inFrame->imageData[i*3+2] == 255 
 		) return 0;
+	if( (unsigned char)inFrameHSV->imageData[i*3+1] < 30 ) return 0;
+	//if( (unsigned char)inFrameHSV->imageData[i*3+2] < 20 ) return 0;
 	return 1;
 }
 int isRed(const IplImage *img,int i)
 {
-	if( (unsigned char)img->imageData[i*3] < 10
+	if( ( (unsigned char)img->imageData[i*3] < 20 
+		|| (unsigned char)img->imageData[i*3] > 240 )
 		&& notBlackorWhite(i)
 	)
 		return 1;
@@ -411,8 +415,7 @@ void findObject(int color)
 {
 	int min_x , max_x ;
 	int zone;
-	int avg_x=0;
-	int count=0;
+	int count_1=0,count_2=0,count_3=0;
 	for(int i = min_y * 640 ; i < max_y * 640 ; i++)
 	{
 		switch(color)
@@ -420,24 +423,48 @@ void findObject(int color)
 			case 1 : {
 					if(isRed(inFrameHSV,i))
 					{
-						avg_x += i%640;
-						count++;
+						inFrame->imageData[i*3] = 255;	
+						inFrame->imageData[i*3+1] = 255;
+						inFrame->imageData[i*3+2] = 255;
+						if(i%640 < 210)
+							count_1++;
+						else if(i%640 < 420)
+							count_2++;
+						else
+							count_3++;
+
 					}
 					break;
 				}
 			case 2 : {
 					if(isGreen(inFrameHSV,i))
 					{
-						avg_x += i%640;
-						count++;
+						inFrame->imageData[i*3] = 255;	
+						inFrame->imageData[i*3+1] = 255;
+						inFrame->imageData[i*3+2] = 255;
+						if(i%640 < 210)
+							count_1++;
+						else if(i%640 < 420)
+							count_2++;
+						else
+							count_3++;
+
 					}
 					break;
 				}
 			case 3 : {
 					if(isBlue(inFrameHSV,i))
 					{
-						avg_x += i%640;
-						count++;
+						inFrame->imageData[i*3] = 255;	
+						inFrame->imageData[i*3+1] = 255;
+						inFrame->imageData[i*3+2] = 255;
+						if(i%640 < 210)
+							count_1++;
+						else if(i%640 < 420)
+							count_2++;
+						else
+							count_3++;
+
 					}
 					break;
 				}
@@ -445,15 +472,18 @@ void findObject(int color)
 			default : printf("ERROR : no object %d \n",color); exit(0); break;
 		}
 
-	}
+	}/*
 	if(count == 0 )  { printf("ERROR : count = 0\n") ;exit(0) ; } // can't find any color in image
-	avg_x = avg_x/count;	
-	printf("avg_x %d\n",avg_x);
 	cvLine(inFrame,cvPoint(avg_x,0),cvPoint(avg_x,479),CV_RGB(255,255,255));
 	if(avg_x < 210 ) zone = 1;
 	else if (avg_x < 420) zone = 2;
-	else zone = 3;
-
+	else zone = 3; */
+	if(count_1 > count_2 && count_1 > count_3)
+		zone=1;
+	else if(count_2 > count_3 && count_2 > count_1)
+		zone=2;
+	else
+		zone=3;
 	switch(zone)
 	{
 		case 1 : min_x = 0 ; max_x = 210 ;  break;
@@ -484,6 +514,24 @@ void findObject(int color)
 	printf("zone : %d\n",zone);
 	printf("%d %d | %.2f %.2f | %.2f\n",ix,iy,fx,fy,min_dist);
 	cvCircle(inFrame,cvPoint(ix,iy),5,CV_RGB(255,255,255));
+
+	g_c++;
+	g_x+=fx;
+	g_y+=fy;
+	g_z+=fz;
+	if(g_c == 10 )
+	{
+		geometry_msgs::Vector3 vector;	
+		vector.x = g_x/g_c;
+		vector.y = g_y/g_c;
+		vector.z = g_z/g_c;
+		printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
+		vector_pub.publish(vector);
+		g_c = 0;
+		g_x = 0;
+		g_z = 0;
+		g_y = 0;
+	}
 }
 void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 {
@@ -510,9 +558,9 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 			inFrame->imageData[i*3+2] = 0;
 		}	
 	}		
-	//cvShowImage("input",inFrame);
+	cvShowImage("input",inFrame);
 	inFrameHSV = convertImageRGBtoHSV(inFrame);
-	cvShowImage("HSV",inFrameHSV);
+	//cvShowImage("HSV",inFrameHSV);
 	
 	cvLine(inFrame,cvPoint(210,0),cvPoint(210,479),CV_RGB(0,0,255));
 	cvLine(inFrame,cvPoint(420,0),cvPoint(420,479),CV_RGB(0,0,255));
@@ -764,9 +812,9 @@ int main(int argc , char *argv[])
 
 	printf("ros : spin\n");
 	cvNamedWindow("input", 1 );
-	cvNamedWindow("HSV",1);
+	cvNamedWindow("out",1);
 	cvSetMouseCallback("input", on_mouse);
-	cvSetMouseCallback("HSV",on_mouse_HSV);
+	cvSetMouseCallback("out",on_mouse_HSV);
 	ros::spin();
 
 }
