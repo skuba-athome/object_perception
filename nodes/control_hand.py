@@ -18,9 +18,9 @@ se.open()
 #print " \x01 \x02 \x03 \x04"
 print se
 def callback(data):
-	send_x = int(data.z * 100)	
+	send_x = int(data.z * 100) 	
 	send_y = int(data.x * 100) + 55
-	send_z = int(data.y * 100) + 15
+	send_z = int(data.y * 100) + 5
 	se.write("\x01\x7F%c"%send_x+"%c"%send_y+"%c"%send_z+"\x0F")
 	rospy.loginfo(rospy.get_name()+"I heard " + str(send_x) + " " + str(send_y) + " " + str(send_z) )
 
@@ -34,7 +34,7 @@ def listener():
 	rospy.Subscriber("object_point", Vector3, callback)
 	#initial manipulation
 	init_mani = 0
-	se.write("\x01\x7F%c"%init_mani+"%c"%init_mani+"%c"%init_mani+"\x0F")
+#	se.write("\x01\x7F%c"%init_mani+"%c"%init_mani+"\x14\x0F")
 #	recieve = threading.Thread(target = read)
 #	recieve.setDaemon(True)
 #	recieve.start()
