@@ -27,20 +27,23 @@ using namespace cv_bridge;
 
 #define TOPIC_CONTROL "/cmd_state"
 #define MANUAL_MODE  1
-#define min_y 370
-#define max_y 460
+#define min_y 250
+#define max_y 350
+#define MAX_RANGE 2.0f
 
 float dist[480][640];
 int canPrintDepth = 0;
 double min_range_;
 double max_range_;
+
 cv::Mat depthImg ;
 cv_bridge::CvImagePtr bridge;
 ros::Publisher vector_pub; // = n2.advertise<geometry_msgs::Vector3>("object_point", 1000);
+ros::Publisher vector_pub2;
 IplImage *inFrame  = cvCreateImage(cvSize(640, 480), 8, 3);
 IplImage *inFrameHSV  = cvCreateImage(cvSize(640, 480), 8, 3);
 int get_dest = 0;
-
+int inWorkSpace = 0;
 void convertmsg2img(const sensor_msgs::ImageConstPtr& msg);
 
 float g_x = 0 , g_y =0  , g_z=0 ;
@@ -541,15 +544,20 @@ void findObject(int color)
 		vector.x = g_x/g_c;
 		vector.y = g_y/g_c;
 		vector.z = g_z/g_c;
-		printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
-		vector_pub.publish(vector);
+		printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);			
+		if( sqrt( pow(vector.x,2)+pow(vector.z,2)  > 80.0f )  )
+			vector_pub2.publish(vector);
+		else
+		{
+			vector_pub.publish(vector);
+			get_coke = 0;
+			get_pg = 0;
+			get_numtip = 0;
+		}
 		g_c = 0;
 		g_x = 0;
 		g_z = 0;
 		g_y = 0;
-		get_coke = 0;
-		get_pg = 0;
-		get_numtip = 0;
 	}
 }
 void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
@@ -563,7 +571,7 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	for(int i=0;i<640*480;i++)
 	{
 		
-		if(dist[i/640][i%640] < 1.25)
+		if(dist[i/640][i%640] < MAX_RANGE)
 		{
 			//printf("%d %d %.2f\n",i/480,i%480,dist[i/480][i%480]);
 			inFrame->imageData[i*3] = msg->data[i*3+2];
@@ -587,7 +595,7 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	cvLine(inFrame,cvPoint(0,min_y),cvPoint(639,min_y),CV_RGB(0,0,255));
 	cvLine(inFrame,cvPoint(0,max_y),cvPoint(639,max_y),CV_RGB(0,0,255));
 	
-	//cvShowImage("input",inFrame);
+	cvShowImage("input",inFrame);
 	// red - color
 	int chk = 0;
 	for(int i=0;i<480*640;i++)
@@ -603,6 +611,7 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 			chk = 1;
 		}
 	}
+	cvReleaseImage(&inFrame);
 	inFrame = convertImageHSVtoRGB(inFrameHSV);
 
 	inKey = cvWaitKey(1);
@@ -643,167 +652,6 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	{
 		findObject(3);
 	}
-	/*if(inKey == 'r' && chk)
-	{
-		int count_x=0;
-		int avg_x=0;
-		for(int tx=0;tx<640;tx++)
-		{
-			if(isRed(inFrameHSV,  (cut_y*640)+tx ))
-			{
-				count_x++;
-				avg_x+=tx;
-			//	printf("x:%d y:%d\n",avg_x,cut_y);
-			}
-		}
-		avg_x = avg_x/count_x;
-		//printf("%d",zone(avg_x))i;
-		float xx,yy;
-		if( avg_x < 220 )
-		{
-			int min_x , min_y ;
-			float min_dist = 10.0f;
-			for(int tx = 0 ; tx < 220 ; tx++ )
-			{
-				if( dist[cut_y][tx] < min_dist)
-				{
-					min_x = tx;
-					min_y = cut_y;
-					min_dist = dist[cut_y][tx];
-				}
-			}
-			xx = min_x;
-			yy = min_y;
-			DepthToWorld(&xx,&yy,min_dist);
-			printf("%d %d | %.2f %.2f | %.2f\n",min_x,min_y,xx,yy,min_dist);
-		cvCircle(inFrame,cvPoint(min_x,min_y),5,CV_RGB(255,255,255));
-		}
-		else if ( avg_x < 440 ) 
-		{
-			int min_x , min_y ;
-			float min_dist = 10.0f;
-			for(int tx = 220 ; tx < 440 ; tx++ )
-			{
-			if( dist[cut_y][tx] < min_dist)
-				{
-					min_x = tx;
-					min_y = cut_y;
-					min_dist = dist[cut_y][tx];
-				}
-			}
-			xx = min_x;
-			yy = min_y;
-			DepthToWorld(&xx,&yy,min_dist);
-			int s = (unsigned char)inFrame->imageData[(min_y*640+min_x)*3 + 1];		
-			int v = (unsigned char)inFrame->imageData[(min_y*640+min_x)*3 + 2];
-			printf("%u %u \n",s,v);
-			printf("%d %d | %.2f %.2f | %.2f\n",min_x,min_y,xx,yy,min_dist);
-		cvCircle(inFrame,cvPoint(min_x,min_y),5,CV_RGB(255,255,255));
-		}
-		else
-		{
-			int min_x , min_y ;
-			float min_dist = 10.0f;
-			for(int tx = 440 ; tx < 640 ; tx++ )
-			{
-			if( dist[cut_y][tx] < min_dist)
-				{
-					min_x = tx;
-					min_y = cut_y;
-					min_dist = dist[cut_y][tx];
-				}
-			}
-			xx = min_x;
-			yy = min_y;
-			DepthToWorld(&xx,&yy,min_dist);
-			printf("%d %d | %.2f %.2f | %.2f\n",min_x,min_y,xx,yy,min_dist);
-		cvCircle(inFrame,cvPoint(min_x,min_y),5,CV_RGB(255,255,255));
-		}
-		cvShowImage("out2",inFrame);
-	}
-	if(inKey == 'g' && chk)
-	{
-		int count_x=0;
-		int avg_x=0;
-		for(int tx=0;tx<640;tx++)
-		{
-			if(isGreen(inFrameHSV,  (cut_y*640)+tx ))
-			{
-				count_x++;
-				avg_x+=tx;
-			//	printf("x:%d y:%d\n",avg_x,cut_y);
-			}
-		}
-		avg_x = avg_x/count_x;
-		//printf("%d",zone(avg_x))i;
-		float xx,yy;
-		if( avg_x < 220 )
-		{
-			int min_x , min_y ;
-			float min_dist = 10.0f;
-			for(int tx = 0 ; tx < 220 ; tx++ )
-			{
-				if( dist[cut_y][tx] < min_dist)
-				{
-					min_x = tx;
-					min_y = cut_y;
-					min_dist = dist[cut_y][tx];
-				}
-			}
-			xx = min_x;
-			yy = min_y;
-			DepthToWorld(&xx,&yy,min_dist);
-			printf("%d %d | %.2f %.2f | %.2f\n",min_x,min_y,xx,yy,min_dist);
-		cvCircle(inFrame,cvPoint(min_x,min_y),5,CV_RGB(255,255,255));
-		}
-		else if ( avg_x < 440 ) 
-		{
-			int min_x , min_y ;
-			float min_dist = 10.0f;
-			for(int tx = 220 ; tx < 440 ; tx++ )
-			{
-			if( dist[cut_y][tx] < min_dist)
-				{
-					min_x = tx;
-					min_y = cut_y;
-					min_dist = dist[cut_y][tx];
-				}
-			}
-			xx = min_x;
-			yy = min_y;
-			DepthToWorld(&xx,&yy,min_dist);
-			printf("%d %d \n",inFrame->imageData[(min_y*640+min_x)*3 + 1]),inFrame->imageData[(min_y*640+min_x)*3 +2];
-			printf("%d %d | %.2f %.2f | %.2f\n",min_x,min_y,xx,yy,min_dist);
-		cvCircle(inFrame,cvPoint(min_x,min_y),5,CV_RGB(255,255,255));
-		}
-		else
-		{
-			int min_x , min_y ;
-			float min_dist = 10.0f;
-			for(int tx = 440 ; tx < 640 ; tx++ )
-			{
-			if( dist[cut_y][tx] < min_dist)
-				{
-					min_x = tx;
-					min_y = cut_y;
-					min_dist = dist[cut_y][tx];
-				}
-			}
-			xx = min_x;
-			yy = min_y;
-			DepthToWorld(&xx,&yy,min_dist);
-			printf("%d %d | %.2f %.2f | %.2f\n",min_x,min_y,xx,yy,min_dist);
-		cvCircle(inFrame,cvPoint(min_x,min_y),5,CV_RGB(255,255,255));
-		}
-		cvShowImage("out2",inFrame);
-	}*/
-
-	//cvShowImage("out",inFrame);
-/*	if(editLib) {
-		write_edited(imgLibDir, indexBook);
-	}
-*/
-	//write_updated(imgLibDir, indexBook);
 	cvReleaseImage(&inFrameHSV);
 //	delete indexBook;
 }
@@ -838,7 +686,8 @@ int main(int argc , char *argv[])
 	ros::Subscriber subDepth = n.subscribe("/camera/depth/image",1,depthCb);
 	ros::Subscriber sub2 = n.subscribe(TOPIC_CONTROL, 1, controlCallBack);
 	vector_pub = n.advertise<geometry_msgs::Vector3>("object_point", 1000);
-	
+	vector_pub2 = n.advertise<geometry_msgs::Vector3>("object_point2", 1000);
+
 
 	printf("ros : spin\n");
 	//cvNamedWindow("input", 1 );
