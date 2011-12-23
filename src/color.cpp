@@ -29,7 +29,7 @@ using namespace cv_bridge;
 #define MANUAL_MODE  1
 #define min_y 250
 #define max_y 350
-#define MAX_RANGE 2.0f
+#define MAX_RANGE 1.5f
 
 float dist[480][640];
 int canPrintDepth = 0;
@@ -304,17 +304,17 @@ void controlCallBack(const std_msgs::String::ConstPtr& msg)
 {
 	if(!strcmp(msg->data.c_str(),"coke"))
 	{
-		get_coke = 1;
+		get_coke = 5;
 		ROS_INFO("get command : %s\n",msg->data.c_str());
 	}
 	if(!strcmp(msg->data.c_str(),"numtip"))
 	{
-		get_numtip = 1;
+		get_numtip = 5;
 		ROS_INFO("get command : %s\n",msg->data.c_str());
 	}
 	if(!strcmp(msg->data.c_str(),"pringles"))
 	{
-		get_pg = 1;
+		get_pg = 5;
 		ROS_INFO("get command : %s\n",msg->data.c_str());
 	}
 
@@ -396,7 +396,7 @@ int	notBlackorWhite(int i)
 		&& (unsigned char)inFrame->imageData[i*3+2] == 255 
 		) return 0;
 	if( (unsigned char)inFrameHSV->imageData[i*3+1] < 30 ) return 0;
-	//if( (unsigned char)inFrameHSV->imageData[i*3+2] < 20 ) return 0;
+	if( (unsigned char)inFrameHSV->imageData[i*3+2] < 20 ) return 0;
 	return 1;
 }
 int isRed(const IplImage *img,int i)
@@ -411,7 +411,7 @@ int isRed(const IplImage *img,int i)
 int isGreen(const IplImage *img,int i)
 {
 	if( (unsigned char)img->imageData[i*3] >= 30
-		&& (unsigned char)img->imageData[i*3] <= 85 
+		&& (unsigned char)img->imageData[i*3] <= 100 
 		&& notBlackorWhite(i)
 	)
 		return 1;
@@ -419,7 +419,7 @@ int isGreen(const IplImage *img,int i)
 }
 int isBlue(const IplImage *img,int i)
 {
-	if( (unsigned char)img->imageData[i*3] >= 85
+	if( (unsigned char)img->imageData[i*3] >= 100
 		&& (unsigned char)img->imageData[i*3] <= 200
 		&& notBlackorWhite(i)
 	)
@@ -430,7 +430,7 @@ int isBlue(const IplImage *img,int i)
 /*
 	color : 1 = coke(red) , 2 = prinles(green) , 3 = numtip(blue)
 */
-void findObject(int color)  
+int findObject(int color)  
 {
 	int min_x , max_x ;
 	int zone;
@@ -488,7 +488,7 @@ void findObject(int color)
 					break;
 				}
 
-			default : printf("ERROR : no object %d \n",color); exit(0); break;
+			default : printf("ERROR : no object %d \n",color); return 0; break;
 		}
 
 	}/*
@@ -524,7 +524,7 @@ void findObject(int color)
 			}
 		}
 	}
-	if(min_dist == 9.9f) {  printf("ERROR : distance\n"); exit(0) ; }
+	if(min_dist == 9.9f) {  printf("ERROR : distance\n"); return 0 ; }
 	float fx = ix;
 	float fy = iy;
 	float fz = min_dist;
@@ -545,14 +545,18 @@ void findObject(int color)
 		vector.y = g_y/g_c;
 		vector.z = g_z/g_c;
 		printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);			
-		if( sqrt( pow(vector.x,2)+pow(vector.z,2)  > 80.0f )  )
+		if( sqrt( pow(vector.x,2)+pow(vector.z,2)  > 0.650000f )  )
+		{
+			printf("move robot ! \n");
 			vector_pub2.publish(vector);
+		}
 		else
 		{
+			printf("move hand");
 			vector_pub.publish(vector);
-			get_coke = 0;
-			get_pg = 0;
-			get_numtip = 0;
+			get_coke--;
+			get_pg--;
+			get_numtip --;
 		}
 		g_c = 0;
 		g_x = 0;
