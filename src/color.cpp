@@ -46,6 +46,7 @@ void convertmsg2img(const sensor_msgs::ImageConstPtr& msg);
 float g_x = 0 , g_y =0  , g_z=0 ;
 int g_c=0 ;
 int cut_y= 240;
+int get_coke = 0, get_numtip = 0,get_pg = 0;
 IplImage* convertImageRGBtoHSV(const IplImage *imageRGB)
 {
 	float fR, fG, fB;
@@ -298,7 +299,22 @@ IplImage* convertImageHSVtoRGB(const IplImage *imageHSV)
 }
 void controlCallBack(const std_msgs::String::ConstPtr& msg)
 {
-	ROS_INFO("get command : %s\n",msg->data.c_str());
+	if(!strcmp(msg->data.c_str(),"coke"))
+	{
+		get_coke = 1;
+		ROS_INFO("get command : %s\n",msg->data.c_str());
+	}
+	if(!strcmp(msg->data.c_str(),"numtip"))
+	{
+		get_numtip = 1;
+		ROS_INFO("get command : %s\n",msg->data.c_str());
+	}
+	if(!strcmp(msg->data.c_str(),"pringles"))
+	{
+		get_pg = 1;
+		ROS_INFO("get command : %s\n",msg->data.c_str());
+	}
+
 }
 
 void DepthToWorld(float * x, float * y, float depth)
@@ -531,6 +547,9 @@ void findObject(int color)
 		g_x = 0;
 		g_z = 0;
 		g_y = 0;
+		get_coke = 0;
+		get_pg = 0;
+		get_numtip = 0;
 	}
 }
 void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
@@ -558,7 +577,7 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 			inFrame->imageData[i*3+2] = 0;
 		}	
 	}		
-	cvShowImage("input",inFrame);
+	//cvShowImage("input",inFrame);
 	inFrameHSV = convertImageRGBtoHSV(inFrame);
 	//cvShowImage("HSV",inFrameHSV);
 	
@@ -568,7 +587,7 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	cvLine(inFrame,cvPoint(0,min_y),cvPoint(639,min_y),CV_RGB(0,0,255));
 	cvLine(inFrame,cvPoint(0,max_y),cvPoint(639,max_y),CV_RGB(0,0,255));
 	
-	cvShowImage("input",inFrame);
+	//cvShowImage("input",inFrame);
 	// red - color
 	int chk = 0;
 	for(int i=0;i<480*640;i++)
@@ -612,6 +631,17 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	{
 		findObject(3);
 		cvShowImage("out2",inFrame);
+	}
+	if(get_coke)
+	{
+		findObject(1);
+	}
+	else if(get_pg)
+	{
+		findObject(2);
+	}else if(get_numtip)
+	{
+		findObject(3);
 	}
 	/*if(inKey == 'r' && chk)
 	{
@@ -768,7 +798,7 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 		cvShowImage("out2",inFrame);
 	}*/
 
-	cvShowImage("out",inFrame);
+	//cvShowImage("out",inFrame);
 /*	if(editLib) {
 		write_edited(imgLibDir, indexBook);
 	}
@@ -811,10 +841,10 @@ int main(int argc , char *argv[])
 	
 
 	printf("ros : spin\n");
-	cvNamedWindow("input", 1 );
-	cvNamedWindow("out",1);
-	cvSetMouseCallback("input", on_mouse);
-	cvSetMouseCallback("out",on_mouse_HSV);
+	//cvNamedWindow("input", 1 );
+	//cvNamedWindow("out",1);
+	//cvSetMouseCallback("input", on_mouse);
+	//cvSetMouseCallback("out",on_mouse_HSV);
 	ros::spin();
 
 }

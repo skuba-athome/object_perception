@@ -21,7 +21,7 @@ print se
 tmp = ''
 def callback(data):
 	send_x = int(data.z * 100) 	
-	send_y = int(data.x * 100 * 1.25) + 50
+	send_y = int(data.x * 100 *1.1) + 60
 	send_z = int(data.y * 100)
 #	send_x = int(math.sqrt(send_x**2 + send_y**2))
 	se.write("\x01\x7F%c"%send_x+"%c"%send_y+"%c"%send_z+"\x0F")
@@ -41,9 +41,9 @@ def listener():
 	#initial manipulation
 	init_mani = 0
 	#se.write("\x01\x7F%c"%init_mani+"%c"%init_mani+"\x00\x0F")
-	recieve = threading.Thread(target = read)
-	recieve.setDaemon(True)
-	recieve.start()
+#	recieve = threading.Thread(target = read)
+#	recieve.setDaemon(True)
+#	recieve.start()
 	rospy.spin()
 
 if __name__ == '__main__':
