@@ -27,15 +27,14 @@ using namespace cv_bridge;
 
 #define TOPIC_CONTROL "/cmd_state"
 #define MANUAL_MODE  1
-#define min_y 250
-#define max_y 350
-#define MAX_RANGE 1.5f
+#define MAX_RANGE 1.1f
 
 float dist[480][640];
 int canPrintDepth = 0;
 double min_range_;
 double max_range_;
 
+int can_move = 1;
 cv::Mat depthImg ;
 cv_bridge::CvImagePtr bridge;
 ros::Publisher vector_pub; // = n2.advertise<geometry_msgs::Vector3>("object_point", 1000);
@@ -45,7 +44,8 @@ IplImage *inFrameHSV  = cvCreateImage(cvSize(640, 480), 8, 3);
 int get_dest = 0;
 int inWorkSpace = 0;
 void convertmsg2img(const sensor_msgs::ImageConstPtr& msg);
-
+int max_y = 350;
+int min_y = 300;
 float g_x = 0 , g_y =0  , g_z=0 ;
 int g_c=0 ;
 int cut_y= 240;
@@ -395,7 +395,7 @@ int	notBlackorWhite(int i)
 		&& (unsigned char)inFrame->imageData[i*3+1] == 255 
 		&& (unsigned char)inFrame->imageData[i*3+2] == 255 
 		) return 0;
-	if( (unsigned char)inFrameHSV->imageData[i*3+1] < 30 ) return 0;
+	if( (unsigned char)inFrameHSV->imageData[i*3+1] < 50 ) return 0;
 	if( (unsigned char)inFrameHSV->imageData[i*3+2] < 20 ) return 0;
 	return 1;
 }
@@ -530,8 +530,8 @@ int findObject(int color)
 	float fz = min_dist;
 
 	DepthToWorld(&fx,&fy,fz);
-	printf("zone : %d\n",zone);
-	printf("%d %d | %.2f %.2f | %.2f\n",ix,iy,fx,fy,min_dist);
+	//printf("zone : %d\n",zone);
+	//printf("%d %d | %.2f %.2f | %.2f\n",ix,iy,fx,fy,min_dist);
 	cvCircle(inFrame,cvPoint(ix,iy),5,CV_RGB(255,255,255));
 
 	g_c++;
@@ -544,19 +544,24 @@ int findObject(int color)
 		vector.x = g_x/g_c;
 		vector.y = g_y/g_c;
 		vector.z = g_z/g_c;
-		printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);			
-		if( sqrt( pow(vector.x,2)+pow(vector.z,2)  > 0.650000f )  )
+		if( sqrt( pow(vector.x,2)+pow(vector.z,2)  > 0.70000f ) && can_move  )
 		{
+			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);			
 			printf("move robot ! \n");
 			vector_pub2.publish(vector);
+			can_move = 0;
+			min_y = 350;
+			max_y = 450;
 		}
-		else
+		else if( sqrt( pow(vector.x,2)+pow(vector.z,2)  < 0.65000f ) )
 		{
+			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);			
 			printf("move hand");
 			vector_pub.publish(vector);
-			get_coke--;
-			get_pg--;
-			get_numtip --;
+			get_coke=0;
+			get_pg=0;
+			get_numtip=0;
+	//		can_move = 1;
 		}
 		g_c = 0;
 		g_x = 0;

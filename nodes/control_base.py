@@ -44,25 +44,25 @@ class run:
 	def callback(self,data):
 		self.x = 0
 		self.y = 0
-		data.x
-		data.z
 		print data.x , data.z , self.y
 		rate = 1
 		if ( data.x < 0 ):
 			while( self.x > data.x*rate ) :
-				self.sl(2)
+				self.sl(5)
 				print "x" , self.x , data.x
-				time.sleep(0.03)
+				time.sleep(0.05)
 		elif (data.x > 0 ): 
 			while ( self.x < data.x*rate ) :
-				self.sr(2)
+				self.sr(5)
 				print "x",self.x , data.x
 				time.sleep(0.05)
-		while ( self.y < data.z - 0.53) :
-			self.fwd(2)
+		while ( float(self.y) < float(data.z - 0.65)) :
+			self.fwd(5)
 			print "y",self.y , data.z
-			time.sleep(0.03)
-		self.fwd(0)
+			time.sleep(0.05)
+		
+		print "y",self.y , data.z
+		se.write("\x01\x7F\x00\x00\x00\x00\x0F")
 
 	def read(self):
 		while( True ):
@@ -78,7 +78,7 @@ class run:
 					SVx = -1 if (int(ctrl.encode('hex'),16)&4) / 4 else 1
 					SVy = -1 if (int(ctrl.encode('hex'),16)&2) / 2 else 1
 					SVth = -1 if (int(ctrl.encode('hex'),16)&1)  else 1
-					self.x =  Sx*int((serial_str[3]+serial_str[4]).encode('hex'),16)/100.
+					self.x =  Sx*int((serial_str[3]+serial_str[4]).encode('hex'),16)/100.0
 					self.y = Sy*int( (serial_str[5]+serial_str[6]).encode('hex') ,16)/100.0
 					th = Sth*int(serial_str[7].encode('hex'),16)/10.0
 					vx =  SVx*int(serial_str[8].encode('hex') ,16)/500.0
@@ -88,6 +88,7 @@ class run:
 	def listener(self):
 		rospy.init_node('serial_skuba', anonymous=True)
 		rospy.Subscriber("object_point2",Vector3, self.callback)
+		se.write("\x01\x7F\x00\x00\x00\x00\x0F")
 		recieve = threading.Thread(target = self.read)
 		recieve.setDaemon(True)
 		recieve.start()
