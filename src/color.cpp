@@ -26,8 +26,11 @@ using namespace cv;
 using namespace cv_bridge;
 
 #define TOPIC_CONTROL "/cmd_state"
+#define MOVE_STATE "mv_state"
 #define MANUAL_MODE  1
 #define MAX_RANGE 1.1f
+
+
 
 float dist[480][640];
 int canPrintDepth = 0;
@@ -44,7 +47,7 @@ IplImage *inFrameHSV  = cvCreateImage(cvSize(640, 480), 8, 3);
 int get_dest = 0;
 int inWorkSpace = 0;
 void convertmsg2img(const sensor_msgs::ImageConstPtr& msg);
-int max_y = 350;
+int max_y = 400;
 int min_y = 300;
 float g_x = 0 , g_y =0  , g_z=0 ;
 int g_c=0 ;
@@ -300,6 +303,14 @@ IplImage* convertImageHSVtoRGB(const IplImage *imageHSV)
 	}
 	return imageRGB;
 }
+
+void MoveStateCallBack(const std_msgs::String::ConstPtr& msg)
+{
+	if(!strcmp(msg->data.c_str(),"finish"))
+	{
+		can_move = 1;
+	}
+}
 void controlCallBack(const std_msgs::String::ConstPtr& msg)
 {
 	if(!strcmp(msg->data.c_str(),"coke"))
@@ -382,7 +393,9 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 		vector.y = ty;
 		vector.z = tz;
 		printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
-		vector_pub.publish(vector);
+		//vector_pub.publish(vector);
+		vector_pub2.publish(vector);
+
 	}
 }
 int	notBlackorWhite(int i)
@@ -544,7 +557,7 @@ int findObject(int color)
 		vector.x = g_x/g_c;
 		vector.y = g_y/g_c;
 		vector.z = g_z/g_c;
-		if( sqrt( pow(vector.x,2)+pow(vector.z,2)  > 0.70000f ) && can_move  )
+		if( sqrt( pow(vector.x,2)+pow(vector.z,2) )  > 0.75000f  && can_move  )
 		{
 			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);			
 			printf("move robot ! \n");
@@ -553,7 +566,7 @@ int findObject(int color)
 			min_y = 350;
 			max_y = 450;
 		}
-		else if( sqrt( pow(vector.x,2)+pow(vector.z,2)  < 0.65000f ) )
+		else if( sqrt( pow(vector.x,2)+pow(vector.z,2) )  < 0.75000f && can_move ) 
 		{
 			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);			
 			printf("move hand");
@@ -561,7 +574,7 @@ int findObject(int color)
 			get_coke=0;
 			get_pg=0;
 			get_numtip=0;
-	//		can_move = 1;
+			can_move = 0;
 		}
 		g_c = 0;
 		g_x = 0;
@@ -694,15 +707,16 @@ int main(int argc , char *argv[])
 	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,kinectCallBack);
 	ros::Subscriber subDepth = n.subscribe("/camera/depth/image",1,depthCb);
 	ros::Subscriber sub2 = n.subscribe(TOPIC_CONTROL, 1, controlCallBack);
+	ros::Subscriber subMove = n.subscribe(MOVE_STATE, 1, MoveStateCallBack);
 	vector_pub = n.advertise<geometry_msgs::Vector3>("object_point", 1000);
 	vector_pub2 = n.advertise<geometry_msgs::Vector3>("object_point2", 1000);
 
 
 	printf("ros : spin\n");
-	//cvNamedWindow("input", 1 );
+	cvNamedWindow("input", 1 );
 	//cvNamedWindow("out",1);
 	//cvSetMouseCallback("input", on_mouse);
-	//cvSetMouseCallback("out",on_mouse_HSV);
+	cvSetMouseCallback("in",on_mouse_HSV);
 	ros::spin();
 
 }
