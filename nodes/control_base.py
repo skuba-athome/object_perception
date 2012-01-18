@@ -21,6 +21,9 @@ class run:
 	def __init__(self):
 		self.x = 0
 		self.y = 0
+		self.tmpx= 0
+		self.tmpy= 0
+		self.pub = rospy.Publisher('mv_state',String)
 	def fwd(self,s): #forward
 		se.write("\x01\x7F\x08\x00%c\x00\x0F"%s)
 
@@ -33,7 +36,7 @@ class run:
 		#print "shift right %d"%s
 		se.write("\x01\x7F\x08%c\x00\x00\x0F"%s)
 
-	def tl(self,s): #turn left
+	def tl(self,s): #turn left 
 		#print "shift left %d"%s
 		se.write("\x01\x7F\x08\x00\x00%c\x0F"%s)
 
@@ -48,20 +51,26 @@ class run:
 		rate = 1
 		if ( data.x < 0 ):
 			while( self.x > data.x*rate ) :
+				if( self.x - self.tmpx < 0.15 ):
+					self.x = self.tmpx 
 				self.sl(5)
 				print "x" , self.x , data.x
 				time.sleep(0.05)
 		elif (data.x > 0 ): 
 			while ( self.x < data.x*rate ) :
+				if (  self.tmpx - self.x < 0.15 ):
+					self.x = self.tmpx
 				self.sr(5)
 				print "x",self.x , data.x
 				time.sleep(0.05)
 		while ( float(self.y) < float(data.z - 0.65)) :
+			if( self.tmpy - self.y < 0.15 ):
+				self.y = self.tmpy
 			self.fwd(5)
 			print "y",self.y , data.z
 			time.sleep(0.05)
 		
-		print "y",self.y , data.z
+		self.pub.publish('finish')	
 		se.write("\x01\x7F\x00\x00\x00\x00\x0F")
 
 	def read(self):
@@ -78,8 +87,8 @@ class run:
 					SVx = -1 if (int(ctrl.encode('hex'),16)&4) / 4 else 1
 					SVy = -1 if (int(ctrl.encode('hex'),16)&2) / 2 else 1
 					SVth = -1 if (int(ctrl.encode('hex'),16)&1)  else 1
-					self.x =  Sx*int((serial_str[3]+serial_str[4]).encode('hex'),16)/100.0
-					self.y = Sy*int( (serial_str[5]+serial_str[6]).encode('hex') ,16)/100.0
+					self.tmpx =  Sx*int((serial_str[3]+serial_str[4]).encode('hex'),16)/100.0
+					self.tmpy = Sy*int( (serial_str[5]+serial_str[6]).encode('hex') ,16)/100.0
 					th = Sth*int(serial_str[7].encode('hex'),16)/10.0
 					vx =  SVx*int(serial_str[8].encode('hex') ,16)/500.0
 					vy =  SVy*int(serial_str[9].encode('hex') ,16)/500.0
