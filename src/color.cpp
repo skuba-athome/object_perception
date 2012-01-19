@@ -394,9 +394,16 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 		vector.x = tx;
 		vector.y = ty;
 		vector.z = tz;
-		printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
-		//vector_pub.publish(vector);
-		vector_pub2.publish(vector);
+		if( vector.x == vector.x 
+			&& vector.y == vector.y
+			&& vector.z == vector.z
+		)
+		{
+			vector_pub.publish(vector);
+
+			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
+		}
+		//vector_pub2.publish(vector);
 
 	}
 }
@@ -717,8 +724,8 @@ int main(int argc , char *argv[])
 	printf("ros : spin\n");
 	cvNamedWindow("input", 1 );
 	//cvNamedWindow("out",1);
-	//cvSetMouseCallback("input", on_mouse);
-	cvSetMouseCallback("in",on_mouse_HSV);
+	cvSetMouseCallback("input", on_mouse);
+	//cvSetMouseCallback("in",on_mouse_HSV);
 	ros::spin();
 
 }
