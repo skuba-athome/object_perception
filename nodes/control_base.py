@@ -51,20 +51,20 @@ class run:
 		rate = 1
 		if ( data.x < 0 ):
 			while( self.x > data.x*rate ) :
-				if( self.x - self.tmpx < 0.15 ):
+				if( abs(self.x - self.tmpx) < 0.25 ):
 					self.x = self.tmpx 
 				self.sl(5)
 				print "x" , self.x , data.x
 				time.sleep(0.05)
 		elif (data.x > 0 ): 
 			while ( self.x < data.x*rate ) :
-				if (  self.tmpx - self.x < 0.15 ):
+				if (  abs(self.tmpx - self.x) < 0.25 ):
 					self.x = self.tmpx
 				self.sr(5)
 				print "x",self.x , data.x
 				time.sleep(0.05)
-		while ( float(self.y) < float(data.z - 0.65)) :
-			if( self.tmpy - self.y < 0.15 ):
+		while ( float(self.y) < float(data.z - 0.7)) :
+			if( abs(self.tmpy - self.y) < 0.25 ):
 				self.y = self.tmpy
 			self.fwd(5)
 			print "y",self.y , data.z
