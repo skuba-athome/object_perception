@@ -318,7 +318,9 @@ void controlCallBack(const std_msgs::String::ConstPtr& msg)
 		get_coke = 5;
 		ROS_INFO("get command : %s\n",msg->data.c_str());
 	}
-	if(!strcmp(msg->data.c_str(),"numtip"))
+	if(	!strcmp(msg->data.c_str(),"numtip") 
+		|| !strcmp(msg->data.c_str(),"water")
+		)
 	{
 		get_numtip = 5;
 		ROS_INFO("get command : %s\n",msg->data.c_str());
