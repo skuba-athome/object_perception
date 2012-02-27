@@ -10,9 +10,9 @@ import threading
 import math
 #initial==============
 se = serial.Serial()
-se.baudrate = 9600
+se.baudrate = 57600
 se.bytesize = 8
-se.timeout = 1
+se.timeout = 5
 se.port = sys.argv[1]
 se.open()
 #======================
@@ -24,16 +24,16 @@ def callback(data):
 	send_y = int(data.x * 100 *1.1) + 60
 	send_z = int(data.y * 100)
 #	send_x = int(math.sqrt(send_x**2 + send_y**2))
-	se.write("\x01\x7F%c"%send_x+"%c"%send_y+"%c"%send_z+"\x0F")
+	print se.write("\x01\x7F%c"%send_x+"%c"%send_y+"%c"%send_z+"\x0F")
 	rospy.loginfo(rospy.get_name()+"I heard " + str(send_x) + " " + str(send_y) + " " + str(send_z) )
 
 def read():
 	while True:
 		tmp = se.read()
-		if(tmp == '\x01'):
-			print 'ready !'
-		else :
-			print 'not ready !'
+#		if(tmp == '\x01'):
+#			print 'ready !'
+#		else :
+#			print 'not ready !'
 
 def listener():
 	rospy.init_node('control_hand', anonymous=True)
@@ -41,9 +41,9 @@ def listener():
 	#initial manipulation
 	init_mani = 0
 	se.write("\x01\x7F%c"%init_mani+"%c"%init_mani+"\x1C\x0F")
-#	recieve = threading.Thread(target = read)
-#	recieve.setDaemon(True)
-#	recieve.start()
+	recieve = threading.Thread(target = read)
+	recieve.setDaemon(True)
+	recieve.start()
 	rospy.spin()
 
 if __name__ == '__main__':
