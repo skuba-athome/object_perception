@@ -28,7 +28,49 @@
 
 //-------------------------------------------------------
 
-int mainImage(void)
+#define TOPIC_CONTROL "/cmd_state"
+#define MANUAL_MODE  0
+
+int gROI_x1 = 0;
+int gROI_y1 = 0;
+int gROI_x2 = 640;
+int gROI_y2 = 480;
+
+char *imgLibDir = "./img-lib";
+
+char *queryFile = "query.000.bmp";
+char fileName[1024];
+int numSaveFrame = 0;
+int numObj = 0;
+float dist[480][640];
+int canPrintDepth = 0;
+double min_range_;
+double max_range_;
+int curObj = 0;
+cv::Mat depthImg ;
+cv_bridge::CvImagePtr bridge;
+ros::Publisher vector_pub; // = n2.advertise<geometry_msgs::Vector3>("object_point", 1000);
+typedef struct {
+	int numObj;
+	char **label;
+	int *numPic;
+	cv::flann::Index *index;
+	cv::Mat desc_mat; // surf descriptor
+	cv::Mat ind_mat;  // label(ID)
+}IndexBook;
+IplImage *inFrame  = cvCreateImage(cvSize(640, 480), 8, 3);
+
+IndexBook *indexBook;
+int get_dest = 0;
+char obj_label[30];
+
+void convertmsg2img(const sensor_msgs::ImageConstPtr& msg);
+IndexBook* load_index(char* dirpath);
+
+float g_x , g_y  , g_z ;
+int g_c ;
+
+void controlCallBack(const std_msgs::String::ConstPtr& msg)
 {
   // Declare Ipoints and other stuff
   IpVec ipts;
@@ -235,14 +277,32 @@ int mainStaticMatch()
   img4 = cvLoadImage("imgs/cup04.jpg");
   img5 = cvLoadImage("imgs/cup05.jpg");
 
-  IpVec ipts1, ipts5,ipts4,ipts3,ipts2;
-  surfDetDes(img1,ipts1,false,4,4,2,0.0001f);
-  surfDetDes(img2,ipts2,false,4,4,2,0.0001f);
-  surfDetDes(img3,ipts3,false,4,4,2,0.0001f);
-  surfDetDes(img4,ipts4,false,4,4,2,0.0001f);
-  surfDetDes(img5,ipts5,false,4,4,2,0.0001f);
-  
-	IpPairVec matches;
+	for(int i=0;i<640*480;i++)
+	{
+		
+		if(dist[i/640][i%640] < 1.25 || 1)
+		{
+			//printf("%d %d %.2f\n",i/480,i%480,dist[i/480][i%480]);
+			inFrame->imageData[i*3] = msg->data[i*3+2];
+			inFrame->imageData[i*3+1] = msg->data[i*3+1];
+			inFrame->imageData[i*3+2] = msg->data[i*3];
+		}
+		else
+		{
+			inFrame->imageData[i*3] = 255;
+			inFrame->imageData[i*3+1] = 0;
+			inFrame->imageData[i*3+2] = 255;
+		}	
+	}		
+	
+	//convertmsg2img(msg);
+	cvCvtColor(inFrame, grayImg, CV_BGR2GRAY);
+	//cvCvtColor(grayImg, markImg, CV_GRAY2RGB);
+	if(0){
+		findObjectAndMark(grayImg, markImg, inFrame);
+	//output
+		cvDrawRect(markImg, cvPoint(gROI_x1,gROI_y1), cvPoint(gROI_x2,gROI_y2), CV_RGB(0,255,0));
+		cvPutText(markImg, indexBook->label[curObj], cvPoint(gROI_x1,gROI_y1), &cvFont(1.5,2), CV_RGB(255,255,255));
 
   getMatches(ipts1,ipts2,matches);
  	for (unsigned int i = 0; i < matches.size(); ++i)
@@ -285,8 +345,32 @@ int mainStaticMatch()
     cvLine(img5,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
   }
 
-
-  std::cout<< "Matches: " << matches.size();
+	inKey = cvWaitKey(1);
+	if(inKey == 27){
+		exit(0);
+	}
+	else if(inKey == 32){
+		static int picID = 0;
+		printf("fetch\n");
+		cvSetImageROI(inFrame, cvRect(gROI_x1, gROI_y1, gROI_x2 - gROI_x1, gROI_y2 - gROI_y1));
+		
+		sprintf(fileName,"imgs/%03d.bmp",picID++);
+		cvSaveImage(fileName, inFrame);
+		cvResetImageROI(inFrame);
+	}
+	else if(inKey == 2555904){
+		curObj = (curObj+1)%indexBook->numObj;
+	}
+	else if(inKey == 2424832){
+		curObj = (curObj+(indexBook->numObj-1))%indexBook->numObj;
+	}
+	else if(inKey == 'a'){
+		get_dest = 1;
+		strcpy(obj_label,"oishi");
+	}
+	else if(inKey >= 0){
+		printf("key = %d\n", inKey);
+	}
 
   cvNamedWindow("1", CV_WINDOW_AUTOSIZE );
   cvNamedWindow("2", CV_WINDOW_AUTOSIZE );
@@ -314,14 +398,6 @@ int mainKmeans(void)
   for (int repeat = 0; repeat < 10; ++repeat)
   {
 
-    IplImage *img = cvLoadImage("imgs/img1.jpg");
-    km.Run(&ipts, 5, true);
-    drawPoints(img, km.clusters);
-
-    for (unsigned int i = 0; i < ipts.size(); ++i)
-    {
-      cvLine(img, cvPoint(ipts[i].x,ipts[i].y), cvPoint(km.clusters[ipts[i].clusterIndex].x ,km.clusters[ipts[i].clusterIndex].y),cvScalar(255,255,255));
-    }
 
     showImage(img);
   }
