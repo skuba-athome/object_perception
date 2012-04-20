@@ -27,4 +27,11 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #target_link_libraries(example ${PROJECT_NAME})
+
+rosbuild_add_library(surf_libs	src/integral.cpp
+																src/utils.cpp
+																src/fasthessian.cpp
+																src/ipoint.cpp
+																src/surf.cpp)
+rosbuild_add_compile_flags(surf_libs "-fPIC")
 rosbuild_add_executable(main src/main.cpp)
