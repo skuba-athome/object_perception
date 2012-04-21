@@ -233,16 +233,16 @@ int mainStaticMatch()
   img2 = cvLoadImage("imgs/cup02.jpg");
   img3 = cvLoadImage("imgs/cup03.jpg");
   img4 = cvLoadImage("imgs/cup04.jpg");
-  img5 = cvLoadImage("imgs/cup05.jpg");
-
+  img5 = cvLoadImage("imgs/cup05.jpg");	  
+  cvShowImage("1", img1);
   IpVec ipts1, ipts5,ipts4,ipts3,ipts2;
   surfDetDes(img1,ipts1,false,4,4,2,0.0001f);
   surfDetDes(img2,ipts2,false,4,4,2,0.0001f);
   surfDetDes(img3,ipts3,false,4,4,2,0.0001f);
   surfDetDes(img4,ipts4,false,4,4,2,0.0001f);
   surfDetDes(img5,ipts5,false,4,4,2,0.0001f);
-  
-	IpPairVec matches;
+ 
+  IpPairVec matches;
 
   getMatches(ipts1,ipts2,matches);
  	for (unsigned int i = 0; i < matches.size(); ++i)
