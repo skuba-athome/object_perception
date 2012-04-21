@@ -229,12 +229,14 @@ int mainMotionPoints(void)
 int mainStaticMatch()
 {
   IplImage *img1,*img2,*img3,*img4,*img5;
-  img1 = cvLoadImage("imgs/cup01.jpg");
-  img2 = cvLoadImage("imgs/cup02.jpg");
-  img3 = cvLoadImage("imgs/cup03.jpg");
-  img4 = cvLoadImage("imgs/cup04.jpg");
-  img5 = cvLoadImage("imgs/cup05.jpg");	  
+  img1 = cvLoadImage("imgs/01.pgm");
+  img2 = cvLoadImage("imgs/02.pgm");
+  img3 = cvLoadImage("imgs/03.pgm");
+  img4 = cvLoadImage("imgs/04.pgm");
+  img5 = cvLoadImage("imgs/05.pgm");
+
   cvShowImage("1", img1);
+
   IpVec ipts1, ipts5,ipts4,ipts3,ipts2;
   surfDetDes(img1,ipts1,false,4,4,2,0.0001f);
   surfDetDes(img2,ipts2,false,4,4,2,0.0001f);
