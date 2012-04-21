@@ -8,7 +8,6 @@
 *  MSc University of Bristol, 2008.                        *
 *                                                          *
 ************************************************************/
-
 #include "surflib.h"
 #include "kmeans.h"
 #include <ctime>
