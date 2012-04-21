@@ -53,6 +53,8 @@ float g_x = 0 , g_y =0  , g_z=0 ;
 int g_c=0 ;
 int cut_y= 240;
 int get_coke = 0, get_numtip = 0,get_pg = 0;
+
+
 IplImage* convertImageRGBtoHSV(const IplImage *imageRGB)
 {
 	float fR, fG, fB;
