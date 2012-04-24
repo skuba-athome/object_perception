@@ -17,11 +17,13 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <geometry_msgs/Vector3.h>
 
-IplImage *inFrame  = cvCreateImage(cvSize(640, 480), 8, 3);
+#define WIDTH 1280
+#define HIEGHT 1024
 
-int min_x = 0 , min_y = 0;
 
-int max_x = 639 , max_y = 479 ;
+IplImage *inFrame  = cvCreateImage(cvSize(WIDTH, HIEGHT), 8, 1);
+
+static int min_x = 0 , min_y = 0 , max_x = WIDTH-1 , max_y = HIEGHT-1 ;
 
 void inFrame_mouse_callback( int event, int x, int y, int flags, void* param ){
 	switch( event ){
@@ -39,14 +41,16 @@ void inFrame_mouse_callback( int event, int x, int y, int flags, void* param ){
 
 void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 {
-	for(int i=0;i<640*480;i++)
+	for(int i=0;i<WIDTH*HIEGHT;i++)
 	{
 		//printf("%d %d %.2f\n",i/480,i%480,dist[i/480][i%480]);
-		inFrame->imageData[i*3] = msg->data[i*3+2];
+		/*inFrame->imageData[i*3] = msg->data[i*3+2];
 		inFrame->imageData[i*3+1] = msg->data[i*3+1];
-		inFrame->imageData[i*3+2] = msg->data[i*3];
+		inFrame->imageData[i*3+2] = msg->data[i*3];*/
+		inFrame->imageData[i] = msg->data[i];
 	}
 
+	cvSmooth(inFrame,inFrame,CV_GAUSSIAN);
 	cvRectangle(inFrame,cvPoint(min_x,min_y),cvPoint(max_x,max_y), cvScalarAll(7.0) );
 	cvShowImage("inFrame",inFrame);
 
@@ -75,7 +79,7 @@ int main(int argc,char * argv[])
 
 	ros::NodeHandle n;
 
-	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,kinectCallBack);
+	ros::Subscriber sub = n.subscribe("/camera/rgb/image_mono",1,kinectCallBack);
 
 
 	cvNamedWindow( "inFrame" );
