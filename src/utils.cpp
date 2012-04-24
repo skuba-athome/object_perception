@@ -163,7 +163,7 @@ void drawIpoint(IplImage *img, Ipoint &ipt, int tailSize)
   }
 
   // Draw motion from ipoint dx and dy
-  if (tailSize)
+  if (tailSize && 0)
   {
     cvLine(img, cvPoint(c1,r1),
       cvPoint(int(c1+ipt.dx*tailSize), int(r1+ipt.dy*tailSize)),

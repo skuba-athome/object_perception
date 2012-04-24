@@ -29,9 +29,14 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #target_link_libraries(example ${PROJECT_NAME})
 
 rosbuild_add_library(surf_libs	src/integral.cpp
-																src/utils.cpp
-																src/fasthessian.cpp
-																src/ipoint.cpp
-																src/surf.cpp)
+				src/utils.cpp
+				src/fasthessian.cpp
+				src/ipoint.cpp
+				src/surf.cpp)
 rosbuild_add_compile_flags(surf_libs "-fPIC")
 rosbuild_add_executable(main src/main.cpp)
+target_link_libraries(main surf_libs)
+
+rosbuild_add_executable(capture src/capture.cpp)
+
+rosbuild_add_executable(segment src/segment.cpp)
