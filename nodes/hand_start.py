@@ -39,7 +39,7 @@ def listener():
 	rospy.init_node('control_hand', anonymous=True)
 	rospy.Subscriber("object_point", Vector3, callback)
 	#initial manipulation
-	init_mani = 0
+	init_mani = 15
 	se.write("\x01\x7F%c"%init_mani+"%c"%init_mani+"\x0F\x0F")	
 	recieve = threading.Thread(target = read)
 	recieve.setDaemon(True)
