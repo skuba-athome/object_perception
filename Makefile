@@ -330,6 +330,19 @@ test-results-run/fast:
 .PHONY : test-results-run/fast
 
 #=============================================================================
+# Target rules for targets named tester
+
+# Build rule for target.
+tester: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 tester
+.PHONY : tester
+
+# fast build rule for target.
+tester/fast:
+	$(MAKE) -f CMakeFiles/tester.dir/build.make CMakeFiles/tester.dir/build
+.PHONY : tester/fast
+
+#=============================================================================
 # Target rules for targets named tests
 
 # Build rule for target.
@@ -402,6 +415,21 @@ src/pcd_viewer.s:
 	$(MAKE) -f CMakeFiles/pcd_viewer.dir/build.make CMakeFiles/pcd_viewer.dir/src/pcd_viewer.s
 .PHONY : src/pcd_viewer.s
 
+# target to build an object file
+src/test.o:
+	$(MAKE) -f CMakeFiles/tester.dir/build.make CMakeFiles/tester.dir/src/test.o
+.PHONY : src/test.o
+
+# target to preprocess a source file
+src/test.i:
+	$(MAKE) -f CMakeFiles/tester.dir/build.make CMakeFiles/tester.dir/src/test.i
+.PHONY : src/test.i
+
+# target to generate assembly for a file
+src/test.s:
+	$(MAKE) -f CMakeFiles/tester.dir/build.make CMakeFiles/tester.dir/src/test.s
+.PHONY : src/test.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -428,6 +456,7 @@ help:
 	@echo "... test-future"
 	@echo "... test-results"
 	@echo "... test-results-run"
+	@echo "... tester"
 	@echo "... tests"
 	@echo "... src/ece.o"
 	@echo "... src/ece.i"
@@ -441,6 +470,9 @@ help:
 	@echo "... src/pcd_viewer.o"
 	@echo "... src/pcd_viewer.i"
 	@echo "... src/pcd_viewer.s"
+	@echo "... src/test.o"
+	@echo "... src/test.i"
+	@echo "... src/test.s"
 .PHONY : help
 
 

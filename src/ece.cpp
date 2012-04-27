@@ -158,7 +158,8 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		// Compute the features
 		vfh.compute (*vfhs);
 
-		ss << ".vfh";
+		std::stringstream ss2;
+		ss2 << "cloud_cluster_" << j  << "vfh.pcd";
 		writer.write<pcl::VFHSignature308> (ss.str (), *vfhs, false);
 	 }
 	writer.write<pcl::PointXYZ> ( "scence.pcd" , *cloud, false );
