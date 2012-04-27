@@ -200,6 +200,19 @@ nearest_neighbors/fast:
 .PHONY : nearest_neighbors/fast
 
 #=============================================================================
+# Target rules for targets named open_door
+
+# Build rule for target.
+open_door: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 open_door
+.PHONY : open_door
+
+# fast build rule for target.
+open_door/fast:
+	$(MAKE) -f CMakeFiles/open_door.dir/build.make CMakeFiles/open_door.dir/build
+.PHONY : open_door/fast
+
+#=============================================================================
 # Target rules for targets named pcd_viewer
 
 # Build rule for target.
@@ -401,6 +414,21 @@ src/nearest_neighbors.s:
 .PHONY : src/nearest_neighbors.s
 
 # target to build an object file
+src/open_door.o:
+	$(MAKE) -f CMakeFiles/open_door.dir/build.make CMakeFiles/open_door.dir/src/open_door.o
+.PHONY : src/open_door.o
+
+# target to preprocess a source file
+src/open_door.i:
+	$(MAKE) -f CMakeFiles/open_door.dir/build.make CMakeFiles/open_door.dir/src/open_door.i
+.PHONY : src/open_door.i
+
+# target to generate assembly for a file
+src/open_door.s:
+	$(MAKE) -f CMakeFiles/open_door.dir/build.make CMakeFiles/open_door.dir/src/open_door.s
+.PHONY : src/open_door.s
+
+# target to build an object file
 src/pcd_viewer.o:
 	$(MAKE) -f CMakeFiles/pcd_viewer.dir/build.make CMakeFiles/pcd_viewer.dir/src/pcd_viewer.o
 .PHONY : src/pcd_viewer.o
@@ -445,6 +473,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... main"
 	@echo "... nearest_neighbors"
+	@echo "... open_door"
 	@echo "... pcd_viewer"
 	@echo "... rebuild_cache"
 	@echo "... rosbuild_precompile"
@@ -467,6 +496,9 @@ help:
 	@echo "... src/nearest_neighbors.o"
 	@echo "... src/nearest_neighbors.i"
 	@echo "... src/nearest_neighbors.s"
+	@echo "... src/open_door.o"
+	@echo "... src/open_door.i"
+	@echo "... src/open_door.s"
 	@echo "... src/pcd_viewer.o"
 	@echo "... src/pcd_viewer.i"
 	@echo "... src/pcd_viewer.s"

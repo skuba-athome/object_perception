@@ -63,3 +63,7 @@ rosbuild_add_executable(tester src/test.cpp)
 target_link_libraries(tester /usr/lib/libboost_filesystem.so.1.46.1)
 target_link_libraries(tester /usr/lib/libhdf5.so.6)
 target_link_libraries(tester /usr/lib/libboost_system.so.1.46.1)
+
+rosbuild_add_executable(open_door src/open_door.cpp)
+target_link_libraries(open_door /opt/ros/fuerte/lib/libopencv_core.so)
+

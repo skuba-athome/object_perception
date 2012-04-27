@@ -4,6 +4,11 @@ void msg_cb(const std_msgs::String::ConstPtr& msg)
 {
 	ROS_INFO("%s",msg->data.c_str());
 
+	if(check)
+	{
+		ROS_INFO("lock process !!");
+		return ;
+	}
 
 	name = msg->data.c_str();
 
@@ -43,6 +48,7 @@ void msg_cb(const std_msgs::String::ConstPtr& msg)
 
 void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
+	//ROS_INFO("%d",check);
 	if(check)
 	{
 		ROS_INFO("regcognize !");
@@ -58,6 +64,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		pass.setFilterFieldName ("z");
 		pass.setFilterLimits (0.4, 2.0);
 		pass.filter (*cloud);
+
 	//	std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
 		// Create the filtering object: downsample the dataset using a leaf size of 1cm
 		pcl::VoxelGrid<pcl::PointXYZ> vg;
@@ -68,12 +75,14 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	//	std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
 
 
+
 		// Create the segmentation object for the planar model and set all the parameters
 		pcl::SACSegmentation<pcl::PointXYZ> seg;
 		pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
 		pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZ> ());
 		pcl::PCDWriter writer;
+
 		seg.setOptimizeCoefficients (true);
 		seg.setModelType (pcl::SACMODEL_PLANE);
 		seg.setMethodType (pcl::SAC_RANSAC);
@@ -121,13 +130,25 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		ec.setInputCloud (cloud_filtered);
 		ec.extract (cluster_indices);
 
+		float x,y,z;
+		printf("debug : cluster \n");
 		for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
 		{
+			x = 0.0f;
+			y = 0.0f;
+			z = 0.0f;
 			pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
 
 			for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++)
+			{
 				cloud_cluster->points.push_back (cloud_filtered->points[*pit]); //*
-
+				x+=cloud_filtered->points[*pit].x;
+				y+=cloud_filtered->points[*pit].y;
+				z+=cloud_filtered->points[*pit].z;
+			}
+			x/=cloud_cluster->points.size ();
+			y/=cloud_cluster->points.size ();
+			z/=cloud_cluster->points.size ();
 			cloud_cluster->width = cloud_cluster->points.size ();
 			cloud_cluster->height = 1;
 			cloud_cluster->is_dense = true;
@@ -168,6 +189,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 			ss << "test.vfh.pcd";
 			writer.write<pcl::VFHSignature308> (ss.str (), *vfhs, false);
 
+
 			// Check if the tree index has already been saved to disk
 			if (!boost::filesystem::exists (kdtree_idx_file_name))
 			{
@@ -178,8 +200,10 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 			{
 				vfh_model histogram;
 				loadHist ("test.vfh.pcd", histogram );
-
-				flann::Index<flann::ChiSquareDistance<float> > index (data, flann::SavedIndexParams ("kdtree.idx"));
+				printf("debug : segmentation fault !\n");
+				char tmp[20];
+				sprintf(tmp,"%s.idx",name.c_str()	);
+				flann::Index<flann::ChiSquareDistance<float> > index (data, flann::SavedIndexParams (tmp));
 			    index.buildIndex ();
 			    nearestKSearch (index, histogram, k, k_indices, k_distances);
 
@@ -188,12 +212,20 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 			    for (int i = 0; i < k; ++i)
 			      pcl::console::print_info ("    %d - %s (%d) with a distance of: %f\n",
 			          i, models.at (k_indices[0][i]).first.c_str (), k_indices[0][i], k_distances[0][i]);
+
+			    if(k_distances[0][0] < obg_threshold)
+			    {
+					printf("%.2f %.2f %.2f  \n",x,y,z);
+					check = 0;
+					return ;
+			    }
 			}
 
 		 }
 		check = 0;
 
 		writer.write<pcl::PointXYZ> ("scence.pcd", *cloud, false);
+		writer.write<pcl::PointXYZ> ("scence_f.pcd", *cloud_filtered, false);
 	}
 
 }
