@@ -64,7 +64,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	seg.setOptimizeCoefficients (true);
 	seg.setModelType (pcl::SACMODEL_PLANE);
 	seg.setMethodType (pcl::SAC_RANSAC);
-	seg.setMaxIterations (100);
+	seg.setMaxIterations (250);
 	seg.setDistanceThreshold (0.01);
 
 	int i=0, nr_points = (int) cloud_filtered->points.size ();
@@ -102,7 +102,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	std::vector<pcl::PointIndices> cluster_indices;
 	pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
 	ec.setClusterTolerance (0.02); // 2cm
-	ec.setMinClusterSize (100);
+	ec.setMinClusterSize (150);
 	ec.setMaxClusterSize (25000);
 	ec.setSearchMethod (tree);
 	ec.setInputCloud (cloud_filtered);
@@ -158,8 +158,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		// Compute the features
 		vfh.compute (*vfhs);
 
-		ss.clear();
-		ss << "cloud_cluster_" << j << "vfh" << ".pcd";
+		ss << ".vfh";
 		writer.write<pcl::VFHSignature308> (ss.str (), *vfhs, false);
 	 }
 
