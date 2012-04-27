@@ -47,8 +47,8 @@ rosbuild_add_executable(nearest_neighbors src/nearest_neighbors.cpp)
 target_link_libraries(nearest_neighbors /usr/lib/libvtkCommon.so.5.6)
 target_link_libraries(nearest_neighbors /usr/lib/libvtkRendering.so.5.6)
 target_link_libraries(nearest_neighbors /usr/lib/libvtkFiltering.so.5.6)
-target_link_libraries(nearest_neighbors /usr/lib/libboost_system.so.1.46.1)
 target_link_libraries(nearest_neighbors /usr/lib/libboost_filesystem.so.1.46.1)
+target_link_libraries(nearest_neighbors /usr/lib/libboost_system.so.1.46.1)
 target_link_libraries(nearest_neighbors /usr/lib/libhdf5.so.6)
 
 
@@ -58,3 +58,8 @@ target_link_libraries(pcd_viewer /usr/lib/libvtkCommon.so.5.6)
 target_link_libraries(pcd_viewer /usr/lib/libvtkRendering.so.5.6)
 target_link_libraries(pcd_viewer /usr/lib/libvtkFiltering.so.5.6)
 
+
+rosbuild_add_executable(tester src/test.cpp)
+target_link_libraries(tester /usr/lib/libboost_filesystem.so.1.46.1)
+target_link_libraries(tester /usr/lib/libhdf5.so.6)
+target_link_libraries(tester /usr/lib/libboost_system.so.1.46.1)

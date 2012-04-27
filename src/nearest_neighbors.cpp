@@ -1,3 +1,5 @@
+
+
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/common/common.h>
@@ -202,7 +204,7 @@ main (int argc, char** argv)
   pcl::console::print_info ("x");
   pcl::console::print_value ("%f", y_step);
   pcl::console::print_info (")\n");
-
+/*
   int viewport = 0, l = 0, m = 0;
   for (int i = 0; i < k; ++i)
   {
@@ -270,6 +272,6 @@ main (int argc, char** argv)
   // Add coordianate systems to all viewports
   p.addCoordinateSystem (0.1, 0);
 
-  p.spin ();
+  p.spin (); */
   return (0);
 }
