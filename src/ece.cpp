@@ -50,7 +50,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	pcl::VoxelGrid<pcl::PointXYZ> vg;
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 	vg.setInputCloud (cloud);
-	vg.setLeafSize (0.005f, 0.005f, 0.005f);
+	vg.setLeafSize (0.0075f, 0.0075f, 0.01f);
 	vg.filter (*cloud_filtered);
 	std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
 
@@ -101,9 +101,9 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 	std::vector<pcl::PointIndices> cluster_indices;
 	pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
-	ec.setClusterTolerance (0.02); // 2cm
-	ec.setMinClusterSize (150);
-	ec.setMaxClusterSize (25000);
+	ec.setClusterTolerance (0.05); // 2cm
+	ec.setMinClusterSize (200);
+	ec.setMaxClusterSize (2500);
 	ec.setSearchMethod (tree);
 	ec.setInputCloud (cloud_filtered);
 	ec.extract (cluster_indices);
@@ -161,8 +161,8 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		ss << ".vfh";
 		writer.write<pcl::VFHSignature308> (ss.str (), *vfhs, false);
 	 }
-
-	writer.write<pcl::PointXYZ> ( "scence.pcd" , *cloud_filtered , false );
+	writer.write<pcl::PointXYZ> ( "scence.pcd" , *cloud, false );
+	writer.write<pcl::PointXYZ> ( "scence_filter.pcd" , *cloud_filtered , false );
 	// ... do data processing
 	exit(0);
 }
@@ -173,7 +173,7 @@ int main (int argc, char** argv)
 	ros::init (argc, argv, "my_pcl_tutorial");
 	ros::NodeHandle nh;
 	// Create a ROS subscriber for the input point cloud
-	ros::Subscriber sub = nh.subscribe ("/camera/depth/points", 1, cloud_cb);
+	ros::Subscriber sub = nh.subscribe ("/camera/depth_registered/points", 1, cloud_cb);
 
 	// Create a ROS publisher for the output point cloud
 	pub = nh.advertise<sensor_msgs::PointCloud2> ("input", 1);

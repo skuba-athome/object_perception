@@ -54,3 +54,7 @@ target_link_libraries(nearest_neighbors /usr/lib/libhdf5.so.6)
 
 rosbuild_add_executable(ece src/ece.cpp)
 rosbuild_add_executable(pcd_viewer src/pcd_viewer.cpp)
+target_link_libraries(pcd_viewer /usr/lib/libvtkCommon.so.5.6)
+target_link_libraries(pcd_viewer /usr/lib/libvtkRendering.so.5.6)
+target_link_libraries(pcd_viewer /usr/lib/libvtkFiltering.so.5.6)
+
