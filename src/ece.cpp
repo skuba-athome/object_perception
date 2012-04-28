@@ -45,7 +45,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 	std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
 
-/*
+
 	// Create the filtering object: downsample the dataset using a leaf size of 1cm
 	pcl::VoxelGrid<pcl::PointXYZ> vg;
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
@@ -53,15 +53,14 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	vg.setLeafSize (0.0075f, 0.0075f, 0.01f);
 	vg.filter (*cloud_filtered);
 	std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
-*/
-	cloud_f = cloud ;
+
+
 	// Create the segmentation object for the planar model and set all the parameters
 	pcl::SACSegmentation<pcl::PointXYZ> seg;
 	pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
 	pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZ> ());
 	pcl::PCDWriter writer;
-	writer.write<pcl::PointXYZ> ( "scence_f.pcd" , *cloud_f , false );
 	seg.setOptimizeCoefficients (true);
 	seg.setModelType (pcl::SACMODEL_PLANE);
 	seg.setMethodType (pcl::SAC_RANSAC);

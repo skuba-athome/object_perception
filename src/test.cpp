@@ -51,7 +51,8 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	//ROS_INFO("%d",check);
 	if(check)
 	{
-		ROS_INFO("regcognize !");
+		pcl::PCDWriter writer;
+		//ROS_INFO("regcognize !");
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>), cloud_f (new pcl::PointCloud<pcl::PointXYZ>);
 		pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal> ());
 		pcl::fromROSMsg(*input , *cloud);
@@ -74,14 +75,14 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		vg.filter (*cloud_filtered);
 	//	std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
 
-
+		writer.write<pcl::PointXYZ> ("scence_f1.pcd", *cloud_filtered, false);
 
 		// Create the segmentation object for the planar model and set all the parameters
 		pcl::SACSegmentation<pcl::PointXYZ> seg;
 		pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
 		pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZ> ());
-		pcl::PCDWriter writer;
+
 
 		seg.setOptimizeCoefficients (true);
 		seg.setModelType (pcl::SACMODEL_PLANE);
@@ -116,7 +117,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 			extract.filter (*cloud_f);
 			cloud_filtered = cloud_f;
 		}
-
+		writer.write<pcl::PointXYZ> ("scence_f2.pcd", *cloud_filtered, false);
 		  // Creating the KdTree object for the search method of the extraction
 		pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
 		tree->setInputCloud (cloud_filtered);
@@ -225,7 +226,6 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		check = 0;
 
 		writer.write<pcl::PointXYZ> ("scence.pcd", *cloud, false);
-		writer.write<pcl::PointXYZ> ("scence_f.pcd", *cloud_filtered, false);
 	}
 
 }

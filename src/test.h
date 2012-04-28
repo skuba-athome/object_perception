@@ -42,9 +42,9 @@ std::string training_data_h5_file_name ;
 std::string training_data_list_file_name;
 std::string name;
 
-float obg_threshold = 150.0f;
+float obg_threshold = 100.0f;
 
-int k = 6;
+int k = 1;
 
 /** \brief Load the list of file model names from an ASCII file
   * \param models the resultant list of model name
