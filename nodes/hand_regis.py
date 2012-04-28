@@ -12,7 +12,7 @@ import math
 se = serial.Serial()
 se.baudrate = 57600
 se.bytesize = 8
-se.timeout = 5
+se.timeout =  5
 #se.port = sys.argv[1]
 se.port = '/dev/ttyACM1'
 se.open()
@@ -20,6 +20,7 @@ se.open()
 #print " \x01 \x02 \x03 \x04"
 print se
 tmp = ''
+HandPublisher = rospy.Publisher('hand_state',String)
 def callback(msg):
 	if(msg.data == "send"):
 		send_x = 15
@@ -51,10 +52,12 @@ def callback(msg):
 def read():
 	while True:
 		tmp = se.read()
-#		if(tmp == '\x01'):
-#			print 'ready !'
-#		else :
-#			print 'not ready !'
+		if(tmp == '\x01'):
+			#print 'ready !'
+			HandPublisher.publish('1')
+		else :
+			#print 'not ready !'
+			HandPublisher.publish('0')
 
 def listener():
 	rospy.init_node('control_hand', anonymous=True)
