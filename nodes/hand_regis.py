@@ -12,7 +12,7 @@ import math
 se = serial.Serial()
 se.baudrate = 57600
 se.bytesize = 8
-se.timeout = 
+se.timeout = 5
 #se.port = sys.argv[1]
 se.port = '/dev/ttyACM1'
 se.open()
@@ -61,7 +61,7 @@ def listener():
 	rospy.Subscriber("hand_cmd", String, callback)
 	#initial manipulation
 	init_mani = 0
-	se.write("\x01\x7F%c"%init_mani+"%c"%init_mani+"\x1C\x0F")
+	se.write("\x01\x7F%c"%init_mani+"%c"%init_mani+"\x10\x0F")
 	recieve = threading.Thread(target = read)
 	recieve.setDaemon(True)
 	recieve.start()
