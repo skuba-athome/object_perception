@@ -200,6 +200,19 @@ nearest_neighbors/fast:
 .PHONY : nearest_neighbors/fast
 
 #=============================================================================
+# Target rules for targets named object_surf
+
+# Build rule for target.
+object_surf: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 object_surf
+.PHONY : object_surf
+
+# fast build rule for target.
+object_surf/fast:
+	$(MAKE) -f CMakeFiles/object_surf.dir/build.make CMakeFiles/object_surf.dir/build
+.PHONY : object_surf/fast
+
+#=============================================================================
 # Target rules for targets named open_door
 
 # Build rule for target.
@@ -289,6 +302,19 @@ rospack_gensrv: cmake_check_build_system
 rospack_gensrv/fast:
 	$(MAKE) -f CMakeFiles/rospack_gensrv.dir/build.make CMakeFiles/rospack_gensrv.dir/build
 .PHONY : rospack_gensrv/fast
+
+#=============================================================================
+# Target rules for targets named surf_libs
+
+# Build rule for target.
+surf_libs: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 surf_libs
+.PHONY : surf_libs
+
+# fast build rule for target.
+surf_libs/fast:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/build
+.PHONY : surf_libs/fast
 
 #=============================================================================
 # Target rules for targets named test
@@ -384,6 +410,51 @@ src/ece.s:
 .PHONY : src/ece.s
 
 # target to build an object file
+src/fasthessian.o:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/fasthessian.o
+.PHONY : src/fasthessian.o
+
+# target to preprocess a source file
+src/fasthessian.i:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/fasthessian.i
+.PHONY : src/fasthessian.i
+
+# target to generate assembly for a file
+src/fasthessian.s:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/fasthessian.s
+.PHONY : src/fasthessian.s
+
+# target to build an object file
+src/integral.o:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/integral.o
+.PHONY : src/integral.o
+
+# target to preprocess a source file
+src/integral.i:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/integral.i
+.PHONY : src/integral.i
+
+# target to generate assembly for a file
+src/integral.s:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/integral.s
+.PHONY : src/integral.s
+
+# target to build an object file
+src/ipoint.o:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/ipoint.o
+.PHONY : src/ipoint.o
+
+# target to preprocess a source file
+src/ipoint.i:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/ipoint.i
+.PHONY : src/ipoint.i
+
+# target to generate assembly for a file
+src/ipoint.s:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/ipoint.s
+.PHONY : src/ipoint.s
+
+# target to build an object file
 src/main.o:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.o
 .PHONY : src/main.o
@@ -397,6 +468,21 @@ src/main.i:
 src/main.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.s
 .PHONY : src/main.s
+
+# target to build an object file
+src/mainSurf.o:
+	$(MAKE) -f CMakeFiles/object_surf.dir/build.make CMakeFiles/object_surf.dir/src/mainSurf.o
+.PHONY : src/mainSurf.o
+
+# target to preprocess a source file
+src/mainSurf.i:
+	$(MAKE) -f CMakeFiles/object_surf.dir/build.make CMakeFiles/object_surf.dir/src/mainSurf.i
+.PHONY : src/mainSurf.i
+
+# target to generate assembly for a file
+src/mainSurf.s:
+	$(MAKE) -f CMakeFiles/object_surf.dir/build.make CMakeFiles/object_surf.dir/src/mainSurf.s
+.PHONY : src/mainSurf.s
 
 # target to build an object file
 src/nearest_neighbors.o:
@@ -444,6 +530,21 @@ src/pcd_viewer.s:
 .PHONY : src/pcd_viewer.s
 
 # target to build an object file
+src/surf.o:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/surf.o
+.PHONY : src/surf.o
+
+# target to preprocess a source file
+src/surf.i:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/surf.i
+.PHONY : src/surf.i
+
+# target to generate assembly for a file
+src/surf.s:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/surf.s
+.PHONY : src/surf.s
+
+# target to build an object file
 src/test.o:
 	$(MAKE) -f CMakeFiles/tester.dir/build.make CMakeFiles/tester.dir/src/test.o
 .PHONY : src/test.o
@@ -457,6 +558,21 @@ src/test.i:
 src/test.s:
 	$(MAKE) -f CMakeFiles/tester.dir/build.make CMakeFiles/tester.dir/src/test.s
 .PHONY : src/test.s
+
+# target to build an object file
+src/utils.o:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/utils.o
+.PHONY : src/utils.o
+
+# target to preprocess a source file
+src/utils.i:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/utils.i
+.PHONY : src/utils.i
+
+# target to generate assembly for a file
+src/utils.s:
+	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/utils.s
+.PHONY : src/utils.s
 
 # Help Target
 help:
@@ -473,6 +589,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... main"
 	@echo "... nearest_neighbors"
+	@echo "... object_surf"
 	@echo "... open_door"
 	@echo "... pcd_viewer"
 	@echo "... rebuild_cache"
@@ -481,6 +598,7 @@ help:
 	@echo "... rospack_genmsg"
 	@echo "... rospack_genmsg_libexe"
 	@echo "... rospack_gensrv"
+	@echo "... surf_libs"
 	@echo "... test"
 	@echo "... test-future"
 	@echo "... test-results"
@@ -490,9 +608,21 @@ help:
 	@echo "... src/ece.o"
 	@echo "... src/ece.i"
 	@echo "... src/ece.s"
+	@echo "... src/fasthessian.o"
+	@echo "... src/fasthessian.i"
+	@echo "... src/fasthessian.s"
+	@echo "... src/integral.o"
+	@echo "... src/integral.i"
+	@echo "... src/integral.s"
+	@echo "... src/ipoint.o"
+	@echo "... src/ipoint.i"
+	@echo "... src/ipoint.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/mainSurf.o"
+	@echo "... src/mainSurf.i"
+	@echo "... src/mainSurf.s"
 	@echo "... src/nearest_neighbors.o"
 	@echo "... src/nearest_neighbors.i"
 	@echo "... src/nearest_neighbors.s"
@@ -502,9 +632,15 @@ help:
 	@echo "... src/pcd_viewer.o"
 	@echo "... src/pcd_viewer.i"
 	@echo "... src/pcd_viewer.s"
+	@echo "... src/surf.o"
+	@echo "... src/surf.i"
+	@echo "... src/surf.s"
 	@echo "... src/test.o"
 	@echo "... src/test.i"
 	@echo "... src/test.s"
+	@echo "... src/utils.o"
+	@echo "... src/utils.i"
+	@echo "... src/utils.s"
 .PHONY : help
 
 

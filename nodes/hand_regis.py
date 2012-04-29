@@ -53,7 +53,7 @@ def read():
 	while True:
 		tmp = se.read()
 		if(tmp == '\x01'):
-			#print 'ready !'
+			print 'ready !'
 			HandPublisher.publish('1')
 		else :
 			#print 'not ready !'

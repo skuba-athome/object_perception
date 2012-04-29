@@ -19,10 +19,10 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
-find_package(Flann)
-include_directories(${FLANN_INCLUDE_DIRS})
+#find_package(Flann)
+#include_directories(${FLANN_INCLUDE_DIRS})
 include_directories("/usr/include/vtk-5.6")
-include_directories(${HDF5_INCLUDE_DIR})
+#include_directories(${HDF5_INCLUDE_DIR})
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
@@ -30,13 +30,26 @@ include_directories(${HDF5_INCLUDE_DIR})
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #target_link_libraries(example ${PROJECT_NAME})
 
-#rosbuild_add_library(surf_libs	src/integral.cpp
-#				src/utils.cpp
-#				src/fasthessian.cpp
-#				src/ipoint.cpp
-#				src/surf.cpp)
-#rosbuild_add_compile_flags(surf_libs "-fPIC")
-#target_link_libraries(main surf_libs)
+rosbuild_add_library(surf_libs	src/integral.cpp
+				src/utils.cpp
+				src/fasthessian.cpp
+				src/ipoint.cpp
+				src/surf.cpp)
+rosbuild_add_compile_flags(surf_libs "-fPIC")
+rosbuild_add_executable(object_surf src/mainSurf.cpp)
+target_link_libraries(object_surf surf_libs)
+target_link_libraries(object_surf /opt/ros/fuerte/lib/libopencv_core.so)
+target_link_libraries(object_surf /opt/ros/fuerte/lib/libopencv_imgproc.so)
+target_link_libraries(object_surf /opt/ros/fuerte/lib/libopencv_highgui.so)
+target_link_libraries(surf_libs   /opt/ros/fuerte/lib/libopencv_objdetect.so)
+target_link_libraries(object_surf /opt/ros/fuerte/lib/libopencv_contrib.so)
+target_link_libraries(surf_libs /opt/ros/fuerte/lib/libopencv_calib3d.so)
+target_link_libraries(object_surf /opt/ros/fuerte/lib/libopencv_legacy.so)
+target_link_libraries(object_surf /opt/ros/fuerte/lib/libopencv_flann.so)
+target_link_libraries(object_surf /opt/ros/fuerte/lib/libopencv_stitching.so)
+target_link_libraries(object_surf /opt/ros/fuerte/lib/libopencv_ts.so)
+target_link_libraries(object_surf /opt/ros/fuerte/lib/libopencv_video.so)
+
 rosbuild_add_executable(main src/main.cpp)
 target_link_libraries(main /usr/lib/libboost_system.so.1.46.1)
 target_link_libraries(main /usr/lib/libboost_filesystem.so.1.46.1)
