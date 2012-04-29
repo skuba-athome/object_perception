@@ -256,7 +256,7 @@ int mainStaticMatch()
     cvLine(img1,cvPoint(matches[i].first.x,matches[i].first.y),cvPoint(matches[i].second.x+w,matches[i].second.y), cvScalar(255,255,255),1);
     cvLine(img2,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
   } 
-	getMatches(ipts1,ipts3,matches);
+	/*getMatches(ipts1,ipts3,matches);
 	for (unsigned int i = 0; i < matches.size(); ++i)
   {
     drawPoint(img1,matches[i].first);
@@ -286,7 +286,7 @@ int mainStaticMatch()
     cvLine(img1,cvPoint(matches[i].first.x,matches[i].first.y),cvPoint(matches[i].second.x+w,matches[i].second.y), cvScalar(255,255,255),1);
     cvLine(img5,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
   }
-
+*/
 
   std::cout<< "Matches: " << matches.size();
 
