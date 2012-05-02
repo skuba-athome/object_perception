@@ -26,6 +26,10 @@
 #include <pcl/visualization/cloud_viewer.h>
 #include <boost/filesystem.hpp>
 #include <std_msgs/String.h>
+#include <pcl/common/impl/centroid.hpp>
+#include <pcl/kdtree/impl/kdtree_flann.hpp>
+#include <pcl_ros/impl/transforms.hpp>
+
 
 #define TOPIC_CONTROL "/cmd_state"
 
@@ -41,6 +45,8 @@ std::string kdtree_idx_file_name;
 std::string training_data_h5_file_name ;
 std::string training_data_list_file_name;
 std::string name;
+
+
 
 float obg_threshold = 100.0f;
 
