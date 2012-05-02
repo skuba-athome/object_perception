@@ -156,6 +156,11 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 			std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
 
+			Eigen::Vector4f centroid;
+			pcl::compute3DCentroid(cloud_cluster,centroid);
+
+			//printf("%.2f , %.2f , %.2f \n",centroid.);
+
 			//============================== vfh =====================================
 
 			// normal estimate

@@ -7,7 +7,7 @@
 
 
 #include <pcl/ModelCoefficients.h>
-#include <pcl/point_types.h>
+#include <pcl/point_types.h> d
 #include <pcl/io/pcd_io.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/voxel_grid.h>
