@@ -102,9 +102,9 @@ main (int argc, char** argv)
   std::string extension (".pcd");
   transform (extension.begin (), extension.end (), extension.begin (), (int(*)(int))tolower);
 
-  std::string kdtree_idx_file_name = "kdtree.idx";
-  std::string training_data_h5_file_name = "training_data.h5";
-  std::string training_data_list_file_name = "training_data.list";
+  std::string kdtree_idx_file_name =  std::string (argv[1]) + ".idx";
+  std::string training_data_h5_file_name = std::string(argv[1]) + ".h5" ;
+  std::string training_data_list_file_name = std::string(argv[1]) + ".list";
 
   std::vector<vfh_model> models;
 

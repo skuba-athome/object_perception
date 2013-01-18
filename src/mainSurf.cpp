@@ -8,12 +8,35 @@
 *  MSc University of Bristol, 2008.                        *
 *                                                          *
 ************************************************************/
-
+#include <cv.h>
+#include <highgui.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include<ros/ros.h>
+#include<sensor_msgs/Image.h>
+#include<std_msgs/String.h>
+#include "std_msgs/String.h"
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include<ros/ros.h>
+#include <geometry_msgs/Vector3.h>
 #include "surflib.h"
 #include "kmeans.h"
 #include <ctime>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <iostream>
+#include <fstream>
 
+IplImage* imgRGB = cvCreateImage( cvSize(1280,1024),IPL_DEPTH_8U, 3 );
+IplImage* img = cvCreateImage( cvSize(1280,1024),IPL_DEPTH_8U, 1 );
+int should_continue=1;
 //-------------------------------------------------------
 // In order to you use OpenSURF, the following illustrates
 // some of the simple tasks you can do.  It takes only 1
@@ -225,9 +248,26 @@ int mainMotionPoints(void)
 
 
 //-------------------------------------------------------
-
-int mainStaticMatch()
+void convertmsg2img(const sensor_msgs::ImageConstPtr& msg)
 {
+	for(int i=0;i<1280*1024;i++)
+	{
+		imgRGB->imageData[i*3] = msg->data[i*3];
+		imgRGB->imageData[i*3+1] = msg->data[i*3+1];
+		imgRGB->imageData[i*3+2] = msg->data[i*3+2];
+    }
+	cvCvtColor ( imgRGB , img , CV_RGB2GRAY );
+}
+void mainStaticMatch(const sensor_msgs::ImageConstPtr& msg)
+{
+
+	std::ifstream input("est.txt");
+    	std::string line;
+	
+	convertmsg2img(msg);
+	//cvNamedWindow("kinect", CV_WINDOW_NORMAL );
+	//cvShowImage("kinect", imgRGB);
+/*
   IplImage *img1,*img2,*img3,*img4,*img5;
   img1 = cvLoadImage("imgs/01.pgm");
   img2 = cvLoadImage("imgs/02.pgm");
@@ -256,6 +296,9 @@ int mainStaticMatch()
     cvLine(img1,cvPoint(matches[i].first.x,matches[i].first.y),cvPoint(matches[i].second.x+w,matches[i].second.y), cvScalar(255,255,255),1);
     cvLine(img2,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
   } 
+
+*/
+
 	/*getMatches(ipts1,ipts3,matches);
 	for (unsigned int i = 0; i < matches.size(); ++i)
   {
@@ -287,7 +330,7 @@ int mainStaticMatch()
     cvLine(img5,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
   }
 */
-
+/*
   std::cout<< "Matches: " << matches.size();
 
   cvNamedWindow("1", CV_WINDOW_AUTOSIZE );
@@ -300,6 +343,156 @@ int mainStaticMatch()
   cvWaitKey(0);
 
   return 0;
+*/
+
+  IplImage *img1, *img2;
+ 	img2=imgRGB; 
+	int numpic=0;
+	IpPairVec matchesFinal;
+	Ipoint CentroidFinal;
+	int sizematchFinal=0;
+	int picFinal=0;
+    	while( std::getline( input, line ) ) {
+        	std::cout<<line<<'\n';
+		//string namepic=line;
+		//printf("%s",line);
+		char *fileName = (char*)line.c_str();
+		img1 = cvLoadImage(fileName);
+		//cvNamedWindow(fileName, CV_WINDOW_NORMAL );
+  		//cvShowImage(fileName, img1);
+		//numpic++;
+    	
+  //img1 = cvLoadImage("imgs/2013-01-07-030227_1.jpg");
+  //img2 = cvLoadImage("imgs/all_1.jpg");
+  //img1 = cvLoadImage("pic/est01.jpg");
+  //img2 = cvLoadImage("pic/frame0005.jpg");           
+  IpVec ipts1, ipts2;
+  surfDetDes(img1,ipts1,false,4,4,2,0.0001f);
+  surfDetDes(img2,ipts2,false,4,4,2,0.0001f);
+
+  IpPairVec matches;
+  getMatches(ipts1,ipts2,matches);
+	
+  std::cout << matches.size() << std::endl;
+  std::cout << ipts1.size() << std::endl;
+  std::cout << ipts2.size() << std::endl;
+/*
+std::cout<< "w1: "  << img1->width << std::endl;
+std::cout<< "h1: "  << img1->height << std::endl;
+std::cout<< "w2: "  << img2->width << std::endl;
+std::cout<< "h2: "  << img2->height << std::endl;
+*/
+const int & w1 = img1->width;
+const int & h1 = img1->height;
+//const int & w2 = img2->width;
+//const int & h2 = img2->height;
+
+
+ Ipoint Pt;
+ Pt.x=0.0;
+ Pt.y=0.0;
+drawPoint(img2,Pt);
+Ipoint Pt2;
+ Pt2.x=1280.0;
+ Pt2.y=1024.0;
+drawPoint(img2,Pt2);
+Ipoint Centroid;
+Ipoint CentroidAvg;
+int sizematch=0;
+int sizematch2=0;
+  for (unsigned int i = 0; i < matches.size(); ++i)
+  {
+    //drawPoint(img1,matches[i].first);
+    //drawPoint(img2,matches[i].second);
+
+    const int & w = img1->width;
+    //cvLine(img1,cvPoint(matches[i].first.x,matches[i].first.y),cvPoint(matches[i].second.x+w,matches[i].second.y), cvScalar(255,255,255),1);
+    //cvLine(img2,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
+	printf("x = %f   y=%f\n",matches[i].second.x,matches[i].second.y);
+
+	if(i==0){
+	//printf("i = %d",i);
+
+		Centroid.x=matches[i].second.x;
+		Centroid.y=matches[i].second.y;
+		CentroidAvg.x=matches[i].second.x;
+		CentroidAvg.y=matches[i].second.y;
+		sizematch2++;
+	}
+
+	else{
+		//printf("i = %d",i);
+		CentroidAvg.x+=matches[i].second.x;
+		CentroidAvg.y+=matches[i].second.y;
+		if((abs(matches[i].second.x-Centroid.x)<=(w1/2))&&(abs(matches[i].second.y-Centroid.y)<=(h1/2))){
+			Centroid.x+=matches[i].second.x;
+			Centroid.y+=matches[i].second.y;
+			Centroid.x/=2;
+			Centroid.y/=2;
+			sizematch2++;
+		}
+
+	}
+	sizematch++;
+  }
+	CentroidAvg.x=CentroidAvg.x/sizematch;
+	CentroidAvg.y=CentroidAvg.y/sizematch;
+	//drawPoint(img2,CentroidAvg);
+
+/*
+	Centroid.x=Centroid.x/sizematch2;
+	Centroid.y=Centroid.y/sizematch2;
+*/
+	//drawPoint(img2,Centroid);
+//printf("CentroidAvg x = %f   y=%f  size=%d\n",CentroidAvg.x,CentroidAvg.y,sizematch);
+printf("--------------------------------------------------------------------------\n");
+printf("pic : %d\n",numpic);
+printf("Centroid x = %f   y=%f  size=%d\n",Centroid.x,Centroid.y,sizematch2);
+  //cvLine(img2,cvPoint(Pt.x,Pt.y),cvPoint(Pt2.x,Pt2.y), cvScalar(255,255,255),1);
+cvLine(img2,cvPoint(Centroid.x,0.0),cvPoint(Centroid.x,1024.0), cvScalar(255,255,255),1);
+cvLine(img2,cvPoint(0.0,Centroid.y),cvPoint(1280.0,Centroid.y), cvScalar(255,255,255),1);
+  std::cout<< "Matches: " << matches.size() << std::endl;
+printf("--------------------------------------------------------------------------\n");
+  //cvNamedWindow("1", CV_WINDOW_NORMAL );
+  //cvNamedWindow("2", CV_WINDOW_NORMAL );
+  //cvShowImage("1", img1);
+  //cvShowImage("2",img2);
+  //cvWaitKey(0);
+	
+    if(numpic==0){
+		matchesFinal=matches;
+		CentroidFinal=Centroid;
+		sizematchFinal=sizematch2;
+		picFinal=numpic;
+	}
+    else{
+		if(sizematch2>sizematchFinal){
+			matchesFinal=matches;
+			CentroidFinal=Centroid;
+			sizematchFinal=sizematch2;
+			picFinal=numpic;
+		}
+	}
+    numpic++;
+}	
+printf("--------------------------------------------------------------------------\n");
+	printf("picFinal : %d\n",picFinal);
+	printf("Centroid x = %f   y=%f  size=%d\n",CentroidFinal.x,CentroidFinal.y,sizematchFinal);
+	drawPoint(img2,CentroidFinal);
+printf("--------------------------------------------------------------------------\n");
+	//drawPoint(img2,matchesFinal[i].second);
+	for (unsigned int i = 0; i < matchesFinal.size(); ++i)
+  	{
+		drawPoint(img2,matchesFinal[i].second);
+		
+	}
+	cvNamedWindow("2", CV_WINDOW_NORMAL );
+  	cvShowImage("2",img2);
+	cvWaitKey(0);
+	should_continue=0;
+	
+  //return 0;
+	
 }
 
 //-------------------------------------------------------
@@ -333,12 +526,24 @@ int mainKmeans(void)
 
 //-------------------------------------------------------
 
-int main(void) 
+int main(int argc, char **argv) 
 {
   if (PROCEDURE == 1) return mainImage();
   if (PROCEDURE == 2) return mainVideo();
   if (PROCEDURE == 3) return mainMatch();
   if (PROCEDURE == 4) return mainMotionPoints();
-  if (PROCEDURE == 5) return mainStaticMatch();
+  //if (PROCEDURE == 5) return mainStaticMatch();
   if (PROCEDURE == 6) return mainKmeans();
+
+	ros::init(argc,argv,"surf");
+	ros::NodeHandle n;
+	ros::NodeHandle nh("~");
+	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,mainStaticMatch);
+	//ros::spin();
+	ros::Rate r(10); // 10 hz
+	while (should_continue)
+	{
+	  ros::spinOnce();
+	  r.sleep();
+	}
 }

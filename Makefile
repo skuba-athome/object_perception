@@ -36,10 +36,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/skuba-athome/skuba_athome_main/objects
+CMAKE_SOURCE_DIR = /home/demonx/skuba_athome_main/objects
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/skuba-athome/skuba_athome_main/objects
+CMAKE_BINARY_DIR = /home/demonx/skuba_athome_main/objects
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -66,9 +66,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/skuba-athome/skuba_athome_main/objects/CMakeFiles /home/skuba-athome/skuba_athome_main/objects/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/demonx/skuba_athome_main/objects/CMakeFiles /home/demonx/skuba_athome_main/objects/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/skuba-athome/skuba_athome_main/objects/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/demonx/skuba_athome_main/objects/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -161,6 +161,32 @@ clean-test-results/fast:
 .PHONY : clean-test-results/fast
 
 #=============================================================================
+# Target rules for targets named color
+
+# Build rule for target.
+color: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 color
+.PHONY : color
+
+# fast build rule for target.
+color/fast:
+	$(MAKE) -f CMakeFiles/color.dir/build.make CMakeFiles/color.dir/build
+.PHONY : color/fast
+
+#=============================================================================
+# Target rules for targets named color2
+
+# Build rule for target.
+color2: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 color2
+.PHONY : color2
+
+# fast build rule for target.
+color2/fast:
+	$(MAKE) -f CMakeFiles/color2.dir/build.make CMakeFiles/color2.dir/build
+.PHONY : color2/fast
+
+#=============================================================================
 # Target rules for targets named ece
 
 # Build rule for target.
@@ -226,6 +252,19 @@ open_door/fast:
 .PHONY : open_door/fast
 
 #=============================================================================
+# Target rules for targets named pcd_color_viewer
+
+# Build rule for target.
+pcd_color_viewer: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 pcd_color_viewer
+.PHONY : pcd_color_viewer
+
+# fast build rule for target.
+pcd_color_viewer/fast:
+	$(MAKE) -f CMakeFiles/pcd_color_viewer.dir/build.make CMakeFiles/pcd_color_viewer.dir/build
+.PHONY : pcd_color_viewer/fast
+
+#=============================================================================
 # Target rules for targets named pcd_viewer
 
 # Build rule for target.
@@ -237,6 +276,19 @@ pcd_viewer: cmake_check_build_system
 pcd_viewer/fast:
 	$(MAKE) -f CMakeFiles/pcd_viewer.dir/build.make CMakeFiles/pcd_viewer.dir/build
 .PHONY : pcd_viewer/fast
+
+#=============================================================================
+# Target rules for targets named pic
+
+# Build rule for target.
+pic: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 pic
+.PHONY : pic
+
+# fast build rule for target.
+pic/fast:
+	$(MAKE) -f CMakeFiles/pic.dir/build.make CMakeFiles/pic.dir/build
+.PHONY : pic/fast
 
 #=============================================================================
 # Target rules for targets named rosbuild_precompile
@@ -382,6 +434,19 @@ tester/fast:
 .PHONY : tester/fast
 
 #=============================================================================
+# Target rules for targets named tester_color
+
+# Build rule for target.
+tester_color: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 tester_color
+.PHONY : tester_color
+
+# fast build rule for target.
+tester_color/fast:
+	$(MAKE) -f CMakeFiles/tester_color.dir/build.make CMakeFiles/tester_color.dir/build
+.PHONY : tester_color/fast
+
+#=============================================================================
 # Target rules for targets named tests
 
 # Build rule for target.
@@ -393,6 +458,21 @@ tests: cmake_check_build_system
 tests/fast:
 	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/build
 .PHONY : tests/fast
+
+# target to build an object file
+src/color.o:
+	$(MAKE) -f CMakeFiles/color2.dir/build.make CMakeFiles/color2.dir/src/color.o
+.PHONY : src/color.o
+
+# target to preprocess a source file
+src/color.i:
+	$(MAKE) -f CMakeFiles/color2.dir/build.make CMakeFiles/color2.dir/src/color.i
+.PHONY : src/color.i
+
+# target to generate assembly for a file
+src/color.s:
+	$(MAKE) -f CMakeFiles/color2.dir/build.make CMakeFiles/color2.dir/src/color.s
+.PHONY : src/color.s
 
 # target to build an object file
 src/ece.o:
@@ -500,6 +580,21 @@ src/nearest_neighbors.s:
 .PHONY : src/nearest_neighbors.s
 
 # target to build an object file
+src/obj_color.o:
+	$(MAKE) -f CMakeFiles/color.dir/build.make CMakeFiles/color.dir/src/obj_color.o
+.PHONY : src/obj_color.o
+
+# target to preprocess a source file
+src/obj_color.i:
+	$(MAKE) -f CMakeFiles/color.dir/build.make CMakeFiles/color.dir/src/obj_color.i
+.PHONY : src/obj_color.i
+
+# target to generate assembly for a file
+src/obj_color.s:
+	$(MAKE) -f CMakeFiles/color.dir/build.make CMakeFiles/color.dir/src/obj_color.s
+.PHONY : src/obj_color.s
+
+# target to build an object file
 src/open_door.o:
 	$(MAKE) -f CMakeFiles/open_door.dir/build.make CMakeFiles/open_door.dir/src/open_door.o
 .PHONY : src/open_door.o
@@ -515,6 +610,21 @@ src/open_door.s:
 .PHONY : src/open_door.s
 
 # target to build an object file
+src/pcd_color_viewer.o:
+	$(MAKE) -f CMakeFiles/pcd_color_viewer.dir/build.make CMakeFiles/pcd_color_viewer.dir/src/pcd_color_viewer.o
+.PHONY : src/pcd_color_viewer.o
+
+# target to preprocess a source file
+src/pcd_color_viewer.i:
+	$(MAKE) -f CMakeFiles/pcd_color_viewer.dir/build.make CMakeFiles/pcd_color_viewer.dir/src/pcd_color_viewer.i
+.PHONY : src/pcd_color_viewer.i
+
+# target to generate assembly for a file
+src/pcd_color_viewer.s:
+	$(MAKE) -f CMakeFiles/pcd_color_viewer.dir/build.make CMakeFiles/pcd_color_viewer.dir/src/pcd_color_viewer.s
+.PHONY : src/pcd_color_viewer.s
+
+# target to build an object file
 src/pcd_viewer.o:
 	$(MAKE) -f CMakeFiles/pcd_viewer.dir/build.make CMakeFiles/pcd_viewer.dir/src/pcd_viewer.o
 .PHONY : src/pcd_viewer.o
@@ -528,6 +638,21 @@ src/pcd_viewer.i:
 src/pcd_viewer.s:
 	$(MAKE) -f CMakeFiles/pcd_viewer.dir/build.make CMakeFiles/pcd_viewer.dir/src/pcd_viewer.s
 .PHONY : src/pcd_viewer.s
+
+# target to build an object file
+src/pic.o:
+	$(MAKE) -f CMakeFiles/pic.dir/build.make CMakeFiles/pic.dir/src/pic.o
+.PHONY : src/pic.o
+
+# target to preprocess a source file
+src/pic.i:
+	$(MAKE) -f CMakeFiles/pic.dir/build.make CMakeFiles/pic.dir/src/pic.i
+.PHONY : src/pic.i
+
+# target to generate assembly for a file
+src/pic.s:
+	$(MAKE) -f CMakeFiles/pic.dir/build.make CMakeFiles/pic.dir/src/pic.s
+.PHONY : src/pic.s
 
 # target to build an object file
 src/surf.o:
@@ -560,6 +685,21 @@ src/test.s:
 .PHONY : src/test.s
 
 # target to build an object file
+src/test_color.o:
+	$(MAKE) -f CMakeFiles/tester_color.dir/build.make CMakeFiles/tester_color.dir/src/test_color.o
+.PHONY : src/test_color.o
+
+# target to preprocess a source file
+src/test_color.i:
+	$(MAKE) -f CMakeFiles/tester_color.dir/build.make CMakeFiles/tester_color.dir/src/test_color.i
+.PHONY : src/test_color.i
+
+# target to generate assembly for a file
+src/test_color.s:
+	$(MAKE) -f CMakeFiles/tester_color.dir/build.make CMakeFiles/tester_color.dir/src/test_color.s
+.PHONY : src/test_color.s
+
+# target to build an object file
 src/utils.o:
 	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/utils.o
 .PHONY : src/utils.o
@@ -585,13 +725,17 @@ help:
 	@echo "... ROSBUILD_gensrv_cpp"
 	@echo "... ROSBUILD_gensrv_lisp"
 	@echo "... clean-test-results"
+	@echo "... color"
+	@echo "... color2"
 	@echo "... ece"
 	@echo "... edit_cache"
 	@echo "... main"
 	@echo "... nearest_neighbors"
 	@echo "... object_surf"
 	@echo "... open_door"
+	@echo "... pcd_color_viewer"
 	@echo "... pcd_viewer"
+	@echo "... pic"
 	@echo "... rebuild_cache"
 	@echo "... rosbuild_precompile"
 	@echo "... rosbuild_premsgsrvgen"
@@ -604,7 +748,11 @@ help:
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tester"
+	@echo "... tester_color"
 	@echo "... tests"
+	@echo "... src/color.o"
+	@echo "... src/color.i"
+	@echo "... src/color.s"
 	@echo "... src/ece.o"
 	@echo "... src/ece.i"
 	@echo "... src/ece.s"
@@ -626,18 +774,30 @@ help:
 	@echo "... src/nearest_neighbors.o"
 	@echo "... src/nearest_neighbors.i"
 	@echo "... src/nearest_neighbors.s"
+	@echo "... src/obj_color.o"
+	@echo "... src/obj_color.i"
+	@echo "... src/obj_color.s"
 	@echo "... src/open_door.o"
 	@echo "... src/open_door.i"
 	@echo "... src/open_door.s"
+	@echo "... src/pcd_color_viewer.o"
+	@echo "... src/pcd_color_viewer.i"
+	@echo "... src/pcd_color_viewer.s"
 	@echo "... src/pcd_viewer.o"
 	@echo "... src/pcd_viewer.i"
 	@echo "... src/pcd_viewer.s"
+	@echo "... src/pic.o"
+	@echo "... src/pic.i"
+	@echo "... src/pic.s"
 	@echo "... src/surf.o"
 	@echo "... src/surf.i"
 	@echo "... src/surf.s"
 	@echo "... src/test.o"
 	@echo "... src/test.i"
 	@echo "... src/test.s"
+	@echo "... src/test_color.o"
+	@echo "... src/test_color.i"
+	@echo "... src/test_color.s"
 	@echo "... src/utils.o"
 	@echo "... src/utils.i"
 	@echo "... src/utils.s"

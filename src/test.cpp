@@ -1,8 +1,10 @@
 #include "test.h"
 
+ros::Publisher chatter_pub;
+
 void msg_cb(const std_msgs::String::ConstPtr& msg)
 {
-	ROS_INFO("%s",msg->data.c_str());
+	//ROS_INFO("%s",msg->data.c_str());
 
 	if(check)
 	{
@@ -12,25 +14,25 @@ void msg_cb(const std_msgs::String::ConstPtr& msg)
 
 	name = msg->data.c_str();
 
-	char idx[20];
+	char idx[100];
 	sprintf(idx,"%s%s",msg->data.c_str(),".idx");
-	printf("%s\n",idx);
+	//printf("%s\n",idx);
 	kdtree_idx_file_name = idx;
 
-	char h5[20];
+	char h5[100];
 	sprintf(h5,"%s%s",msg->data.c_str(),".h5");
 	training_data_h5_file_name = h5;
-	printf("%s\n",h5);
+	//printf("%s\n",h5);
 
-	char list[20];
+	char list[100];
 	sprintf(list,"%s%s",msg->data.c_str(),".list");
 	training_data_list_file_name = list;
-	printf("%s\n",list);
+	//printf("%s\n",list);
 
 	if (!boost::filesystem::exists (h5) || !boost::filesystem::exists (list))
 	{
 		pcl::console::print_error ("Could not find training data models files %s and %s!\n",
-			training_data_h5_file_name.c_str (), training_data_list_file_name.c_str ());
+		training_data_h5_file_name.c_str (), training_data_list_file_name.c_str ());
 	    return ;
 	}
 	else
@@ -38,11 +40,10 @@ void msg_cb(const std_msgs::String::ConstPtr& msg)
 		ROS_INFO("%s",msg->data.c_str());
 		loadFileList (models, training_data_list_file_name);
 	    flann::load_from_file (data, training_data_h5_file_name, "training_data");
-	    pcl::console::print_highlight ("Training data found. Loaded %d VFH models from %s/%s.\n",
-	        (int)data.rows, training_data_h5_file_name.c_str (), training_data_list_file_name.c_str ());
+	    pcl::console::print_highlight ("Training data found. Loaded %d VFH models from %s/%s.\n",(int)data.rows,training_data_h5_file_name.c_str(),training_data_list_file_name.c_str ());
 	}
 
-	check = 1;
+	check = 5;
 
 }
 
@@ -71,7 +72,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		pcl::VoxelGrid<pcl::PointXYZ> vg;
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 		vg.setInputCloud (cloud);
-		vg.setLeafSize (0.0075f, 0.0075f, 0.01f);
+		vg.setLeafSize (0.003f, 0.003f, 0.005f);
 		vg.filter (*cloud_filtered);
 	//	std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
 
@@ -87,7 +88,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		seg.setOptimizeCoefficients (true);
 		seg.setModelType (pcl::SACMODEL_PLANE);
 		seg.setMethodType (pcl::SAC_RANSAC);
-		seg.setMaxIterations (250);
+		//seg.setMaxIterations (250);
 		seg.setDistanceThreshold (0.01);
 
 		int i=0, nr_points = (int) cloud_filtered->points.size ();
@@ -110,7 +111,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 			// Write the planar inliers to disk
 			extract.filter (*cloud_plane);
-			std::cout << "PointCloud representing the planar component: " << cloud_plane->points.size () << " data points." << std::endl;
+			//std::cout << "PointCloud representing the planar component: " << cloud_plane->points.size () << " data points." << std::endl;
 
 			// Remove the planar inliers, extract the rest
 			extract.setNegative (true);
@@ -124,15 +125,15 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 		std::vector<pcl::PointIndices> cluster_indices;
 		pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
-		ec.setClusterTolerance (0.05); // 2cm
-		ec.setMinClusterSize (200);
+		ec.setClusterTolerance (0.02); // 2cm
+		ec.setMinClusterSize (100);
 		ec.setMaxClusterSize (2500);
 		ec.setSearchMethod (tree);
 		ec.setInputCloud (cloud_filtered);
 		ec.extract (cluster_indices);
 
 		float x,y,z;
-		printf("debug : cluster \n");
+		//printf("debug : cluster \n");
 		for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
 		{
 			x = 0.0f;
@@ -154,10 +155,10 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 			cloud_cluster->height = 1;
 			cloud_cluster->is_dense = true;
 
-			std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
+			//std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
 
 			Eigen::Vector4f centroid;
-			pcl::compute3DCentroid(cloud_cluster,centroid);
+			//pcl::compute3DCentroid(cloud_cluster,centroid);
 
 			//printf("%.2f , %.2f , %.2f \n",centroid.);
 
@@ -206,30 +207,53 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 			{
 				vfh_model histogram;
 				loadHist ("test.vfh.pcd", histogram );
-				printf("debug : segmentation fault !\n");
-				char tmp[20];
+				//printf("debug : segmentation fault !\n");
+				char tmp[100];
 				sprintf(tmp,"%s.idx",name.c_str()	);
 				flann::Index<flann::ChiSquareDistance<float> > index (data, flann::SavedIndexParams (tmp));
 			    index.buildIndex ();
 			    nearestKSearch (index, histogram, k, k_indices, k_distances);
 
 			    // Output the results on screen
-			    pcl::console::print_highlight ("The closest %d neighbors for %s are:\n", k, name.c_str() );
-			    for (int i = 0; i < k; ++i)
-			      pcl::console::print_info ("    %d - %s (%d) with a distance of: %f\n",
-			          i, models.at (k_indices[0][i]).first.c_str (), k_indices[0][i], k_distances[0][i]);
+			   	pcl::console::print_highlight ("The closest %d neighbors for %s are:\n", k, name.c_str() );
+			    //for (int i = 0; i < k; ++i)
+			    pcl::console::print_info ("    %d - %s (%d) with a distance of: %f\n",i, models.at (k_indices[0][i]).first.c_str (), k_indices[0][i], k_distances[0][i]);
 
-			    if(k_distances[0][0] < obg_threshold)
+			    if(k_distances[0][0] < obj_threshold)
 			    {
-					printf("%.2f %.2f %.2f  \n",x,y,z);
+					// public value is exists object "S %x %y %z"
+					printf("%.2f %.2f %.2f  \n",z,x,y);
+					char* str = new char[30];
+ 
+					//publish to Main_Control
+					sprintf(str,"S,%f,%f,%f",z,x,y);
+					state =str;
 					check = 0;
+					std_msgs::String msg;
+   			 		std::stringstream ss;
+	
+		    		ss << state;
+    				msg.data = ss.str();
+    				ROS_INFO("%s", msg.data.c_str());
+    				chatter_pub.publish(msg);
 					return ;
 			    }
 			}
 
 		 }
-		check = 0;
+		// public value is not exists "N ..."
+		check-- ;
+		if(check == 0)
+		{
+			state = 'N';
+			std_msgs::String msg;
+    		std::stringstream ss;
 
+    		ss << state;
+    		msg.data = ss.str();
+    		ROS_INFO("%s", msg.data.c_str());
+    		chatter_pub.publish(msg);
+		}
 		writer.write<pcl::PointXYZ> ("scence.pcd", *cloud, false);
 	}
 
@@ -240,16 +264,24 @@ int main (int argc, char** argv)
 	// Initialize ROS
 	ros::init (argc, argv, "my_pcl_tutorial");
 	ros::NodeHandle nh,n;
-
+	
 	// Create a ROS subscriber for the input point cloud
 	ros::Subscriber sub = nh.subscribe ("/camera/depth_registered/points", 1, cloud_cb);
 
+	chatter_pub = n.advertise<std_msgs::String>("objects_to_voice", 1000);
+	ros::Rate loop_rate(10);
 	// Create a ROS publisher for the output point cloud
 	pub = nh.advertise<sensor_msgs::PointCloud2> ("input", 1);
 
 	ros::Subscriber sub2 = n.subscribe(TOPIC_CONTROL, 1, msg_cb);
-
+/*
 	// Spin
+	while (ros::ok())
+  	{
+    	    	ros::spinOnce();
+    	loop_rate.sleep();
+  	}
+*/
 	ros::spin ();
 }
 
@@ -257,77 +289,77 @@ int main (int argc, char** argv)
 
 bool loadFileList (std::vector<vfh_model> &models, const std::string &filename)
 {
-  ifstream fs;
-  fs.open (filename.c_str ());
-  if (!fs.is_open () || fs.fail ())
-    return (false);
+  	ifstream fs;
+  	fs.open (filename.c_str ());
+  	if (!fs.is_open () || fs.fail ())
+    	return (false);
 
-  std::string line;
-  while (!fs.eof ())
-  {
-    getline (fs, line);
-    if (line.empty ())
-      continue;
-    vfh_model m;
-    m.first = line;
-    models.push_back (m);
-  }
-  fs.close ();
-  return (true);
+  	std::string line;
+  	while (!fs.eof ())
+  	{
+    	getline (fs, line);
+    	if (line.empty ())
+      		continue;
+    	vfh_model m;
+    	m.first = line;
+    	models.push_back (m);
+  	}
+  	fs.close ();
+  	return (true);
 }
 
 
 inline void nearestKSearch (flann::Index<flann::ChiSquareDistance<float> > &index, const vfh_model &model,
 							int k, flann::Matrix<int> &indices, flann::Matrix<float> &distances)
 {
-  // Query point
-  flann::Matrix<float> p = flann::Matrix<float>(new float[model.second.size ()], 1, model.second.size ());
-  memcpy (&p.ptr ()[0], &model.second[0], p.cols * p.rows * sizeof (float));
+	// Query point
+  	flann::Matrix<float> p = flann::Matrix<float>(new float[model.second.size ()], 1, model.second.size ());
+ 	memcpy (&p.ptr ()[0], &model.second[0], p.cols * p.rows * sizeof (float));
 
-  indices = flann::Matrix<int>(new int[k], 1, k);
-  distances = flann::Matrix<float>(new float[k], 1, k);
-  index.knnSearch (p, indices, distances, k, flann::SearchParams (512));
-  delete[] p.ptr ();
+  	indices = flann::Matrix<int>(new int[k], 1, k);
+  	distances = flann::Matrix<float>(new float[k], 1, k);
+  	index.knnSearch (p, indices, distances, k, flann::SearchParams (512));
+  	delete[] p.ptr ();
 }
 
 bool loadHist (const boost::filesystem::path &path, vfh_model &vfh)
 {
-  int vfh_idx;
-  // Load the file as a PCD
-  try
-  {
-    sensor_msgs::PointCloud2 cloud;
-    int version;
-    Eigen::Vector4f origin;
-    Eigen::Quaternionf orientation;
-    pcl::PCDReader r;
-    int type; int idx;
-    const std::string temp_str = path.string();
-    r.readHeader(temp_str, cloud, origin, orientation, version, type, idx);
+	int vfh_idx;
+	// Load the file as a PCD
+	try
+	{
+  		sensor_msgs::PointCloud2 cloud;
+  		int version;
+  		Eigen::Vector4f origin;
+  		Eigen::Quaternionf orientation;
+  		pcl::PCDReader r;
+  		int type; int idx;
+  		const std::string temp_str = path.string();
+  		r.readHeader(temp_str, cloud, origin, orientation, version, type, idx);
 
-    vfh_idx = pcl::getFieldIndex (cloud, "vfh");
-    if (vfh_idx == -1)
-      return (false);
-    if ((int)cloud.width * cloud.height != 1)
-      return (false);
-  }
-  catch (pcl::InvalidConversionException e)
-  {
-    return (false);
-  }
+  		vfh_idx = pcl::getFieldIndex (cloud, "vfh");
+  		if (vfh_idx == -1)
+    		return (false);
+  		if ((int)cloud.width * cloud.height != 1)
+    		return (false);
+	}
+	catch (pcl::InvalidConversionException e)
+	{
+  		return (false);
+	}
 
-  // Treat the VFH signature as a single Point Cloud
-  pcl::PointCloud <pcl::VFHSignature308> point;
-  pcl::io::loadPCDFile (path.string (), point);
-  vfh.second.resize (308);
+	// Treat the VFH signature as a single Point Cloud
+	pcl::PointCloud <pcl::VFHSignature308> point;
+	pcl::io::loadPCDFile (path.string (), point);
+	vfh.second.resize (308);
 
-  std::vector <sensor_msgs::PointField> fields;
-  getFieldIndex (point, "vfh", fields);
+	std::vector <sensor_msgs::PointField> fields;
+	getFieldIndex (point, "vfh", fields);
 
-  for (size_t i = 0; i < fields[vfh_idx].count; ++i)
-  {
-    vfh.second[i] = point.points[0].histogram[i];
-  }
-  vfh.first = path.string ();
-  return (true);
+	for (size_t i = 0; i < fields[vfh_idx].count; ++i)
+	{
+  		vfh.second[i] = point.points[0].histogram[i];
+	}
+	vfh.first = path.string ();
+	return (true);
 }

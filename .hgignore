@@ -5,4 +5,6 @@ syntax: glob
 build
 bin
 *.tmp
+CMakeCache.txt
+CMakeFiles
 

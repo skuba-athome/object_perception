@@ -7,7 +7,7 @@
 
 
 #include <pcl/ModelCoefficients.h>
-#include <pcl/point_types.h> d
+#include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/voxel_grid.h>
@@ -39,10 +39,19 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	pcl::PassThrough<pcl::PointXYZ> pass;
 	pass.setInputCloud (cloud);
 	pass.setFilterFieldName ("z");
-	pass.setFilterLimits (0.4, 2.0);
+	pass.setFilterLimits (0.4, 1.5);
 	pass.filter (*cloud);
 
+	pass.setInputCloud(cloud);
+	pass.setFilterFieldName("x");
+	pass.setFilterLimits(-0.5 , 0.5 );
+	pass.filter(*cloud);
 
+	pass.setInputCloud(cloud);
+	pass.setFilterFieldName("y");
+	pass.setFilterLimits(-0.3 , 0.3 );
+	pass.filter(*cloud);
+	
 	std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
 
 
@@ -50,7 +59,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	pcl::VoxelGrid<pcl::PointXYZ> vg;
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 	vg.setInputCloud (cloud);
-	vg.setLeafSize (0.0075f, 0.0075f, 0.01f);
+	vg.setLeafSize (0.005f, 0.005f, 0.005f);
 	vg.filter (*cloud_filtered);
 	std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
 
@@ -102,7 +111,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	std::vector<pcl::PointIndices> cluster_indices;
 	pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
 	ec.setClusterTolerance (0.05); // 2cm
-	ec.setMinClusterSize (200);
+	ec.setMinClusterSize (100);
 	ec.setMaxClusterSize (2500);
 	ec.setSearchMethod (tree);
 	ec.setInputCloud (cloud_filtered);
