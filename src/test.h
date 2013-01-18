@@ -1,4 +1,6 @@
 #include <ros/ros.h>
+#include <string.h>
+#include <string>
 #include <sensor_msgs/PointCloud2.h>
 // PCL specific includes
 #include <pcl/ros/conversions.h>
@@ -31,7 +33,7 @@
 #include <pcl_ros/impl/transforms.hpp>
 
 
-#define TOPIC_CONTROL "/cmd_state"
+#define TOPIC_CONTROL "voice_to_objects"
 
 ros::Publisher pub;
 int check = 0;
@@ -45,10 +47,11 @@ std::string kdtree_idx_file_name;
 std::string training_data_h5_file_name ;
 std::string training_data_list_file_name;
 std::string name;
+std::string state ="--";
 
 
 
-float obg_threshold = 100.0f;
+float obj_threshold = 75.0f;
 
 int k = 1;
 

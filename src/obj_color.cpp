@@ -29,14 +29,16 @@ ros::Publisher pub;
 
 void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>), cloud_f (new pcl::PointCloud<pcl::PointXYZ>);
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGB>), cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
+	
 	pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal> ());
+	
 	pcl::fromROSMsg(*input , *cloud);
 
 	std::cout << cloud->height << " " << cloud->width << std::endl;
 
 	// Create the filtering object
-	pcl::PassThrough<pcl::PointXYZ> pass;
+	pcl::PassThrough<pcl::PointXYZRGB> pass;
 	pass.setInputCloud (cloud);
 	pass.setFilterFieldName ("z");
 	pass.setFilterLimits (0.4, 1.5);
@@ -46,34 +48,36 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	pass.setFilterFieldName("x");
 	pass.setFilterLimits(-0.5 , 0.5 );
 	pass.filter(*cloud);
-
+/*
 	pass.setInputCloud(cloud);
 	pass.setFilterFieldName("y");
 	pass.setFilterLimits(-0.3 , 0.3 );
 	pass.filter(*cloud);
-	
-	std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
+*/	
+	std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; 
 
 
+	pcl::PCDWriter writer;
 	// Create the filtering object: downsample the dataset using a leaf size of 1cm
-	pcl::VoxelGrid<pcl::PointXYZ> vg;
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
+	pcl::VoxelGrid<pcl::PointXYZRGB> vg;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
 	vg.setInputCloud (cloud);
-	vg.setLeafSize (0.005f, 0.005f, 0.005f);
+	vg.setLeafSize (0.003f, 0.003f, 0.005f);
 	vg.filter (*cloud_filtered);
-	std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
+	std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; 
+
+	writer.write<pcl::PointXYZRGB> ("test.pcd", *cloud_filtered, true); //
 
 
 	// Create the segmentation object for the planar model and set all the parameters
-	pcl::SACSegmentation<pcl::PointXYZ> seg;
+	pcl::SACSegmentation<pcl::PointXYZRGB> seg;
 	pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
 	pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZ> ());
-	pcl::PCDWriter writer;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZRGB> ());
 	seg.setOptimizeCoefficients (true);
-	seg.setModelType (pcl::SACMODEL_PLANE);
+	seg.setModelType (pcl::SACMODEL_PARALLEL_PLANE);
 	seg.setMethodType (pcl::SAC_RANSAC);
-	seg.setMaxIterations (250);
+	//seg.setMaxIterations (250);
 	seg.setDistanceThreshold (0.01);
 
 	int i=0, nr_points = (int) cloud_filtered->points.size ();
@@ -89,7 +93,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	    }
 
 	    // Extract the planar inliers from the input cloud
-	    pcl::ExtractIndices<pcl::PointXYZ> extract;
+	    pcl::ExtractIndices<pcl::PointXYZRGB> extract;
 	    extract.setInputCloud (cloud_filtered);
 	    extract.setIndices (inliers);
 	    extract.setNegative (false);
@@ -105,12 +109,12 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	}
 
 	  // Creating the KdTree object for the search method of the extraction
-	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
+	pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
 	tree->setInputCloud (cloud_filtered);
 
 	std::vector<pcl::PointIndices> cluster_indices;
-	pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
-	ec.setClusterTolerance (0.05); // 2cm
+	pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
+	ec.setClusterTolerance (0.02); // 2cm
 	ec.setMinClusterSize (100);
 	ec.setMaxClusterSize (2500);
 	ec.setSearchMethod (tree);
@@ -120,7 +124,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	int j = 0;
 	for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
 	{
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
 
 		for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++)
 			cloud_cluster->points.push_back (cloud_filtered->points[*pit]); //*
@@ -133,14 +137,14 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 	    std::stringstream ss;
 		ss << "cloud_cluster_" << j << ".pcd";
-		writer.write<pcl::PointXYZ> (ss.str (), *cloud_cluster, false); //
+		writer.write<pcl::PointXYZRGB> (ss.str (), *cloud_cluster, false); //
 
 
 
 		//============================== vfh =====================================
 
 		// normal estimate
-		pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> ne;
+		pcl::NormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
 		ne.setInputCloud (cloud_cluster);
 		// Use all neighbors in a sphere of radius 3cm
 		ne.setRadiusSearch (0.03);
@@ -149,7 +153,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 		// Create the VFH estimation class, and pass the input dataset+normals to it
 
-		pcl::VFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::VFHSignature308> vfh;
+		pcl::VFHEstimation<pcl::PointXYZRGB, pcl::Normal, pcl::VFHSignature308> vfh;
 		vfh.setInputCloud(cloud_cluster);
 		vfh.setInputNormals(normals);
 
@@ -157,7 +161,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 		// Create an empty kdtree representation, and pass it to the FPFH estimation object.
 		// Its content will be filled inside the object, based on the given input dataset (as no other search surface is given).
-		pcl::KdTreeFLANN<pcl::PointXYZ>::Ptr tree (new pcl::KdTreeFLANN<pcl::PointXYZ> ());
+		pcl::KdTreeFLANN<pcl::PointXYZRGB>::Ptr tree (new pcl::KdTreeFLANN<pcl::PointXYZRGB> ());
 		//vfh.setSearchMethod (tree);
 
 
@@ -173,10 +177,11 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 		j++;
 	 }
-	writer.write<pcl::PointXYZ> ( "scence.pcd" , *cloud, false );
-	writer.write<pcl::PointXYZ> ( "scence_filter.pcd" , *cloud_filtered , false );
+	writer.write<pcl::PointXYZRGB> ( "scence.pcd" , *cloud, false );
+	writer.write<pcl::PointXYZRGB> ( "scence_filter.pcd" , *cloud_filtered , false );
 	// ... do data processing
 	exit(0);
+
 }
 
 int main (int argc, char** argv)

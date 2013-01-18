@@ -1,0 +1,3 @@
+pic/fantaG_01.jpg
+pic/fantaG_02.jpg
+pic/fantaG_03.jpg

@@ -20,7 +20,34 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <geometry_msgs/Vector3.h>
+//---pcl---
+#include <ros/ros.h>
+#include <sensor_msgs/PointCloud2.h>
+// PCL specific includes
+#include <pcl/ros/conversions.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 
+
+#include <pcl/ModelCoefficients.h>
+#include <pcl/point_types.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/filters/extract_indices.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/kdtree/kdtree.h>
+#include <pcl/sample_consensus/method_types.h>
+#include <pcl/sample_consensus/model_types.h>
+#include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/segmentation/extract_clusters.h>
+#include <pcl/filters/passthrough.h>
+#include <pcl/features/vfh.h>
+
+#include <pcl/kdtree/kdtree_flann.h>
+
+#include <pcl/features/normal_3d_omp.h>
+#include <pcl/visualization/cloud_viewer.h>
+//---------
 using namespace std;
 using namespace cv;
 using namespace cv_bridge;
@@ -600,37 +627,76 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	
 //if(canPrintDepth) cv::imshow("win2",depthImg);
 	//IndexBook *indexBook = load_index(imgLibDir);
+/*
+	for(int i=0;i<480;i++)
+	{
+		for (int j=0;j<640;j++){
+		//if(dist[i/640][i%640] < MAX_RANGE)
+			int k=i+j;
+			if(dist[i][j] < MAX_RANGE)
+			{
+			//printf("%d %d %.2f\n",i/480,i%480,dist[i/480][i%480]);
+			//printf("%.2f\n",dist[i/640][i%640]);
+			
+				inFrame->imageData[k*3] = msg->data[k*3];
+				inFrame->imageData[k*3+1] = msg->data[k*3+1];
+				inFrame->imageData[k*3+2] = msg->data[k*3+2];
+			}
+			else
+			{
+				inFrame->imageData[k*3] = 0;
+				inFrame->imageData[k*3+1] = 0;
+				inFrame->imageData[k*3+2] = 0;
+			}
+		}	
+	}	
+*/
 
 	for(int i=0;i<640*480;i++)
 	{
 		
+		//if(dist[i/640][i%640] < MAX_RANGE)
 		if(dist[i/640][i%640] < MAX_RANGE)
 		{
 			//printf("%d %d %.2f\n",i/480,i%480,dist[i/480][i%480]);
-			inFrame->imageData[i*3] = msg->data[i*3+2];
-			inFrame->imageData[i*3+1] = msg->data[i*3+1];
-			inFrame->imageData[i*3+2] = msg->data[i*3];
-		}
-		else
-		{
+			//printf("%.2f\n",dist[i/640][i%640]);
+			//inFrame->imageData[i*3] = msg->data[i*3+2];
+			//inFrame->imageData[i*3+1] = msg->data[i*3+1];
+			//inFrame->imageData[i*3+2] = msg->data[i*3];
+			//inFrame->imageData[i*3] = msg->data[i*3];
+			//inFrame->imageData[i*3+1] = msg->data[i*3+1];
+			//inFrame->imageData[i*3+2] = msg->data[i*3+2];
 			inFrame->imageData[i*3] = 0;
 			inFrame->imageData[i*3+1] = 0;
 			inFrame->imageData[i*3+2] = 0;
+		}
+		else
+		{
+			//inFrame->imageData[i*3] = 0;
+			//inFrame->imageData[i*3+1] = 0;
+			//inFrame->imageData[i*3+2] = 0;
+			inFrame->imageData[i*3] = msg->data[i*3];
+			inFrame->imageData[i*3+1] = msg->data[i*3+1];
+			inFrame->imageData[i*3+2] = msg->data[i*3+2];
 		}	
-	}		
+	}
+		
 	//cvShowImage("input",inFrame);
 	inFrameHSV = convertImageRGBtoHSV(inFrame);
 	//cvShowImage("HSV",inFrameHSV);
 	
-	cvLine(inFrame,cvPoint(210,0),cvPoint(210,479),CV_RGB(0,0,255));
-	cvLine(inFrame,cvPoint(420,0),cvPoint(420,479),CV_RGB(0,0,255));
-		
-	cvLine(inFrame,cvPoint(0,min_y),cvPoint(639,min_y),CV_RGB(0,0,255));
-	cvLine(inFrame,cvPoint(0,max_y),cvPoint(639,max_y),CV_RGB(0,0,255));
+	//cvLine(inFrame,cvPoint(210,0),cvPoint(210,479),CV_RGB(0,0,255));
+	//cvLine(inFrame,cvPoint(420,0),cvPoint(420,479),CV_RGB(0,0,255));
+
+	//cvLine(inFrame,cvPoint(0,0),cvPoint(640,480),CV_RGB(255,0,0));	
+
+	//cvLine(inFrame,cvPoint(0,min_y),cvPoint(639,min_y),CV_RGB(0,0,255));
+	//cvLine(inFrame,cvPoint(0,max_y),cvPoint(639,max_y),CV_RGB(0,0,255));
 	
-	cvShowImage("input",inFrame);
+	//cvShowImage("input",inFrame);
 	// red - color
 	int chk = 0;
+	
 	for(int i=0;i<480*640;i++)
 	{
 		if( isRed( inFrameHSV , i))
@@ -644,8 +710,8 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 			chk = 1;
 		}
 	}
-	cvReleaseImage(&inFrame);
-	inFrame = convertImageHSVtoRGB(inFrameHSV);
+	cvShowImage("input",inFrame);
+	//inFrame = convertImageHSVtoRGB(inFrameHSV);
 
 	inKey = cvWaitKey(1);
 	if(inKey == 27){
@@ -666,27 +732,29 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	}
 	if(inKey == 'g' && chk)
 	{
-		findObject(2);
+		//findObject(2);
 		cvShowImage("out2",inFrame);
 	}
 	if(inKey == 'b' && chk)
 	{
-		findObject(3);
+		//findObject(3);
 		cvShowImage("out2",inFrame);
 	}
 	if(get_coke)
 	{
-		findObject(1);
+		//findObject(1);
 	}
 	else if(get_pg)
 	{
-		findObject(2);
+		//findObject(2);
 	}else if(get_numtip)
 	{
-		findObject(3);
+		//findObject(3);
 	}
 	cvReleaseImage(&inFrameHSV);
 //	delete indexBook;
+	//cvShowImage("input",inFrame);
+	//cvShowImage("inFrameHSV",inFrameHSV);
 }
 
 int main(int argc , char *argv[])
@@ -712,9 +780,11 @@ int main(int argc , char *argv[])
 	ros::NodeHandle n;
 	ros::NodeHandle nh("~");
 	
+	//nh.param("min_range", min_range_, 0.5);
+	//nh.param("max_range", max_range_, 5.5);
+	
 	nh.param("min_range", min_range_, 0.5);
 	nh.param("max_range", max_range_, 5.5);
-
 	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,kinectCallBack);
 	ros::Subscriber subDepth = n.subscribe("/camera/depth/image",1,depthCb);
 	ros::Subscriber sub2 = n.subscribe(TOPIC_CONTROL, 1, controlCallBack);
