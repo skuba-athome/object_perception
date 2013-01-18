@@ -7,4 +7,4 @@ bin
 *.tmp
 CMakeCache.txt
 CMakeFiles
-
+*.svn*

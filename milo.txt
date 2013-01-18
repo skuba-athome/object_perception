@@ -1,4 +1,0 @@
-pic/milo01.jpg
-pic/milo02.jpg
-pic/milo03.jpg
-pic/milo04.jpg
