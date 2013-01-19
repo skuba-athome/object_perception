@@ -258,13 +258,12 @@ void convertmsg2img(const sensor_msgs::ImageConstPtr& msg)
     }
 	cvCvtColor ( imgRGB , img , CV_RGB2GRAY );
 }
-void mainStaticMatch(const sensor_msgs::ImageConstPtr& msg)
+void mainStaticMatch(const std_msgs::String::ConstPtr& msg)
 {
 
-	std::ifstream input("est.txt");
+	std::ifstream input(msg->data.c_str());
     	std::string line;
 	
-	convertmsg2img(msg);
 	//cvNamedWindow("kinect", CV_WINDOW_NORMAL );
 	//cvShowImage("kinect", imgRGB);
 /*
@@ -535,15 +534,14 @@ int main(int argc, char **argv)
   //if (PROCEDURE == 5) return mainStaticMatch();
   if (PROCEDURE == 6) return mainKmeans();
 
-	ros::init(argc,argv,"surf");
+	ros::init(argc,argv,"object_surf");
 	ros::NodeHandle n;
 	ros::NodeHandle nh("~");
-	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,mainStaticMatch);
+	ros::Subscriber sub_img = n.subscribe("/camera/rgb/image_color",1,convertmsg2img);
+	ros::Subscriber sub_filename = n.subscribe("/object/filename",10,mainStaticMatch);
 	//ros::spin();
 	ros::Rate r(10); // 10 hz
-	while (should_continue)
-	{
-	  ros::spinOnce();
-	  r.sleep();
-	}
+	ros::spin();
+
+	return 0;
 }
