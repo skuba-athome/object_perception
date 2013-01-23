@@ -15,6 +15,11 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
+find_package(PCL 1.2 REQUIRED)
+
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+
 #uncomment if you have defined messages
 #rosbuild_genmsg()
 #uncomment if you have defined services
@@ -97,3 +102,6 @@ target_link_libraries(open_door /opt/ros/fuerte/lib/libopencv_core.so)
 rosbuild_add_executable(color src/obj_color.cpp)
 rosbuild_add_executable(color2 src/color.cpp)
 rosbuild_add_executable(pic src/pic.cpp)
+
+rosbuild_add_executable(color_hist src/color_detection.cpp)
+target_link_libraries(color_hist ${PCL_LIBRARIES})
