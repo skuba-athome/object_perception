@@ -37,6 +37,8 @@
 IplImage* imgRGB = cvCreateImage( cvSize(1280,1024),IPL_DEPTH_8U, 3 );
 IplImage* img = cvCreateImage( cvSize(1280,1024),IPL_DEPTH_8U, 1 );
 int should_continue=1;
+ros::Publisher chatter_pub;
+std_msgs::String msg_pub;
 //-------------------------------------------------------
 // In order to you use OpenSURF, the following illustrates
 // some of the simple tasks you can do.  It takes only 1
@@ -250,6 +252,8 @@ int mainMotionPoints(void)
 //-------------------------------------------------------
 void convertmsg2img(const sensor_msgs::ImageConstPtr& msg)
 {
+	if(msg->width != 1280) return;
+	//std::cout<< "kinect: "  << img1->width << std::endl;
 	for(int i=0;i<1280*1024;i++)
 	{
 		imgRGB->imageData[i*3] = msg->data[i*3];
@@ -260,10 +264,6 @@ void convertmsg2img(const sensor_msgs::ImageConstPtr& msg)
 }
 void mainStaticMatch(const std_msgs::String::ConstPtr& msg)
 {
-
-	std::ifstream input(msg->data.c_str());
-    	std::string line;
-	
 	//cvNamedWindow("kinect", CV_WINDOW_NORMAL );
 	//cvShowImage("kinect", imgRGB);
 /*
@@ -343,15 +343,27 @@ void mainStaticMatch(const std_msgs::String::ConstPtr& msg)
 
   return 0;
 */
-
+	//std::ifstream input("pic2/fantaR.txt");
+	std::ifstream input(std::string(msg->data+".txt").c_str());    	
+	std::string line;
+	
+	//convertmsg2img(msg);
   IplImage *img1, *img2;
  	img2=imgRGB; 
 	int numpic=0;
+//-----------------------------------
 	IpPairVec matchesFinal;
 	Ipoint CentroidFinal;
 	int sizematchFinal=0;
 	int picFinal=0;
+//------------------------------------
+	IpPairVec matchesCan;
+	Ipoint CentroidCan;
+	int sizematchCan=0;
+	int picCan=0;
+//-----------------------------------
     	while( std::getline( input, line ) ) {
+		
         	std::cout<<line<<'\n';
 		//string namepic=line;
 		//printf("%s",line);
@@ -366,8 +378,8 @@ void mainStaticMatch(const std_msgs::String::ConstPtr& msg)
   //img1 = cvLoadImage("pic/est01.jpg");
   //img2 = cvLoadImage("pic/frame0005.jpg");           
   IpVec ipts1, ipts2;
-  surfDetDes(img1,ipts1,false,4,4,2,0.0001f);
-  surfDetDes(img2,ipts2,false,4,4,2,0.0001f);
+  surfDetDes(img1,ipts1,false,4,4,2,0.0003f);
+  surfDetDes(img2,ipts2,false,4,4,2,0.0003f);
 
   IpPairVec matches;
   getMatches(ipts1,ipts2,matches);
@@ -375,12 +387,12 @@ void mainStaticMatch(const std_msgs::String::ConstPtr& msg)
   std::cout << matches.size() << std::endl;
   std::cout << ipts1.size() << std::endl;
   std::cout << ipts2.size() << std::endl;
-/*
+
 std::cout<< "w1: "  << img1->width << std::endl;
 std::cout<< "h1: "  << img1->height << std::endl;
 std::cout<< "w2: "  << img2->width << std::endl;
 std::cout<< "h2: "  << img2->height << std::endl;
-*/
+
 const int & w1 = img1->width;
 const int & h1 = img1->height;
 //const int & w2 = img2->width;
@@ -403,12 +415,12 @@ int sizematch2=0;
   {
     //drawPoint(img1,matches[i].first);
     //drawPoint(img2,matches[i].second);
-
+	
     const int & w = img1->width;
     //cvLine(img1,cvPoint(matches[i].first.x,matches[i].first.y),cvPoint(matches[i].second.x+w,matches[i].second.y), cvScalar(255,255,255),1);
     //cvLine(img2,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
 	printf("x = %f   y=%f\n",matches[i].second.x,matches[i].second.y);
-
+	
 	if(i==0){
 	//printf("i = %d",i);
 
@@ -423,7 +435,7 @@ int sizematch2=0;
 		//printf("i = %d",i);
 		CentroidAvg.x+=matches[i].second.x;
 		CentroidAvg.y+=matches[i].second.y;
-		if((abs(matches[i].second.x-Centroid.x)<=(w1/2))&&(abs(matches[i].second.y-Centroid.y)<=(h1/2))){
+		if((abs(matches[i].second.x-Centroid.x)<=w1)&&(abs(matches[i].second.y-Centroid.y)<=h1)){
 			Centroid.x+=matches[i].second.x;
 			Centroid.y+=matches[i].second.y;
 			Centroid.x/=2;
@@ -445,13 +457,12 @@ int sizematch2=0;
 	//drawPoint(img2,Centroid);
 //printf("CentroidAvg x = %f   y=%f  size=%d\n",CentroidAvg.x,CentroidAvg.y,sizematch);
 printf("--------------------------------------------------------------------------\n");
-printf("pic : %d\n",numpic);
-printf("Centroid x = %f   y=%f  size=%d\n",Centroid.x,Centroid.y,sizematch2);
+printf("pic : %d\n",numpic+1);
+//printf("Centroid x = %f   y=%f  size=%d\n",Centroid.x,Centroid.y,sizematch2);
+printf("Centroid x = %f   y=%f  size=%d\n",Centroid.x,Centroid.y,sizematch);
   //cvLine(img2,cvPoint(Pt.x,Pt.y),cvPoint(Pt2.x,Pt2.y), cvScalar(255,255,255),1);
-cvLine(img2,cvPoint(Centroid.x,0.0),cvPoint(Centroid.x,1024.0), cvScalar(255,255,255),1);
-cvLine(img2,cvPoint(0.0,Centroid.y),cvPoint(1280.0,Centroid.y), cvScalar(255,255,255),1);
+//drawPoint(img2,matches[i].second);
   std::cout<< "Matches: " << matches.size() << std::endl;
-printf("--------------------------------------------------------------------------\n");
   //cvNamedWindow("1", CV_WINDOW_NORMAL );
   //cvNamedWindow("2", CV_WINDOW_NORMAL );
   //cvShowImage("1", img1);
@@ -461,23 +472,47 @@ printf("------------------------------------------------------------------------
     if(numpic==0){
 		matchesFinal=matches;
 		CentroidFinal=Centroid;
-		sizematchFinal=sizematch2;
+		sizematchFinal=sizematch;
 		picFinal=numpic;
+//-----------------------------------------
+		//matchesCan=matches;
+		//CentroidCan=Centroid;
+		//sizematchCan=sizematch;
+		//picCan=numpic;
+
 	}
     else{
-		if(sizematch2>sizematchFinal){
+		printf("sizematch=%d\n",sizematch);
+		if(sizematch>=sizematchFinal){
 			matchesFinal=matches;
 			CentroidFinal=Centroid;
-			sizematchFinal=sizematch2;
+			sizematchFinal=sizematch;
 			picFinal=numpic;
 		}
+		else if((sizematch>=sizematchCan)&&(sizematch<=sizematchFinal)){
+			matchesCan=matches;
+			CentroidCan=Centroid;
+			sizematchCan=sizematch;
+			picCan=numpic;
+		}
 	}
+printf("Final pic = %d   size=%d\n",picFinal+1,sizematchFinal);
+printf("Can pic = %d   size=%d\n",picCan+1,sizematchCan);
     numpic++;
+printf("--------------------------------------------------------------------------\n");
 }	
 printf("--------------------------------------------------------------------------\n");
-	printf("picFinal : %d\n",picFinal);
-	printf("Centroid x = %f   y=%f  size=%d\n",CentroidFinal.x,CentroidFinal.y,sizematchFinal);
+	printf("picFinal : %d\n",picFinal+1);
+	printf("Centroid x = %f   y=%f  size=%d\n",CentroidFinal.x/2,CentroidFinal.y/2,sizematchFinal);
 	drawPoint(img2,CentroidFinal);
+	cvLine(img2,cvPoint(CentroidFinal.x,0.0),cvPoint(CentroidFinal.x,1024.0), cvScalar(0,0,255),1);
+	cvLine(img2,cvPoint(0.0,CentroidFinal.y),cvPoint(1280.0,CentroidFinal.y), cvScalar(0,0,255),1);
+printf("--------------------------------------------------------------------------\n");
+	printf("picCan : %d\n",picCan+1);
+	printf("CentroidCan x = %f   y=%f  size=%d\n",CentroidCan.x/2,CentroidCan.y/2,sizematchCan);
+	drawPoint(img2,CentroidCan);
+	cvLine(img2,cvPoint(CentroidCan.x,0.0),cvPoint(CentroidCan.x,1024.0), cvScalar(255,0,0),1);
+	cvLine(img2,cvPoint(0.0,CentroidCan.y),cvPoint(1280.0,CentroidCan.y), cvScalar(255,0,0),1);
 printf("--------------------------------------------------------------------------\n");
 	//drawPoint(img2,matchesFinal[i].second);
 	for (unsigned int i = 0; i < matchesFinal.size(); ++i)
@@ -487,7 +522,20 @@ printf("------------------------------------------------------------------------
 	}
 	cvNamedWindow("2", CV_WINDOW_NORMAL );
   	cvShowImage("2",img2);
-	cvWaitKey(0);
+	char filenameS [255];
+	sprintf(filenameS, "%s.jpg",std::string(msg->data+".txt").c_str());
+	cvSaveImage("test.jpg",img2);
+	cvWaitKey(1000);
+	int Can1_x=CentroidFinal.x/2;
+	int Can1_y=CentroidFinal.y/2;
+	int Can2_x=CentroidCan.x/2;
+	int Can2_y=CentroidCan.x/2;
+	std::stringstream ss;
+    	ss << "Candiate1 "<< "x="<< Can1_x << " "<< "y="<< Can1_y <<" "<<"size="<< sizematchFinal ;
+        ss << "|Candiate2 "<< "x="<< Can2_x << " "<< "y="<< Can2_y <<" "<<"size="<< sizematchCan ;
+	msg_pub.data = ss.str();
+	ROS_INFO("%s", msg_pub.data.c_str());
+	chatter_pub.publish(msg_pub);
 	should_continue=0;
 	
   //return 0;
@@ -534,14 +582,19 @@ int main(int argc, char **argv)
   //if (PROCEDURE == 5) return mainStaticMatch();
   if (PROCEDURE == 6) return mainKmeans();
 
-	ros::init(argc,argv,"object_surf");
+	ros::init(argc,argv,"surf");
 	ros::NodeHandle n;
 	ros::NodeHandle nh("~");
-	ros::Subscriber sub_img = n.subscribe("/camera/rgb/image_color",1,convertmsg2img);
+	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,convertmsg2img);
 	ros::Subscriber sub_filename = n.subscribe("/object/filename",10,mainStaticMatch);
-	//ros::spin();
-	ros::Rate r(10); // 10 hz
+	chatter_pub = n.advertise<std_msgs::String>("/object/surf", 1000);
 	ros::spin();
-
-	return 0;
+	ros::Rate r(10); // 10 hz
+/*
+	while (should_continue)
+	{
+	  ros::spinOnce();
+	  r.sleep();
+	}
+*/
 }
