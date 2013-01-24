@@ -187,6 +187,19 @@ color2/fast:
 .PHONY : color2/fast
 
 #=============================================================================
+# Target rules for targets named color_hist
+
+# Build rule for target.
+color_hist: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 color_hist
+.PHONY : color_hist
+
+# fast build rule for target.
+color_hist/fast:
+	$(MAKE) -f CMakeFiles/color_hist.dir/build.make CMakeFiles/color_hist.dir/build
+.PHONY : color_hist/fast
+
+#=============================================================================
 # Target rules for targets named ece
 
 # Build rule for target.
@@ -198,6 +211,19 @@ ece: cmake_check_build_system
 ece/fast:
 	$(MAKE) -f CMakeFiles/ece.dir/build.make CMakeFiles/ece.dir/build
 .PHONY : ece/fast
+
+#=============================================================================
+# Target rules for targets named ech
+
+# Build rule for target.
+ech: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ech
+.PHONY : ech
+
+# fast build rule for target.
+ech/fast:
+	$(MAKE) -f CMakeFiles/ech.dir/build.make CMakeFiles/ech.dir/build
+.PHONY : ech/fast
 
 #=============================================================================
 # Target rules for targets named main
@@ -475,6 +501,36 @@ src/color.s:
 .PHONY : src/color.s
 
 # target to build an object file
+src/color_detection.o:
+	$(MAKE) -f CMakeFiles/color_hist.dir/build.make CMakeFiles/color_hist.dir/src/color_detection.o
+.PHONY : src/color_detection.o
+
+# target to preprocess a source file
+src/color_detection.i:
+	$(MAKE) -f CMakeFiles/color_hist.dir/build.make CMakeFiles/color_hist.dir/src/color_detection.i
+.PHONY : src/color_detection.i
+
+# target to generate assembly for a file
+src/color_detection.s:
+	$(MAKE) -f CMakeFiles/color_hist.dir/build.make CMakeFiles/color_hist.dir/src/color_detection.s
+.PHONY : src/color_detection.s
+
+# target to build an object file
+src/color_histogram.o:
+	$(MAKE) -f CMakeFiles/ech.dir/build.make CMakeFiles/ech.dir/src/color_histogram.o
+.PHONY : src/color_histogram.o
+
+# target to preprocess a source file
+src/color_histogram.i:
+	$(MAKE) -f CMakeFiles/ech.dir/build.make CMakeFiles/ech.dir/src/color_histogram.i
+.PHONY : src/color_histogram.i
+
+# target to generate assembly for a file
+src/color_histogram.s:
+	$(MAKE) -f CMakeFiles/ech.dir/build.make CMakeFiles/ech.dir/src/color_histogram.s
+.PHONY : src/color_histogram.s
+
+# target to build an object file
 src/ece.o:
 	$(MAKE) -f CMakeFiles/ece.dir/build.make CMakeFiles/ece.dir/src/ece.o
 .PHONY : src/ece.o
@@ -727,7 +783,9 @@ help:
 	@echo "... clean-test-results"
 	@echo "... color"
 	@echo "... color2"
+	@echo "... color_hist"
 	@echo "... ece"
+	@echo "... ech"
 	@echo "... edit_cache"
 	@echo "... main"
 	@echo "... nearest_neighbors"
@@ -753,6 +811,12 @@ help:
 	@echo "... src/color.o"
 	@echo "... src/color.i"
 	@echo "... src/color.s"
+	@echo "... src/color_detection.o"
+	@echo "... src/color_detection.i"
+	@echo "... src/color_detection.s"
+	@echo "... src/color_histogram.o"
+	@echo "... src/color_histogram.i"
+	@echo "... src/color_histogram.s"
 	@echo "... src/ece.o"
 	@echo "... src/ece.i"
 	@echo "... src/ece.s"
