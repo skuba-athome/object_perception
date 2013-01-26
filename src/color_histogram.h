@@ -37,9 +37,9 @@ typedef struct color_hist {
 	}
 
 	void norm() {
-		int hist_max = 0;
-		for(register int i=0;i<22;++i) hist_max = max(hist_max,hist[i]);
-		for(register int i=0;i<22;++i) hist_norm[i] = hist[i]*1.0/hist_max;
+		//int hist_max = 0;
+		//for(register int i=0;i<22;++i) hist_max = max(hist_max,hist[i]);
+		for(register int i=0;i<22;++i) hist_norm[i] = hist[i]*1.0/count();
 	}
 	
 	inline float operator-(struct color_hist &b) {
