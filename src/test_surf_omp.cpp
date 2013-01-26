@@ -262,284 +262,107 @@ void convertmsg2img(const sensor_msgs::ImageConstPtr& msg)
     }
 	cvCvtColor ( imgRGB , img , CV_RGB2GRAY );
 }
+
+Ipoint findCentroid(IpPairVec matches,int width,int height) {
+	Ipoint Centroid;
+	Centroid.x = 0;
+	Centroid.y = 0;
+	for(unsigned int i=0;i<matches.size();++i) {
+		if(i==0){
+				Centroid.x=matches[i].second.x;
+				Centroid.y=matches[i].second.y;
+		} else {
+				if((abs(matches[i].second.x-Centroid.x)<=width)&&(abs(matches[i].second.y-Centroid.y)<=height)){
+					Centroid.x+=matches[i].second.x;
+					Centroid.y+=matches[i].second.y;
+					Centroid.x/=2;
+					Centroid.y/=2;
+				}
+
+		}
+	}
+	return Centroid;
+}
+
+struct matchStruct {
+	IpPairVec matches;
+	Ipoint centroid;
+	int matchSize;
+};
+
+void find2Candidate(std::vector<struct matchStruct> candidate,struct matchStruct &first,struct matchStruct &second) {
+	first = candidate[0];
+	for(unsigned int i=1;i<candidate.size();++i) {
+		if(candidate[i].matchSize >= first.matchSize) {
+			second = first;
+			first = candidate[i];
+		} else if (candidate[i].matchSize >= second.matchSize) {
+			second = candidate[i];
+		}
+	}
+}
+
 void mainStaticMatch(const std_msgs::String::ConstPtr& msg)
 {
-	//cvNamedWindow("kinect", CV_WINDOW_NORMAL );
-	//cvShowImage("kinect", imgRGB);
-/*
-  IplImage *img1,*img2,*img3,*img4,*img5;
-  img1 = cvLoadImage("imgs/01.pgm");
-  img2 = cvLoadImage("imgs/02.pgm");
-  img3 = cvLoadImage("imgs/03.pgm");
-  img4 = cvLoadImage("imgs/04.pgm");
-  img5 = cvLoadImage("imgs/05.pgm");
-
-  cvShowImage("1", img1);
-
-  IpVec ipts1, ipts5,ipts4,ipts3,ipts2;
-  surfDetDes(img1,ipts1,false,4,4,2,0.0001f);
-  surfDetDes(img2,ipts2,false,4,4,2,0.0001f);
-  surfDetDes(img3,ipts3,false,4,4,2,0.0001f);
-  surfDetDes(img4,ipts4,false,4,4,2,0.0001f);
-  surfDetDes(img5,ipts5,false,4,4,2,0.0001f);
- 
-  IpPairVec matches;
-
-  getMatches(ipts1,ipts2,matches);
- 	for (unsigned int i = 0; i < matches.size(); ++i)
-  {
-    drawPoint(img1,matches[i].first);
-    drawPoint(img2,matches[i].second);
-  
-    const int & w = img1->width;
-    cvLine(img1,cvPoint(matches[i].first.x,matches[i].first.y),cvPoint(matches[i].second.x+w,matches[i].second.y), cvScalar(255,255,255),1);
-    cvLine(img2,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
-  } 
-
-*/
-
-	/*getMatches(ipts1,ipts3,matches);
-	for (unsigned int i = 0; i < matches.size(); ++i)
-  {
-    drawPoint(img1,matches[i].first);
-    drawPoint(img3,matches[i].second);
-  
-    const int & w = img1->width;
-    cvLine(img1,cvPoint(matches[i].first.x,matches[i].first.y),cvPoint(matches[i].second.x+w,matches[i].second.y), cvScalar(255,255,255),1);
-    cvLine(img3,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
-  }
-  getMatches(ipts1,ipts4,matches);
-  for (unsigned int i = 0; i < matches.size(); ++i)
-  {
-    drawPoint(img1,matches[i].first);
-    drawPoint(img4,matches[i].second);
-  
-    const int & w = img1->width;
-    cvLine(img1,cvPoint(matches[i].first.x,matches[i].first.y),cvPoint(matches[i].second.x+w,matches[i].second.y), cvScalar(255,255,255),1);
-    cvLine(img4,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
-  }
-	getMatches(ipts1,ipts5,matches);
-	for (unsigned int i = 0; i < matches.size(); ++i)
-  {
-    drawPoint(img1,matches[i].first);
-    drawPoint(img5,matches[i].second);
-  
-    const int & w = img1->width;
-    cvLine(img1,cvPoint(matches[i].first.x,matches[i].first.y),cvPoint(matches[i].second.x+w,matches[i].second.y), cvScalar(255,255,255),1);
-    cvLine(img5,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
-  }
-*/
-/*
-  std::cout<< "Matches: " << matches.size();
-
-  cvNamedWindow("1", CV_WINDOW_AUTOSIZE );
-  cvNamedWindow("2", CV_WINDOW_AUTOSIZE );
-  cvShowImage("2",img2);
-  cvShowImage("3", img3);
-  cvShowImage("4", img4);
-  cvShowImage("5", img5);
-  cvShowImage("1", img1);
-  cvWaitKey(0);
-
-  return 0;
-*/
 	//std::ifstream input("pic2/fantaR.txt");
 	std::ifstream input(std::string(msg->data+".txt").c_str());    	
 	std::string line;
 	
-	//convertmsg2img(msg);
   IplImage *img1, *img2;
  	img2=imgRGB; 
   IpVec ipts1, ipts2;
+	// environment image
   surfDetDes(img2,ipts2,false,5,4,2,0.0003f);
-	int numpic=0;
-//-----------------------------------
-	IpPairVec matchesFinal;
-	Ipoint CentroidFinal;
-	int sizematchFinal=0;
-	int picFinal=0;
-//------------------------------------
-	IpPairVec matchesCan;
-	Ipoint CentroidCan;
-	int sizematchCan=0;
-	int picCan=0;
-//-----------------------------------
-    	while( std::getline( input, line ) ) {
+	//-----------------------------------
+	std::vector<std::string> imagename;
+	// get all file image
+  while( std::getline( input, line ) ) {
+    std::cout << line << std::endl;
+		imagename.push_back(line);
+	}
+
+	std::vector<struct matchStruct> candidate;
+	
+	for(unsigned int i=0;i < imagename.size();++i)	{
+		img1 = cvLoadImage(imagename[i].c_str());
+  	surfDetDes(img1,ipts1,false,5,4,2,0.0003f);
+
+  	IpPairVec matches;
+  	getMatches(ipts1,ipts2,matches);
+		std::cout << "matches : " << matches.size() << std::endl;
+		Ipoint centroid = findCentroid(matches,img1->width,img1->height);
 		
-        	std::cout<<line<<'\n';
-		//string namepic=line;
-		//printf("%s",line);
-		char *fileName = (char*)line.c_str();
-		img1 = cvLoadImage(fileName);
-		//cvNamedWindow(fileName, CV_WINDOW_NORMAL );
-  		//cvShowImage(fileName, img1);
-		//numpic++;
-    	
-  //img1 = cvLoadImage("imgs/2013-01-07-030227_1.jpg");
-  //img2 = cvLoadImage("imgs/all_1.jpg");
-  //img1 = cvLoadImage("pic/est01.jpg");
-  //img2 = cvLoadImage("pic/frame0005.jpg");           
-  surfDetDes(img1,ipts1,false,5,4,2,0.0003f);
-
-  IpPairVec matches;
-  getMatches(ipts1,ipts2,matches);
+		struct matchStruct temp;
+		temp.matches = matches;
+		temp.centroid = centroid;
+		temp.matchSize = matches.size();
+		candidate.push_back(temp);
 	
-  std::cout << matches.size() << std::endl;
-  std::cout << ipts1.size() << std::endl;
-  std::cout << ipts2.size() << std::endl;
-
-std::cout<< "w1: "  << img1->width << std::endl;
-std::cout<< "h1: "  << img1->height << std::endl;
-std::cout<< "w2: "  << img2->width << std::endl;
-std::cout<< "h2: "  << img2->height << std::endl;
-
-const int & w1 = img1->width;
-const int & h1 = img1->height;
-//const int & w2 = img2->width;
-//const int & h2 = img2->height;
-
-
- Ipoint Pt;
- Pt.x=0.0;
- Pt.y=0.0;
-drawPoint(img2,Pt);
-Ipoint Pt2;
- Pt2.x=1280.0;
- Pt2.y=1024.0;
-drawPoint(img2,Pt2);
-Ipoint Centroid;
-Ipoint CentroidAvg;
-int sizematch=0;
-int sizematch2=0;
-  for (unsigned int i = 0; i < matches.size(); ++i)
-  {
-    //drawPoint(img1,matches[i].first);
-    //drawPoint(img2,matches[i].second);
-	
-    const int & w = img1->width;
-    //cvLine(img1,cvPoint(matches[i].first.x,matches[i].first.y),cvPoint(matches[i].second.x+w,matches[i].second.y), cvScalar(255,255,255),1);
-    //cvLine(img2,cvPoint(matches[i].first.x-w,matches[i].first.y),cvPoint(matches[i].second.x,matches[i].second.y), cvScalar(255,255,255),1);
-	printf("x = %f   y=%f\n",matches[i].second.x,matches[i].second.y);
-	
-	if(i==0){
-	//printf("i = %d",i);
-
-		Centroid.x=matches[i].second.x;
-		Centroid.y=matches[i].second.y;
-		CentroidAvg.x=matches[i].second.x;
-		CentroidAvg.y=matches[i].second.y;
-		sizematch2++;
 	}
-
-	else{
-		//printf("i = %d",i);
-		CentroidAvg.x+=matches[i].second.x;
-		CentroidAvg.y+=matches[i].second.y;
-		if((abs(matches[i].second.x-Centroid.x)<=w1)&&(abs(matches[i].second.y-Centroid.y)<=h1)){
-			Centroid.x+=matches[i].second.x;
-			Centroid.y+=matches[i].second.y;
-			Centroid.x/=2;
-			Centroid.y/=2;
-			sizematch2++;
-		}
-
-	}
-	sizematch++;
-  }
-	CentroidAvg.x=CentroidAvg.x/sizematch;
-	CentroidAvg.y=CentroidAvg.y/sizematch;
-	//drawPoint(img2,CentroidAvg);
-
-/*
-	Centroid.x=Centroid.x/sizematch2;
-	Centroid.y=Centroid.y/sizematch2;
-*/
-	//drawPoint(img2,Centroid);
-//printf("CentroidAvg x = %f   y=%f  size=%d\n",CentroidAvg.x,CentroidAvg.y,sizematch);
-printf("--------------------------------------------------------------------------\n");
-printf("pic : %d\n",numpic+1);
-//printf("Centroid x = %f   y=%f  size=%d\n",Centroid.x,Centroid.y,sizematch2);
-printf("Centroid x = %f   y=%f  size=%d\n",Centroid.x,Centroid.y,sizematch);
-  //cvLine(img2,cvPoint(Pt.x,Pt.y),cvPoint(Pt2.x,Pt2.y), cvScalar(255,255,255),1);
-//drawPoint(img2,matches[i].second);
-  std::cout<< "Matches: " << matches.size() << std::endl;
-  //cvNamedWindow("1", CV_WINDOW_NORMAL );
-  //cvNamedWindow("2", CV_WINDOW_NORMAL );
-  //cvShowImage("1", img1);
-  //cvShowImage("2",img2);
-  //cvWaitKey(0);
-	
-    if(numpic==0){
-		matchesFinal=matches;
-		CentroidFinal=Centroid;
-		sizematchFinal=sizematch;
-		picFinal=numpic;
-//-----------------------------------------
-		//matchesCan=matches;
-		//CentroidCan=Centroid;
-		//sizematchCan=sizematch;
-		//picCan=numpic;
-
-	}
-    else{
-		printf("sizematch=%d\n",sizematch);
-		if(sizematch>=sizematchFinal){
-			matchesFinal=matches;
-			CentroidFinal=Centroid;
-			sizematchFinal=sizematch;
-			picFinal=numpic;
-		}
-		else if((sizematch>=sizematchCan)&&(sizematch<=sizematchFinal)){
-			matchesCan=matches;
-			CentroidCan=Centroid;
-			sizematchCan=sizematch;
-			picCan=numpic;
-		}
-	}
-printf("Final pic = %d   size=%d\n",picFinal+1,sizematchFinal);
-printf("Can pic = %d   size=%d\n",picCan+1,sizematchCan);
-    numpic++;
-printf("--------------------------------------------------------------------------\n");
-}	
-printf("--------------------------------------------------------------------------\n");
-	printf("picFinal : %d\n",picFinal+1);
-	printf("Centroid x = %f   y=%f  size=%d\n",CentroidFinal.x/2,CentroidFinal.y/2,sizematchFinal);
-	drawPoint(img2,CentroidFinal);
-	cvLine(img2,cvPoint(CentroidFinal.x,0.0),cvPoint(CentroidFinal.x,1024.0), cvScalar(0,0,255),1);
-	cvLine(img2,cvPoint(0.0,CentroidFinal.y),cvPoint(1280.0,CentroidFinal.y), cvScalar(0,0,255),1);
-printf("--------------------------------------------------------------------------\n");
-	printf("picCan : %d\n",picCan+1);
-	printf("CentroidCan x = %f   y=%f  size=%d\n",CentroidCan.x/2,CentroidCan.y/2,sizematchCan);
-	drawPoint(img2,CentroidCan);
-	cvLine(img2,cvPoint(CentroidCan.x,0.0),cvPoint(CentroidCan.x,1024.0), cvScalar(255,0,0),1);
-	cvLine(img2,cvPoint(0.0,CentroidCan.y),cvPoint(1280.0,CentroidCan.y), cvScalar(255,0,0),1);
-printf("--------------------------------------------------------------------------\n");
+	struct matchStruct first,second;
+	find2Candidate(candidate,first,second);
 	//drawPoint(img2,matchesFinal[i].second);
-	for (unsigned int i = 0; i < matchesFinal.size(); ++i)
-  	{
-		drawPoint(img2,matchesFinal[i].second);
-		
+	for (register int i = 0; i < first.matchSize; ++i)
+  {
+		drawPoint(img2,first.matches[i].second);
 	}
+	//char filenameS [255];
+	//sprintf(filenameS, "%s.jpg",std::string(msg->data+".txt").c_str());
+	//cvSaveImage("test.jpg",img2);
+	//cvWaitKey(1000);
+	int Can1_x=first.centroid.x/2;
+	int Can1_y=first.centroid.y/2;
+	int Can2_x=second.centroid.x/2;
+	int Can2_y=second.centroid.y/2;
+	std::stringstream ss;
+  ss << "Candiate1 "<< "x="<< Can1_x << " "<< "y="<< Can1_y <<" "<<"size="<< first.matchSize ;
+  ss << "|Candiate2 "<< "x="<< Can2_x << " "<< "y="<< Can2_y <<" "<<"size="<< second.matchSize ;
 	cvNamedWindow("2", CV_WINDOW_NORMAL );
   	cvShowImage("2",img2);
-	char filenameS [255];
-	sprintf(filenameS, "%s.jpg",std::string(msg->data+".txt").c_str());
-	cvSaveImage("test.jpg",img2);
-	cvWaitKey(1000);
-	int Can1_x=CentroidFinal.x/2;
-	int Can1_y=CentroidFinal.y/2;
-	int Can2_x=CentroidCan.x/2;
-	int Can2_y=CentroidCan.x/2;
-	std::stringstream ss;
-    	ss << "Candiate1 "<< "x="<< Can1_x << " "<< "y="<< Can1_y <<" "<<"size="<< sizematchFinal ;
-        ss << "|Candiate2 "<< "x="<< Can2_x << " "<< "y="<< Can2_y <<" "<<"size="<< sizematchCan ;
+	cvWaitKey(1);
 	msg_pub.data = ss.str();
 	ROS_INFO("%s", msg_pub.data.c_str());
 	chatter_pub.publish(msg_pub);
-	should_continue=0;
-	
-  //return 0;
-	
 }
 
 //-------------------------------------------------------
@@ -588,6 +411,7 @@ int main(int argc, char **argv)
 	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,convertmsg2img);
 	ros::Subscriber sub_filename = n.subscribe("/object/filename",10,mainStaticMatch);
 	chatter_pub = n.advertise<std_msgs::String>("/object/surf", 1000);
+	ROS_INFO("Start SURF");
 	ros::spin();
 	ros::Rate r(10); // 10 hz
 /*
