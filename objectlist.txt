@@ -6,6 +6,7 @@ fantaO pic2/fantaO
 fantaP pic2/fantaP
 pringO pic2/pringO
 pringG pic2/pringG
+pringR pic2/pringR
 maleeG pic2/maleeG
 maleeR pic2/maleeR
 redbox pic2/redbox
