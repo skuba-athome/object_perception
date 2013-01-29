@@ -101,6 +101,9 @@ void ece(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud,const float &voxel_distanc
      ec.setInputCloud (cloud_filtered);
      ec.extract (cluster_indices);
 
+	 color_hist object_main;
+	 object_main.readFile(filename+".color");
+
 	 int j = 0;
      for (vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it) {
          pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -111,12 +114,19 @@ void ece(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud,const float &voxel_distanc
          cloud_cluster->height = 1;
          cloud_cluster->is_dense = true;
          
-         ROS_INFO("PointCloud representing the Cluster: %d data points.",cloud_cluster->points.size ());
+         //ROS_INFO("PointCloud representing the Cluster: %d data points.",cloud_cluster->points.size ());
          stringstream ss;
          ss << "object_" << j << ".pcd";
 		 j++;
-         writer.write<pcl::PointXYZRGB> (ss.str (), *cloud_cluster, false); //*
+         //writer.write<pcl::PointXYZRGB> (ss.str (), *cloud_cluster, false); //*
 		  
+     	 pcl::PointCloud<pcl::PointXYZHSV>::Ptr cloud_hsv (new pcl::PointCloud<pcl::PointXYZHSV>);
+	 	 PointCloudXYZRGBtoXYZHSV(*cloud_cluster,*cloud_hsv);
+		 color_hist object_temp;
+	     object_temp.init();
+	     object_temp.classify(cloud_hsv);
+         ROS_INFO("%d -- Diff : %lf",j,object_main -object_temp);
+		 
      }
 }
 
@@ -145,7 +155,7 @@ void checkPoint() {
 	 color_hist object_main;
 	 object_main.readFile(filename+".color");
      int isFound = 0;
-	int j=0;
+	 int j=0;
      for (vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it) {
 	 	if(isFound) continue;
 		int isContinue = 1;

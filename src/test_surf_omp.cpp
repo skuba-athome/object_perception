@@ -357,8 +357,7 @@ void mainStaticMatch(const std_msgs::String::ConstPtr& msg)
 	std::stringstream ss;
   ss << "Candiate1 "<< "x="<< Can1_x << " "<< "y="<< Can1_y <<" "<<"size="<< first.matchSize ;
   ss << "|Candiate2 "<< "x="<< Can2_x << " "<< "y="<< Can2_y <<" "<<"size="<< second.matchSize ;
-	cvNamedWindow("2", CV_WINDOW_NORMAL );
-  	cvShowImage("2",img2);
+  cvShowImage("2",img2);
 	cvWaitKey(1);
 	msg_pub.data = ss.str();
 	ROS_INFO("%s", msg_pub.data.c_str());
@@ -412,6 +411,7 @@ int main(int argc, char **argv)
 	ros::Subscriber sub_filename = n.subscribe("/object/filename",10,mainStaticMatch);
 	chatter_pub = n.advertise<std_msgs::String>("/object/surf", 1000);
 	ROS_INFO("Start SURF");
+	cvNamedWindow("2", CV_WINDOW_NORMAL );
 	ros::spin();
 	ros::Rate r(10); // 10 hz
 /*
