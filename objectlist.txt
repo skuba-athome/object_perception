@@ -1,2 +1,12 @@
 coke pic2/coke
 est pic2/est
+fantaG pic2/fantaG
+fantaR pic2/fantaR
+fantaO pic2/fantaO
+fantaP pic2/fantaP
+pringO pic2/pringO
+pringG pic2/pringG
+maleeG pic2/maleeG
+maleeR pic2/maleeR
+redbox pic2/redbox
+lipton pic2/lipton
