@@ -19,7 +19,7 @@ typedef struct color_hist {
 	}
 
 	inline int h_classify(float h){
-		for(register int i=0;i<19;++i)
+		for(register int i=0;i<=19;++i)
 			if(h < i*18+6.0) return i;
 		return 0;
 	}
