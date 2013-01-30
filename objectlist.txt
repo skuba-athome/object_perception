@@ -11,3 +11,7 @@ maleeG pic2/maleeG 0.2
 maleeR pic2/maleeR 0.2
 redbox pic2/redbox 0.5
 lipton pic2/lipton 0.5
+oishi pic2/oishi 0.5
+sprite pic2/sprite 0.5
+sponsor pic2/sponsor 0.5
+schwep pic2/schwep 0.5

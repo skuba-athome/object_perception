@@ -1,0 +1,7 @@
+pic2/sprite_01.jpg
+pic2/sprite_02.jpg
+pic2/sprite_03.jpg
+pic2/sprite_04.jpg
+pic2/sprite_05.jpg
+pic2/sprite_06.jpg
+pic2/sprite_07.jpg

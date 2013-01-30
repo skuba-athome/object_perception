@@ -1,0 +1,8 @@
+pic2/sponsor_01.jpg
+pic2/sponsor_02.jpg
+pic2/sponsor_03.jpg
+pic2/sponsor_04.jpg
+pic2/sponsor_05.jpg
+pic2/sponsor_06.jpg
+pic2/sponsor_07.jpg
+pic2/sponsor_08.jpg

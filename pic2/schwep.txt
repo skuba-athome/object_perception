@@ -1,0 +1,7 @@
+pic2/schweppes_01.jpg
+pic2/schweppes_02.jpg
+pic2/schweppes_03.jpg
+pic2/schweppes_04.jpg
+pic2/schweppes_05.jpg
+pic2/schweppes_06.jpg
+pic2/schweppes_07.jpg
