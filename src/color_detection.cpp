@@ -39,6 +39,25 @@ void savePointCloudToPCD(const sensor_msgs::PointCloud2& cloud,const char filena
      ROS_INFO ("Data saved to %s", filename);
 } 
 
+pcl::PointXYZRGB getCentroid(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud) {
+     pcl::PointXYZRGB centroid;
+     centroid.x = centroid.y = centroid.z = 0;
+     int size = cloud->width;
+     for (unsigned int i=0;i<cloud->width;++i) {
+         if(std::isnan(cloud->points[i].x)) size--;
+         else {
+              centroid.x += cloud->points[i].x;
+              centroid.y += cloud->points[i].y;
+              centroid.z += cloud->points[i].z;
+         }
+     }
+     centroid.x /= size;
+     centroid.y /= size;
+     centroid.z /= size;
+     return centroid;
+}
+
+
 void ece(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud,const float &voxel_distance,const string filename) {
      pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
      
@@ -101,10 +120,10 @@ void ece(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud,const float &voxel_distanc
      ec.setInputCloud (cloud_filtered);
      ec.extract (cluster_indices);
 
-	 color_hist object_main;
-	 object_main.readFile(filename+".color");
+     color_hist object_main;
+     object_main.readFile(filename+".color");
 
-	 int j = 0;
+     int j = 0;
      for (vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it) {
          pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
          for (vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit) {
@@ -117,14 +136,14 @@ void ece(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud,const float &voxel_distanc
          //ROS_INFO("PointCloud representing the Cluster: %d data points.",cloud_cluster->points.size ());
          stringstream ss;
          ss << "object_" << j << ".pcd";
-		 j++;
+	    j++;
          //writer.write<pcl::PointXYZRGB> (ss.str (), *cloud_cluster, false); //*
 		  
-     	 pcl::PointCloud<pcl::PointXYZHSV>::Ptr cloud_hsv (new pcl::PointCloud<pcl::PointXYZHSV>);
-	 	 PointCloudXYZRGBtoXYZHSV(*cloud_cluster,*cloud_hsv);
-		 color_hist object_temp;
-	     object_temp.init();
-	     object_temp.classify(cloud_hsv);
+         pcl::PointCloud<pcl::PointXYZHSV>::Ptr cloud_hsv (new pcl::PointCloud<pcl::PointXYZHSV>);
+         PointCloudXYZRGBtoXYZHSV(*cloud_cluster,*cloud_hsv);
+         color_hist object_temp;
+         object_temp.init();
+         object_temp.classify(cloud_hsv);
          ROS_INFO("%d -- Diff : %lf",j,object_main -object_temp);
 		 
      }
@@ -136,78 +155,94 @@ void getImageFromPCD(const char filename[]) {
 }
 
 void showCollectData(const int& pictureNO) {
-	 stringstream sss;
-	 sss << "picture_" << pictureNO << PICTURE_TYPE;
-	 cv::Mat image;
-	 image = cv::imread(sss.str(),1);
-	 cv::imshow("Show Image",image);
+     stringstream sss;
+     sss << "picture_" << pictureNO << PICTURE_TYPE;
+     cv::Mat image;
+     image = cv::imread(sss.str(),1);
+     cv::imshow("Show Image",image);
      //image.release();
 }
 
 void filenameCallback (const std_msgs::String::ConstPtr& msg) {
-	filename = msg->data;
-	ROS_INFO("filename : %s",msg->data.c_str());
-	cluster_indices.clear();
-	ece(cloud_pcl,0.00001f,filename);
+     std::string path("/home/skuba/skuba_athome/objects/");
+     filename = path+msg->data;
+     ROS_INFO("filename : %s",msg->data.c_str());
+     cluster_indices.clear();
+     ece(cloud_pcl,0.00001f,filename);
+}
+
+float getDistance(pcl::PointXYZRGB first,pcl::PointXYZRGB second) {
+     float diff_x = first.x - second.x;
+     float diff_y = first.y - second.y;
+     float diff_z = first.z - second.z;
+     return diff_x*diff_x + diff_y*diff_y + diff_z*diff_z;
 }
 
 void checkPoint() {
-	 color_hist object_main;
-	 object_main.readFile(filename+".color");
-     int isFound = 0;
-	 int j=0;
+     color_hist object_main;
+     object_main.readFile(filename+".color");
+     float min_dis= 100.0f,min_diff = 100.0f;
+     int j=0,min_j = 0;
+       
      for (vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it) {
-	 	if(isFound) continue;
-		int isContinue = 1;
-        pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
-        for (vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit) {
-		    if(pointCheck.x == cloud_filtered->points[*pit].x &&
-		   	pointCheck.y == cloud_filtered->points[*pit].y &&
-		   	pointCheck.z == cloud_filtered->points[*pit].z )
-		   		isContinue = 0;
-            cloud_cluster->points.push_back (cloud_filtered->points[*pit]); //*
-		}
-        cloud_cluster->width = cloud_cluster->points.size ();
-        cloud_cluster->height = 1;
-        cloud_cluster->is_dense = true;
-		 
-		if(isContinue) continue;
-		isFound = 1;
+         pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
+         for (vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); ++pit) {
+             cloud_cluster->points.push_back (cloud_filtered->points[*pit]); //*
+         }
+         cloud_cluster->width = cloud_cluster->points.size ();
+         cloud_cluster->height = 1;
+         cloud_cluster->is_dense = true;
+         pcl::PointXYZRGB centroid = getCentroid(cloud_cluster);
+         if(getDistance(centroid,pointCheck) < min_dis) min_dis = getDistance(centroid,pointCheck);
+         else{ ++j;continue;}
 	
-     	pcl::PointCloud<pcl::PointXYZHSV>::Ptr cloud_hsv (new pcl::PointCloud<pcl::PointXYZHSV>);
-	 	PointCloudXYZRGBtoXYZHSV(*cloud_cluster,*cloud_hsv);
+         pcl::PointCloud<pcl::PointXYZHSV>::Ptr cloud_hsv (new pcl::PointCloud<pcl::PointXYZHSV>);
+         PointCloudXYZRGBtoXYZHSV(*cloud_cluster,*cloud_hsv);
 		
-		color_hist object_temp;
+         color_hist object_temp;
 	    object_temp.init();
 	    object_temp.classify(cloud_hsv);
 		
-		std::stringstream sk;
-		//std::cout << object_main << object_temp ;
-		sk << j << " " << filename << " " << object_main - object_temp;
-		std_msgs::String msg;
-		msg.data = sk.str();
-		pub_color_hist.publish(msg);
-		ROS_INFO("%s",msg.data.c_str());
+         min_diff = object_main - object_temp;
+         min_j = j;
+         ++j;
      }
-     if(isFound == 0) {
-	 	std::stringstream sk;
-	 	//std::cout << object_main << object_temp ;
-	 	sk << j << " " << filename << " " << 100.00f;
-	 	std_msgs::String msg;
-	 	msg.data = sk.str();
-	 	pub_color_hist.publish(msg);
-	 	ROS_INFO("%s",msg.data.c_str());
-     }
+     std::stringstream sk;
+     //std::cout << object_main << object_temp ;
+     sk << min_j << " " << filename << " " << min_diff;
+     std_msgs::String msg;
+     msg.data = sk.str();
+     pub_color_hist.publish(msg);
+     ROS_INFO("%s",msg.data.c_str());
 }
 
+#define MAX_FRAME 3
 void pointcheckCallback (const std_msgs::String::ConstPtr& msg) {
-	int x,y;
-	ROS_INFO("pointCheck : %s",msg->data.c_str());
-	sscanf(msg->data.c_str(),"%d,%d",&x,&y);
-	if(x+y*640 >= 0 && x+y*640 < 640*480) {
-		pointCheck = cloud_pcl->points[x+y*640];
-		checkPoint();
-	}
+     int _x,_y;
+     ROS_INFO("pointCheck : %s",msg->data.c_str());
+     sscanf(msg->data.c_str(),"%d,%d",&_x,&_y);
+     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
+	for(int i=0;i<MAX_FRAME;++i)
+		for(int j=0;j<MAX_FRAME;++j) {
+			register int x = _x+i,y = _y+j;
+			if(x+y*640 >= 0 && x+y*640 < 640*480) {
+				if(!std::isnan(cloud_pcl->points[x+y*640].x)) {
+                                        cloud_cluster->points.push_back(cloud_pcl->points[x+y*640]);
+				}
+			}
+			x = _x-i; y = _y-j;
+			if(x+y*640 >= 0 && x+y*640 < 640*480) {
+				if(!std::isnan(cloud_pcl->points[x+y*640].x)) {
+                                        cloud_cluster->points.push_back(cloud_pcl->points[x+y*640]);
+				}
+			}
+		}
+     cloud_cluster->width = cloud_cluster->points.size();
+     cloud_cluster->height = 1;
+     cloud_cluster->is_dense = true;
+	
+     pointCheck = getCentroid(cloud_cluster);
+     checkPoint();
 }
 
 
