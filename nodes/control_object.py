@@ -22,14 +22,17 @@ def decision(data):
 		print color_candidate
 		a = float(color_candidate[0])
 		b = float(color_candidate[1])
-		if(a < b):
-			temp,x = surf_candidate[0][1].split('=')
-			temp,y = surf_candidate[0][2].split('=')
-			pub_show.publish('%s %s %s' % (x,y,object_list[object_index-1]))
+			
+		if(a <= b):
+			if(a < object_dic[object_list[object_index-1]][1]):
+				temp,x = surf_candidate[0][1].split('=')
+				temp,y = surf_candidate[0][2].split('=')
+				pub_show.publish('%s %s %s' % (x,y,object_list[object_index-1]))
 		else:
-			temp,x = surf_candidate[1][1].split('=')
-			temp,y = surf_candidate[1][2].split('=')
-			pub_show.publish('%s %s %s' % (x,y,object_list[object_index-1]))
+			if(b < object_dic[object_list[object_index-1]][1]):
+				temp,x = surf_candidate[1][1].split('=')
+				temp,y = surf_candidate[1][2].split('=')
+				pub_show.publish('%s %s %s' % (x,y,object_list[object_index-1]))
 		surf_candidate = []
 		color_candidate = []
 		pub_main.publish('data')
@@ -65,7 +68,7 @@ def mainCallback(data):
 		surf_candidate = []
 	if(object_index < len(object_list)):
 		rospy.loginfo(object_list[object_index])
-		pub_filename.publish(object_dic[object_list[object_index]])
+		pub_filename.publish(object_dic[object_list[object_index]][0])
 		object_index += 1
 		
 
@@ -87,8 +90,9 @@ if __name__ == '__main__':
 		f = open('objectlist.txt','r')
 		for line in f:
 			temp = line.strip().split(' ')
+			if('#' in temp[0]): continue
 			object_list.append(temp[0])
-			object_dic[temp[0]] = temp[1]
+			object_dic[temp[0]] = [temp[1],float(temp[2])]
 		f.close()
 		control_object()
 	except:

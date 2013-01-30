@@ -4,4 +4,3 @@ pic2/pringR_03.jpg
 pic2/pringR_04.jpg
 pic2/pringR_05.jpg
 pic2/pringR_06.jpg
-pic2/pringR_07.jpg

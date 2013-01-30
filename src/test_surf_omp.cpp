@@ -305,7 +305,8 @@ void find2Candidate(std::vector<struct matchStruct> candidate,struct matchStruct
 void mainStaticMatch(const std_msgs::String::ConstPtr& msg)
 {
 	//std::ifstream input("pic2/fantaR.txt");
-	std::ifstream input(std::string(msg->data+".txt").c_str());    	
+	std::string path("/home/skuba/skuba_athome/objects/");
+	std::ifstream input(std::string(path+msg->data+".txt").c_str());    	
 	std::string line;
 	
   IplImage *img1, *img2;

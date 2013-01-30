@@ -50,7 +50,7 @@ void showimg(const std_msgs::String::ConstPtr& msg)
 	float y;
 	char Name [255];
 	CvFont font;
-   	 cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0, 0, 5, CV_AA);
+   	 cvInitFont(&font,FONT_HERSHEY_COMPLEX, 1.0, 1.0, 0, 4, CV_AA);
 	//ROS_INFO("I heard: [%s]", msg->data.c_str());
   	//if(!img) printf("Could not load image file: %s\n",fileName);
 	//cvNamedWindow("Ipl", CV_WINDOW_NORMAL );
@@ -61,12 +61,15 @@ void showimg(const std_msgs::String::ConstPtr& msg)
 	Centroid.x=x*2;
 	Centroid.y=y*2;
 	//cvPutText(img, Name, Centroid, &font, cvScalar(0, 0, 255,0));
+	//cvLine(img2,cvPoint(Centroid.x,0.0),cvPoint(Centroid.x,1024.0), cvScalar(255,0,0),1);
+	//cvLine(img2,cvPoint(0.0,Centroid.y),cvPoint(1280.0,Centroid.y), cvScalar(255,0,0),1);
 	cvPutText(img2, Name, Centroid, &font, cvScalar(0, 0, 255,0));
 	//cvNamedWindow("2", CV_WINDOW_NORMAL );
   	//cvShowImage("2",img);
 	cvNamedWindow("22", CV_WINDOW_NORMAL );
   	cvShowImage("22",img2);
 	cvWaitKey(1000);
+	cvSaveImage("output.jpg",img2);
 	//cvReleaseImage(&img);
 	//}
 	//return 0;
