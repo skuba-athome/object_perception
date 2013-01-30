@@ -66,7 +66,7 @@ void showimg(const std_msgs::String::ConstPtr& msg)
 	cvPutText(img2, Name, Centroid, &font, cvScalar(0, 0, 255,0));
 	//cvNamedWindow("2", CV_WINDOW_NORMAL );
   	//cvShowImage("2",img);
-	cvNamedWindow("22", CV_WINDOW_NORMAL );
+	cvNamedWindow("22", CV_WINDOW_AUTOSIZE );
   	cvShowImage("22",img2);
 	cvWaitKey(1000);
 	cvSaveImage("output.jpg",img2);
