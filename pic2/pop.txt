@@ -1,0 +1,6 @@
+pic2/pop_01.jpg
+pic2/pop_02.jpg
+pic2/pop_03.jpg
+pic2/pop_04.jpg
+pic2/pop_05.jpg
+pic2/pop_06.jpg
