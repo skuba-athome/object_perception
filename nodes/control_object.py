@@ -20,19 +20,19 @@ def decision(data):
 	
 	if(len(surf_candidate) == len(color_candidate)):
 		print color_candidate
-		a = float(color_candidate[0])
-		b = float(color_candidate[1])
+		a = float(color_candidate[0][0])
+		b = float(color_candidate[1][0])
 			
 		if(a <= b):
 			if(a < object_dic[object_list[object_index-1]][1]):
 				temp,x = surf_candidate[0][1].split('=')
 				temp,y = surf_candidate[0][2].split('=')
-				pub_show.publish('%s %s %s' % (x,y,object_list[object_index-1]))
+				pub_show.publish('%s %s %s %s %s %s' % (x,y,object_list[object_index-1],color_candidate[0][1],color_candidate[0][2],color_candidate[0][3]))
 		else:
 			if(b < object_dic[object_list[object_index-1]][1]):
 				temp,x = surf_candidate[1][1].split('=')
 				temp,y = surf_candidate[1][2].split('=')
-				pub_show.publish('%s %s %s' % (x,y,object_list[object_index-1]))
+				pub_show.publish('%s %s %s %s %s %s' % (x,y,object_list[object_index-1],color_candidate[1][1],color_candidate[1][2],color_candidate[1][3]))
 		surf_candidate = []
 		color_candidate = []
 		pub_main.publish('data')
@@ -57,7 +57,7 @@ def surfCallback(data):
 def color_histCallback(data):
 	global color_candidate
 	temp = data.data.strip().split(' ')
-	color_candidate.append(temp[2])
+	color_candidate.append([temp[2],temp[3],temp[4],temp[5]])
 	decision('color_hist')
 
 def mainCallback(data):

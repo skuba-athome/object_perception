@@ -183,6 +183,7 @@ void checkPoint() {
      object_main.readFile(filename+".color");
      float min_dis= 100.0f,min_diff = 100.0f;
      int j=0,min_j = 0;
+     pcl::PointXYZRGB centroid_min;
        
      for (vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it) {
          pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -205,11 +206,13 @@ void checkPoint() {
 		
          min_diff = object_main - object_temp;
          min_j = j;
+         centroid_min = centroid;
          ++j;
      }
      std::stringstream sk;
      //std::cout << object_main << object_temp ;
-     sk << min_j << " " << filename << " " << min_diff;
+     sk << min_j << " " << filename << " " << min_diff << " " ;
+     sk << centroid_min.x << " " << centroid_min.y << " " << centroid_min.z << " ";
      std_msgs::String msg;
      msg.data = sk.str();
      pub_color_hist.publish(msg);
