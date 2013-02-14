@@ -115,3 +115,5 @@ rosbuild_add_executable(surf_omp src/test_surf_omp.cpp)
 target_link_libraries(surf_omp surf_libs)
 
 rosbuild_add_executable(show src/show.cpp)
+
+rosbuild_add_executable(framerate src/test_framerate.cpp)
