@@ -102,6 +102,7 @@ int main (int argc, char** argv) {
     // Write the planar inliers to disk
     extract.filter (*cloud_plane);
     std::cout << "PointCloud representing the planar component: " << cloud_plane->points.size () << " data points." << std::endl;
+    if(cloud_plane->points.size() < 100000) break;
 
     // Remove the planar inliers, extract the rest
     extract.setNegative (true);

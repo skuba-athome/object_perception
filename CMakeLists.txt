@@ -117,3 +117,11 @@ target_link_libraries(surf_omp surf_libs)
 rosbuild_add_executable(show src/show.cpp)
 
 rosbuild_add_executable(framerate src/test_framerate.cpp)
+
+rosbuild_add_executable(extract_surf src/extract_surf.cpp)
+
+rosbuild_add_executable(ml src/ml.cpp)
+rosbuild_add_executable(ml2 src/ml2.cpp)
+rosbuild_add_executable(ml3 src/ml3.cpp)
+rosbuild_add_executable(voxel_grid src/voxel_grid.cpp)
+rosbuild_add_executable(SURF_FlannMatcher src/SURF_FlannMatcher.cpp)
