@@ -76,7 +76,7 @@ void showimg(const std_msgs::String::ConstPtr& msg)
 	//cvNamedWindow("Ipl", CV_WINDOW_NORMAL );
 	//cvShowImage("Ipl",img);
 	sscanf(msg->data.c_str(),"%f %f %s %f %f %f",&x,&y,Name,&_x,&_y,&_z);
-	printf("%f %f %s\n",x,y,Name);
+	printf("%f %f %s\n%f %f %f\n",x,y,Name,_x,_y,_z);
 	cv::Point Centroid;
 	Centroid.x=x*2;
 	Centroid.y=y*2;
