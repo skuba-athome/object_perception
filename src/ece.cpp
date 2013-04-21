@@ -60,7 +60,7 @@ int main (int argc, char** argv) {
   // Create the filtering object: downsample the dataset using a leaf size of 1cm
   pcl::VoxelGrid<pcl::PointXYZRGB> vg;
   vg.setInputCloud (cloud);
-  vg.setLeafSize (0.0001f, 0.0001f, 0.0001f);
+  vg.setLeafSize (0.01f, 0.01f, 0.01f);
   vg.filter (*cloud_filtered);
 
   /*pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB> sor;
@@ -102,7 +102,7 @@ int main (int argc, char** argv) {
     // Write the planar inliers to disk
     extract.filter (*cloud_plane);
     std::cout << "PointCloud representing the planar component: " << cloud_plane->points.size () << " data points." << std::endl;
-    if(cloud_plane->points.size() < 100000) break;
+    //if(cloud_plane->points.size() < 100000) break;
 
     // Remove the planar inliers, extract the rest
     extract.setNegative (true);
@@ -116,7 +116,7 @@ int main (int argc, char** argv) {
 
   pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
   ec.setClusterTolerance (0.02); // 2cm
-  ec.setMinClusterSize (1000);
+  ec.setMinClusterSize (100);
   ec.setMaxClusterSize (25000);
   ec.setSearchMethod (tree);
   ec.setInputCloud (cloud_filtered);

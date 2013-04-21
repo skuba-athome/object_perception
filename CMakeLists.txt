@@ -125,3 +125,8 @@ rosbuild_add_executable(ml2 src/ml2.cpp)
 rosbuild_add_executable(ml3 src/ml3.cpp)
 rosbuild_add_executable(voxel_grid src/voxel_grid.cpp)
 rosbuild_add_executable(SURF_FlannMatcher src/SURF_FlannMatcher.cpp)
+rosbuild_add_executable(extract_object src/extract_object.cpp)
+target_link_libraries(extract_object ${PCL_LIBRARIES})
+
+rosbuild_add_executable(range_image_border_extraction src/range_image_border_extraction.cpp)
+target_link_libraries(range_image_border_extraction ${PCL_LIBRARIES})
