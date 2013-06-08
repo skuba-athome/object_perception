@@ -663,12 +663,12 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 			//inFrame->imageData[i*3] = msg->data[i*3+2];
 			//inFrame->imageData[i*3+1] = msg->data[i*3+1];
 			//inFrame->imageData[i*3+2] = msg->data[i*3];
-			//inFrame->imageData[i*3] = msg->data[i*3];
-			//inFrame->imageData[i*3+1] = msg->data[i*3+1];
-			//inFrame->imageData[i*3+2] = msg->data[i*3+2];
-			inFrame->imageData[i*3] = 0;
-			inFrame->imageData[i*3+1] = 0;
-			inFrame->imageData[i*3+2] = 0;
+			inFrame->imageData[i*3] = msg->data[i*3];
+			inFrame->imageData[i*3+1] = msg->data[i*3+1];
+			inFrame->imageData[i*3+2] = msg->data[i*3+2];
+			//inFrame->imageData[i*3] = 0;
+			//inFrame->imageData[i*3+1] = 0;
+			//inFrame->imageData[i*3+2] = 0;
 		}
 		else
 		{
@@ -786,7 +786,10 @@ int main(int argc , char *argv[])
 	nh.param("min_range", min_range_, 0.5);
 	nh.param("max_range", max_range_, 5.5);
 	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,kinectCallBack);
-	ros::Subscriber subDepth = n.subscribe("/camera/depth/image",1,depthCb);
+	//ros::Subscriber subDepth = n.subscribe("/camera/depth/image",1,depthCb);
+	//ros::Subscriber subDepth = n.subscribe("cloud_tf",1,depthCb);
+	ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
+	
 	ros::Subscriber sub2 = n.subscribe(TOPIC_CONTROL, 1, controlCallBack);
 	ros::Subscriber subMove = n.subscribe(MOVE_STATE, 1, MoveStateCallBack);
 	vector_pub = n.advertise<geometry_msgs::Vector3>("object_point", 1000);

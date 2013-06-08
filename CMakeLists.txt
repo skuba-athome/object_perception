@@ -110,6 +110,8 @@ target_link_libraries(color_hist ${PCL_LIBRARIES})
 rosbuild_add_executable(ech src/color_histogram.cpp)
 target_link_libraries(ech ${PCL_LIBRARIES})
 
+rosbuild_add_executable(click src/click_object.cpp)
+target_link_libraries(click ${PCL_LIBRARIES})
 
 rosbuild_add_executable(surf_omp src/test_surf_omp.cpp)
 target_link_libraries(surf_omp surf_libs)
