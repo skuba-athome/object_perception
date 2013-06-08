@@ -12,6 +12,7 @@ pub_filename = []
 pub_main = []
 pub_pointCheck = []
 pub_show = []
+pub_extract = []
 object_index = 0
 candidate_index = 0
 
@@ -47,6 +48,7 @@ def decision(data):
 
 def surfCallback(data):
 	global surf_candidate,candidate_index
+	print data.data
 	candidates = data.data.strip().split('|')
 	for candidate in candidates:
 		temp = candidate.strip().split(' ')
@@ -61,28 +63,32 @@ def color_histCallback(data):
 	decision('color_hist')
 
 def mainCallback(data):
-	global pub_filename,object_index,object_list,surf_candidate,color_candidate
+	global pub_filename,object_index,object_list,surf_candidate,color_candidate,pub_extract
 	if('reset' in data.data):
-		object_index = 0
-		color_candidate = []
-		surf_candidate = []
-	if(object_index < len(object_list)):
-		rospy.loginfo(object_list[object_index])
-		pub_filename.publish(object_dic[object_list[object_index]][0])
-		object_index += 1
-		
+		print 'start extract'
+                pub_extract.publish('start')
+
+def countCallback(data):
+	count = int(data.data)
+	print 'object : ' + str(count)
+        for i in range(0,count):
+		for j in object_list:
+			print i,j
+			pub_filename.publish('%s %s' % ('object_'+str(i)+'.jpg','object_japan/'+j))
 
 def control_object():
-	global pub_filename,pub_main,pub_pointCheck,pub_show
+	global pub_filename,pub_main,pub_pointCheck,pub_show,pub_extract
 	rospy.init_node('control_object')
 	rospy.loginfo('Start control_object')
 	pub_filename = rospy.Publisher('/object/filename',String)
 	pub_show = rospy.Publisher('/object/show',String)
 	pub_main = rospy.Publisher('/object/start_search',String)
 	pub_pointCheck = rospy.Publisher('/object/pointcheck',String)
+        pub_extract  = rospy.Publisher('/object/extract',String)
 	rospy.Subscriber("/object/surf",String,surfCallback)
 	rospy.Subscriber("/object/color_hist",String,color_histCallback)
 	rospy.Subscriber("/object/start_search",String,mainCallback)
+	rospy.Subscriber("/object/count",String,countCallback)
 	rospy.spin()
 
 if __name__ == '__main__':
