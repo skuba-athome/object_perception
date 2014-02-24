@@ -47,6 +47,7 @@ std::string kdtree_idx_file_name;
 std::string training_data_h5_file_name ;
 std::string training_data_list_file_name;
 std::string name;
+std::string name3;
 std::string state ="--";
 
 

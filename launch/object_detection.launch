@@ -1,4 +1,0 @@
-<launch>
-	<node pkg="objects" name="color_hist" type="color_hist"/>
-	<node pkg="objects" name="surf_omp" type="surf_omp"/>
-</launch>

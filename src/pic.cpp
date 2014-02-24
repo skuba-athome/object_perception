@@ -375,7 +375,6 @@ void DepthToWorld(float * x, float * y, float depth)
 
 void depthCb( const sensor_msgs::ImageConstPtr& image )
 {
-	//printf("----------------------------------------------------");
     canPrintDepth = 0;
     try
     {
@@ -419,26 +418,17 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 		tx = x;
 		ty = y;
 		tz = dist[y][x];
-		printf("%.2f %.2f %.2f\n",tx,ty,tz);
+		printf("%.2f %.2f %f\n",tx,ty,tz);
 		DepthToWorld(&tx,&ty,tz);
 		vector.x = tx;
-		tx *= -1.0;
-		tx -= 0.02;
 		vector.y = ty;
-		tz -= 0.2;
 		vector.z = tz;
-		stringstream ss;
-		ss << "get_object," << tz << "," << tx << "," << ty;
-		//printf("%s",ss.str());
-		//printf("send : x:%.2f %.2f y:%.2f %.2f z:%.2f %.2f \n",vector.x,tx,vector.y,ty,vector.z,tz);	
 		if( vector.x == vector.x 
 			&& vector.y == vector.y
 			&& vector.z == vector.z
 		)
 		{
-			std_msgs::String msg;
-			msg.data = ss.str();
-			vector_pub.publish(msg);
+			vector_pub.publish(vector);
 
 			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
 		}
@@ -634,11 +624,8 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 {
 	int inKey = 0;
 	bool editLib = false;
-	//printf("%s\n",(canPrintDepth)?"true":"false");
-if(canPrintDepth){
-	//printf("sssssssssssssssss");
-	 cv::imshow("win2",depthImg);
-}
+	
+//if(canPrintDepth) cv::imshow("win2",depthImg);
 	//IndexBook *indexBook = load_index(imgLibDir);
 /*
 	for(int i=0;i<480;i++)
@@ -667,13 +654,11 @@ if(canPrintDepth){
 	
 	for(int i=0;i<640*480;i++)
 	{
-
 		inFrame->imageData[i*3] = msg->data[i*3];
 			inFrame->imageData[i*3+1] = msg->data[i*3+1];
 			inFrame->imageData[i*3+2] = msg->data[i*3+2];
-
 		//if(dist[i/640][i%640] < MAX_RANGE)
-/*		
+		/*
 		if(dist[i/640][i%640] < MAX_RANGE)
 		{
 			//printf("%d %d %.2f\n",i/480,i%480,dist[i/480][i%480]);
@@ -763,7 +748,7 @@ if(canPrintDepth){
       	char filename [255];
       	int number = numpic;
       	sprintf(filename, "%s%d.png", base, number);
-	//cvSaveImage(filename,inFrame);
+	cvSaveImage(filename,inFrame);
 	numpic++;
 	}
 	if(get_coke)
@@ -818,10 +803,9 @@ int main(int argc , char *argv[])
 	nh.param("max_range", max_range_, 5.5);
 	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,kinectCallBack);
 	ros::Subscriber subDepth = n.subscribe("/camera/depth/image",1,depthCb);
-	//ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
-	//ros::Subscriber sub2 = n.subscribe(TOPIC_CONTROL, 1, controlCallBack);
-	//ros::Subscriber subMove = n.subscribe(MOVE_STATE, 1, MoveStateCallBack);
-	vector_pub = n.advertise<std_msgs::String>("/arm/action", 1000);
+	ros::Subscriber sub2 = n.subscribe(TOPIC_CONTROL, 1, controlCallBack);
+	ros::Subscriber subMove = n.subscribe(MOVE_STATE, 1, MoveStateCallBack);
+	vector_pub = n.advertise<geometry_msgs::Vector3>("object_point", 1000);
 	vector_pub2 = n.advertise<geometry_msgs::Vector3>("object_point2", 1000);
 
 

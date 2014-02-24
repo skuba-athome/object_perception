@@ -1,4 +1,0 @@
-pic2/est_01.jpg
-pic2/est_02.jpg
-pic2/est_03.jpg
-pic2/est_04.jpg
