@@ -1,7 +1,0 @@
-pic2/coke_01.jpg
-pic2/coke_02.jpg
-pic2/coke_03.jpg
-pic2/coke_04.jpg
-pic2/coke_05.jpg
-pic2/coke_06.jpg
-pic2/coke_07.jpg

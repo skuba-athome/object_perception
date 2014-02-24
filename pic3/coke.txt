@@ -1,4 +1,0 @@
-pic2/coke_01.jpg
-pic2/coke_02.jpg
-pic2/coke_03.jpg
-pic2/coke_04.jpg

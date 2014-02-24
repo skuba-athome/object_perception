@@ -1,8 +1,0 @@
-pic2/redbox_01.jpg
-pic2/redbox_02.jpg
-pic2/redbox_03.jpg
-pic2/redbox_04.jpg
-pic2/redbox_05.jpg
-pic2/redbox_06.jpg
-pic2/redbox_07.jpg
-pic2/redbox_08.jpg

@@ -19,6 +19,7 @@
   <depend package="geometry_msgs"/>
   <depend package="pcl"/>
   <depend package="pcl_ros"/>
+  <depend package="tf"/>
   
 </package>
 

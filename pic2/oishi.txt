@@ -1,8 +1,0 @@
-pic2/oishi_01.jpg
-pic2/oishi_02.jpg
-pic2/oishi_03.jpg
-pic2/oishi_04.jpg
-pic2/oishi_05.jpg
-pic2/oishi_06.jpg
-pic2/oishi_07.jpg
-pic2/oishi_08.jpg

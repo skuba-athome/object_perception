@@ -1,5 +1,0 @@
-pic2/mm_01.jpg
-pic2/mm_02.jpg
-pic2/mm_03.jpg
-pic2/mm_04.jpg
-pic2/mm_05.jpg

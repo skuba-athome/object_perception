@@ -1,0 +1,2 @@
+pic/ligo01.jpg
+pic/ligo02.jpg

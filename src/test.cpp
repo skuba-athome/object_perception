@@ -1,4 +1,14 @@
 #include "test.h"
+#include <ros/package.h>
+#include <string>
+#include <tf/transform_listener.h>
+#include <pcl_ros/transforms.h>
+#include <geometry_msgs/PointStamped.h>
+
+tf::TransformListener* listener;
+std::string mani_frame = "/mani_link";
+std::string robot_frame = "/base_link";
+std::string camera_optical_frame = "/camera_rgb_optical_frame";
 
 ros::Publisher chatter_pub;
 
@@ -13,19 +23,79 @@ void msg_cb(const std_msgs::String::ConstPtr& msg)
 	}
 
 	name = msg->data.c_str();
+	std::string name2=msg->data.c_str();
+	name3=msg->data.c_str();
+	if(name2=="apple juice"){
+		name2 =  "applejuice";
+		name = name2;
+	}
+	if(name2=="orange juice"){
+		name2 =  "orangejuice";
+		name = name2;
+	}
+	if(name2=="chocolate milk"){
+		name2 =  "chocolatemilk";
+		name = name2;
+	}
+	if(name2=="tomato sauce"){
+		name2 =  "tamato";
+		name = name2;
+	}
+	if(name2=="chicken noodies"){
+		name2 =  "chickennoodies";
+		name = name2;
+	}
+	if(name2=="veggie noodies"){
+		name2 =  "veggienoodies";
+		name = name2;
+	}
+if(name2=="energy drink"){
+		name2 =  "energydrink";
+		name = name2;
+	}
+	if(name2=="garlic sauce"){
+		name2 =  "garlicsauce";
+		name = name2;
+	}
+	if(name2=="tooth paste"){
+		name2 =  "toothpaste";
+		name = name2;
+	}
+	if(name2=="tomato sauce"){
+		name2 =  "tomato";
+		name = name2;
+	}
+	if(name2=="seven up"){
+		name2 =  "sevenup";
+		name = name2;
+	}
+	if(name2=="fresh discs"){
+		name2 =  "freshdiscs";
+		name = name2;
+	}
+if(name2=="beer can"){
+		name2 =  "beercan";
+		name = name2;
+	}
+if(name2=="peanut butter"){
+		name2 =  "peanutbutter";
+		name = name2;
+	}
+	std::string path = ros::package::getPath("objects");
+	path=path+"/robocup2013";
 
-	char idx[100];
-	sprintf(idx,"%s%s",msg->data.c_str(),".idx");
+	char idx[255];
+	sprintf(idx,"%s/%s%s",path.c_str(),name.c_str(),".idx");
 	//printf("%s\n",idx);
 	kdtree_idx_file_name = idx;
 
-	char h5[100];
-	sprintf(h5,"%s%s",msg->data.c_str(),".h5");
+	char h5[255];
+	sprintf(h5,"%s/%s%s",path.c_str(),name.c_str(),".h5");
 	training_data_h5_file_name = h5;
 	//printf("%s\n",h5);
 
-	char list[100];
-	sprintf(list,"%s%s",msg->data.c_str(),".list");
+	char list[255];
+	sprintf(list,"%s/%s%s",path.c_str(),name.c_str(),".list");
 	training_data_list_file_name = list;
 	//printf("%s\n",list);
 
@@ -33,19 +103,50 @@ void msg_cb(const std_msgs::String::ConstPtr& msg)
 	{
 		pcl::console::print_error ("Could not find training data models files %s and %s!\n",
 		training_data_h5_file_name.c_str (), training_data_list_file_name.c_str ());
+state = "no";
+				std_msgs::String msg;
+    				std::stringstream ss;
+
+    				ss << state;
+    				msg.data = ss.str();
+    				ROS_INFO("%s", msg.data.c_str());
+    				chatter_pub.publish(msg);
 	    return ;
 	}
 	else
 	{
-		ROS_INFO("%s",msg->data.c_str());
+		ROS_INFO("%s",name.c_str());
 		loadFileList (models, training_data_list_file_name);
 	    flann::load_from_file (data, training_data_h5_file_name, "training_data");
 	    pcl::console::print_highlight ("Training data found. Loaded %d VFH models from %s/%s.\n",(int)data.rows,training_data_h5_file_name.c_str(),training_data_list_file_name.c_str ());
 	}
 
-	check = 5;
+	check = 3;
 
 }
+
+
+Eigen::Vector4f plane_coeffs_in_robot_frame(Eigen::Vector4f coeffs_in)
+{
+	tf::StampedTransform transform;
+	try{
+		listener->lookupTransform(camera_optical_frame, robot_frame, ros::Time(0), transform);
+	}
+	catch (tf::TransformException ex){
+		ROS_ERROR("%s",ex.what());
+	}	
+		
+	Eigen::Matrix4f T;
+	pcl_ros::transformAsMatrix(transform,T);
+
+	Eigen::MatrixXf coeffs(1,4); coeffs << coeffs_in(0), coeffs_in(1), coeffs_in(2), coeffs_in(3);
+	Eigen::MatrixXf coeffs_out(1,4);
+	coeffs_out = coeffs*T;
+	Eigen::Vector4f plane_coeffs(coeffs_out(0,0),coeffs_out(0,1),coeffs_out(0,2),coeffs_out(0,3));
+
+	return plane_coeffs;
+}
+
 
 void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
@@ -57,6 +158,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>), cloud_f (new pcl::PointCloud<pcl::PointXYZ>);
 		pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal> ());
 		pcl::fromROSMsg(*input , *cloud);
+
 
 	//	std::cout << cloud->height << " " << cloud->width << std::endl;
 
@@ -90,7 +192,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		seg.setMethodType (pcl::SAC_RANSAC);
 		//seg.setMaxIterations (250);
 		seg.setDistanceThreshold (0.01);
-
+		
 		int i=0, nr_points = (int) cloud_filtered->points.size ();
 		while (cloud_filtered->points.size () > 0.3 * nr_points)
 		{
@@ -102,6 +204,35 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 				std::cout << "Could not estimate a planar model for the given dataset." << std::endl;
 				break;
 			}
+
+
+
+	Eigen::Vector4f plane_coeffs(coefficients->values[0],coefficients->values[1],coefficients->values[2],coefficients->values[3]);
+	Eigen::Vector4f plane_check = plane_coeffs_in_robot_frame(plane_coeffs);
+
+	std::cout << "Table plane coeffs >>>\n"<<plane_check << std::endl;
+	if(plane_check(2) > 0.85 && plane_check(3) < -0.45)
+	{
+		
+		for(unsigned int n = 0; n < cloud_filtered->points.size(); n++)
+		{
+			Eigen::Vector4f tested_point(cloud_filtered->points[n].x, cloud_filtered->points[n].y, cloud_filtered->points[n].z, 1.0f);
+			if(tested_point.dot(plane_coeffs) <= 0.0 || tested_point.dot(plane_coeffs) > 0.35) inliers->indices.push_back(n);	
+		}
+	
+	}
+	else if(plane_check(2) < -0.85 && plane_check(3) > 0.45)
+	{
+		
+		for(unsigned int n = 0; n < cloud_filtered->points.size(); n++)
+		{
+			Eigen::Vector4f tested_point(cloud_filtered->points[n].x, cloud_filtered->points[n].y, cloud_filtered->points[n].z, 1.0f);
+			if(tested_point.dot(plane_coeffs) >= 0.0 || tested_point.dot(plane_coeffs) < -0.35) inliers->indices.push_back(n);	
+		}
+	
+	}
+
+
 
 			// Extract the planar inliers from the input cloud
 			pcl::ExtractIndices<pcl::PointXYZ> extract;
@@ -118,6 +249,9 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 			extract.filter (*cloud_f);
 			cloud_filtered = cloud_f;
 		}
+
+
+
 		writer.write<pcl::PointXYZ> ("scence_f2.pcd", *cloud_filtered, false);
 		  // Creating the KdTree object for the search method of the extraction
 		pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
@@ -192,8 +326,10 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 			// Compute the features
 			vfh.compute (*vfhs);
 
+			std::string path = ros::package::getPath("objects");
+			path=path+"/robocup2013";
 			std::stringstream ss;
-			ss << "test.vfh.pcd";
+			ss << path.c_str() <<"test.vfh.pcd";
 			writer.write<pcl::VFHSignature308> (ss.str (), *vfhs, false);
 
 
@@ -201,15 +337,23 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 			if (!boost::filesystem::exists (kdtree_idx_file_name))
 			{
 				pcl::console::print_error ("Could not find kd-tree index in file %s!", kdtree_idx_file_name.c_str ());
+				state = "no";
+				std_msgs::String msg;
+    				std::stringstream ss;
+
+    				ss << state;
+    				msg.data = ss.str();
+    				ROS_INFO("%s", msg.data.c_str());
+    				chatter_pub.publish(msg);
 				return ;
 			}
 			else
 			{
 				vfh_model histogram;
-				loadHist ("test.vfh.pcd", histogram );
+				loadHist (ss.str().c_str(), histogram );
 				//printf("debug : segmentation fault !\n");
-				char tmp[100];
-				sprintf(tmp,"%s.idx",name.c_str()	);
+				char tmp[255];
+				sprintf(tmp,"%s/%s.idx",path.c_str(),name.c_str()	);
 				flann::Index<flann::ChiSquareDistance<float> > index (data, flann::SavedIndexParams (tmp));
 			    index.buildIndex ();
 			    nearestKSearch (index, histogram, k, k_indices, k_distances);
@@ -221,12 +365,25 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 			    if(k_distances[0][0] < obj_threshold)
 			    {
+				geometry_msgs::PointStamped point_in, point_out;
+				point_in.header = input->header;
+				point_in.point.x = x;
+				point_in.point.y = y;
+				point_in.point.z = z;
+    				try{
+					listener->transformPoint(mani_frame,point_in,point_out);
+				}
+				catch (tf::TransformException ex){
+					ROS_ERROR("%s",ex.what());
+				}	
+					printf("%.2f %.2f %.2f  \n",point_out.point.x,point_out.point.y,point_out.point.z);
 					// public value is exists object "S %x %y %z"
-					printf("%.2f %.2f %.2f  \n",z,x,y);
+					printf("kinect %.2f %.2f %.2f  \n",z,x,y);
 					char* str = new char[30];
  
 					//publish to Main_Control
-					sprintf(str,"S,%f,%f,%f",z,x,y);
+					//sprintf(str,"%s,%f,%f,%f",name.c_str(),z,x,y);
+					sprintf(str,"%s,%.2f,%.2f,%.2f",name3.c_str(),point_out.point.x,point_out.point.y,point_out.point.z);
 					state =str;
 					check = 0;
 					std_msgs::String msg;
@@ -245,7 +402,8 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 		check-- ;
 		if(check == 0)
 		{
-			state = 'N';
+			//state = 'N';
+			state = "no";
 			std_msgs::String msg;
     		std::stringstream ss;
 
@@ -268,12 +426,16 @@ int main (int argc, char** argv)
 	// Create a ROS subscriber for the input point cloud
 	ros::Subscriber sub = nh.subscribe ("/camera/depth_registered/points", 1, cloud_cb);
 
-	chatter_pub = n.advertise<std_msgs::String>("objects_to_voice", 1000);
+	//chatter_pub = n.advertise<std_msgs::String>("objects_to_voice", 1000);
+	chatter_pub = n.advertise<std_msgs::String>("/object/output", 1000);
 	ros::Rate loop_rate(10);
 	// Create a ROS publisher for the output point cloud
 	pub = nh.advertise<sensor_msgs::PointCloud2> ("input", 1);
 
-	ros::Subscriber sub2 = n.subscribe(TOPIC_CONTROL, 1, msg_cb);
+	//ros::Subscriber sub2 = n.subscribe(TOPIC_CONTROL, 1, msg_cb);
+	ros::Subscriber sub2 = n.subscribe("/object/search", 1, msg_cb);
+	
+	listener = new tf::TransformListener();
 /*
 	// Spin
 	while (ros::ok())
