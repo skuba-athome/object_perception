@@ -122,19 +122,6 @@ ROSBUILD_genmsg_lisp/fast:
 .PHONY : ROSBUILD_genmsg_lisp/fast
 
 #=============================================================================
-# Target rules for targets named ROSBUILD_genmsg_py
-
-# Build rule for target.
-ROSBUILD_genmsg_py: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ROSBUILD_genmsg_py
-.PHONY : ROSBUILD_genmsg_py
-
-# fast build rule for target.
-ROSBUILD_genmsg_py/fast:
-	$(MAKE) -f CMakeFiles/ROSBUILD_genmsg_py.dir/build.make CMakeFiles/ROSBUILD_genmsg_py.dir/build
-.PHONY : ROSBUILD_genmsg_py/fast
-
-#=============================================================================
 # Target rules for targets named ROSBUILD_gensrv_cpp
 
 # Build rule for target.
@@ -159,6 +146,19 @@ ROSBUILD_gensrv_lisp: cmake_check_build_system
 ROSBUILD_gensrv_lisp/fast:
 	$(MAKE) -f CMakeFiles/ROSBUILD_gensrv_lisp.dir/build.make CMakeFiles/ROSBUILD_gensrv_lisp.dir/build
 .PHONY : ROSBUILD_gensrv_lisp/fast
+
+#=============================================================================
+# Target rules for targets named ROSBUILD_gensrv_py
+
+# Build rule for target.
+ROSBUILD_gensrv_py: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ROSBUILD_gensrv_py
+.PHONY : ROSBUILD_gensrv_py
+
+# fast build rule for target.
+ROSBUILD_gensrv_py/fast:
+	$(MAKE) -f CMakeFiles/ROSBUILD_gensrv_py.dir/build.make CMakeFiles/ROSBUILD_gensrv_py.dir/build
+.PHONY : ROSBUILD_gensrv_py/fast
 
 #=============================================================================
 # Target rules for targets named clean-test-results
@@ -406,6 +406,19 @@ rospack_gensrv: cmake_check_build_system
 rospack_gensrv/fast:
 	$(MAKE) -f CMakeFiles/rospack_gensrv.dir/build.make CMakeFiles/rospack_gensrv.dir/build
 .PHONY : rospack_gensrv/fast
+
+#=============================================================================
+# Target rules for targets named rospack_gensrv_all
+
+# Build rule for target.
+rospack_gensrv_all: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rospack_gensrv_all
+.PHONY : rospack_gensrv_all
+
+# fast build rule for target.
+rospack_gensrv_all/fast:
+	$(MAKE) -f CMakeFiles/rospack_gensrv_all.dir/build.make CMakeFiles/rospack_gensrv_all.dir/build
+.PHONY : rospack_gensrv_all/fast
 
 #=============================================================================
 # Target rules for targets named surf_libs
@@ -804,9 +817,9 @@ help:
 	@echo "... depend"
 	@echo "... ROSBUILD_genmsg_cpp"
 	@echo "... ROSBUILD_genmsg_lisp"
-	@echo "... ROSBUILD_genmsg_py"
 	@echo "... ROSBUILD_gensrv_cpp"
 	@echo "... ROSBUILD_gensrv_lisp"
+	@echo "... ROSBUILD_gensrv_py"
 	@echo "... clean-test-results"
 	@echo "... color"
 	@echo "... color2"
@@ -828,6 +841,7 @@ help:
 	@echo "... rospack_genmsg_all"
 	@echo "... rospack_genmsg_libexe"
 	@echo "... rospack_gensrv"
+	@echo "... rospack_gensrv_all"
 	@echo "... surf_libs"
 	@echo "... test"
 	@echo "... test-future"

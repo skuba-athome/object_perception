@@ -23,7 +23,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined messages
 rosbuild_genmsg()
 #uncomment if you have defined services
-#rosbuild_gensrv()
+rosbuild_gensrv()
 #find_package(Flann)
 #include_directories(${HDF5_INCLUDE_DIR})
 #include_directories(${FLANN_INCLUDE_DIRS})
