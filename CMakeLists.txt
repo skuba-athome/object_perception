@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
+#add-------------
+find_package(Eigen REQUIRED)
+include_directories(${Eigen_INCLUDE_DIRS})
+#----------------
+
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
 #  Debug          : w/ debug symbols, w/o optimization
@@ -16,7 +21,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #uncomment if you have defined messages
-#rosbuild_genmsg()
+rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
 #find_package(Flann)
@@ -97,3 +102,12 @@ target_link_libraries(open_door /opt/ros/fuerte/lib/libopencv_core.so)
 rosbuild_add_executable(color src/obj_color.cpp)
 rosbuild_add_executable(color2 src/color.cpp)
 rosbuild_add_executable(pic src/pic.cpp)
+
+
+
+
+rosbuild_add_executable(findingCenter src/findingCenter.cpp)
+rosbuild_add_boost_directories()
+rosbuild_link_boost(findingCenter filesystem system)
+
+rosbuild_add_executable(extractSURF src/extractSURF.cpp)
