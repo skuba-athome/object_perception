@@ -2,7 +2,7 @@
 #include <sensor_msgs/PointCloud2.h>
 //#include <my_pcl/cropped_object.h>
 //#include <my_pcl/cropped_msg.h>
-#include <objects/cropped_msg.h>
+#include <object_perception/cropped_msg.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Vector3.h>
 #include <pcl17/ros/conversions.h>
@@ -81,13 +81,13 @@ void getObjectPoint(){
 	compression_params.push_back(98); //specify the compression quality
 
 	//bool bSuccess_ = imwrite("first.jpg", img, compression_params); //write the image to file
-	bool bSuccess_ = imwrite("/home/skuba/skuba_athome/objects/first.jpg", img, compression_params); //write the image to file
+	bool bSuccess_ = imwrite("/home/skuba/skuba_athome/object_perception/first.jpg", img, compression_params); //write the image to file
 	
 	   //pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>);
 	   
 	std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
 	pcl17::PCDWriter writer;
-	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/objects/first.pcd", *cloud, false); 
+	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/first.pcd", *cloud, false); 
 
 
 	for (pcl17::PointCloud<pcl17::PointXYZ>::iterator it = cloud->begin(); it != cloud->end(); ++it){
@@ -123,7 +123,7 @@ void getObjectPoint(){
 
 
 
-	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/objects/cloud_filtered.pcd", *cloud_filtered, false); 
+	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/cloud_filtered.pcd", *cloud_filtered, false); 
 
 	pcl17::SACSegmentation<pcl17::PointXYZ> seg;
 	pcl17::PointIndices::Ptr inliers (new pcl17::PointIndices);
@@ -173,7 +173,7 @@ void getObjectPoint(){
 
 
 		std::stringstream plane_name;
-		plane_name << "/home/skuba/skuba_athome/objects/segmenged_plane" << j << ".pcd";
+		plane_name << "/home/skuba/skuba_athome/object_perception/segmenged_plane" << j << ".pcd";
 		writer.write<pcl17::PointXYZ> (plane_name.str (), *cloud_plane, false); 
 		j++;
 	}
@@ -270,7 +270,7 @@ void getObjectPoint(){
 
 		ROS_INFO("write picture.%d with (%f,%f,%f,%f) iplimage->size() : %d img.size() : %d",j,pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max,iplImage->width*iplImage->height,img.rows*img.cols);
 		std::stringstream ss_;
-		ss_ << "/home/skuba/skuba_athome/objects/picture" << j << ".jpg";
+		ss_ << "/home/skuba/skuba_athome/object_perception/picture" << j << ".jpg";
 
 		bool bSuccess = imwrite(ss_.str(), cv::Mat(iplImage), compression_params); //write the image to file
 
@@ -278,7 +278,7 @@ void getObjectPoint(){
 		//------------------------------------------------------
 
 		char comm[1000];
-		sprintf(comm,"/home/skuba/skuba_athome/objects/bin/extractSURF /home/skuba/skuba_athome/objects/picture%d.jpg /home/skuba/skuba_athome/objects/feature%d",j,j);
+		sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /home/skuba/skuba_athome/object_perception/picture%d.jpg /home/skuba/skuba_athome/object_perception/feature%d",j,j);
 		system(comm);
 
 		//------------------------------------------------------
@@ -309,12 +309,12 @@ void getObjectPoint(){
 
 		//cropped_object_pub.publish(co);
 
-		objects::cropped_msg cm;
+		object_perception::cropped_msg cm;
 		cm.vector = vector_;
 
 
 		std::stringstream sf;
-		sf << "/home/skuba/skuba_athome/objects/feature" << j;
+		sf << "/home/skuba/skuba_athome/object_perception/feature" << j;
 		cm.filePath = sf.str();
 		cropped_msg_pub.publish(cm);
 
@@ -343,7 +343,7 @@ void getObjectPoint(){
 
 		std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
 		std::stringstream ss;
-		ss << "/home/skuba/skuba_athome/objects/cloud_cluster_" << j << ".pcd";
+		ss << "/home/skuba/skuba_athome/object_perception/cloud_cluster_" << j << ".pcd";
 		writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
 		j++;
 
@@ -406,11 +406,11 @@ void getObjectPoint(){
 //	}
 //
 //
-	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/objects/centerOfObject.pcd", *enlarged_cloud, false); 
-//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/objects/y_scope_cloud.pcd", *y_scope_cloud, false); 
-//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/objects/z_scope_cloud.pcd", *z_scope_cloud, false); 
-//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/objects/left_scope_cloud.pcd", *left_scope_cloud, false); 
-//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/objects/right_scope_cloud.pcd", *right_scope_cloud, false); 
+	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/centerOfObject.pcd", *enlarged_cloud, false); 
+//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/y_scope_cloud.pcd", *y_scope_cloud, false); 
+//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/z_scope_cloud.pcd", *z_scope_cloud, false); 
+//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/left_scope_cloud.pcd", *left_scope_cloud, false); 
+//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/right_scope_cloud.pcd", *right_scope_cloud, false); 
 //
 	if(maxArea == 0){
 		ROS_ERROR("No object in this range.");
@@ -500,7 +500,7 @@ int main (int argc, char** argv)
 
 	pub = n.advertise<geometry_msgs::Vector3>("largest_point", 1000);
 	pubObjectNum = n.advertise<std_msgs::String>("object_number", 1000);
-	cropped_msg_pub = n.advertise<objects::cropped_msg>("cropped_msg", 100);
+	cropped_msg_pub = n.advertise<object_perception::cropped_msg>("cropped_msg", 100);
 	center_pub = n.advertise<std_msgs::String>("center_pcl_object", 1000);
 
 	ros::Subscriber sub = n.subscribe("/camera/depth_registered/points",1,depthCB);
