@@ -8,3 +8,5 @@ bin
 CMakeCache.txt
 CMakeFiles
 *.svn*
+msg_gen
+src/object_perception/*
