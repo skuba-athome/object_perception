@@ -20,6 +20,8 @@
   <depend package="pcl"/>
   <depend package="pcl_ros"/>
   <depend package="tf"/>
+  <depend package="pcl17"/>
+  <depend package="pcl17_ros"/>
   
 </package>
 
