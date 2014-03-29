@@ -3,10 +3,14 @@
 //#include <my_pcl/cropped_object.h>
 //#include <my_pcl/cropped_msg.h>
 //#include <object_perception/cropped_msg.h>
+//#include <pcl_ros/transforms.h>
+//#include <pcl/ros/conversions.h>
+//#include <pcl/point_types.h>
 #include <object_perception/classifyObject.h>
-//#include <manipulator/isManipulable.h>
+#include <manipulator/isManipulable.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Vector3.h>
+#include <pcl17_ros/transforms.h>
 #include <pcl17/ros/conversions.h>
 #include <pcl17/ModelCoefficients.h>
 #include <pcl17/point_types.h>
@@ -51,7 +55,8 @@ float pixel_x,pixel_y;
 float pos_x,pos_y,pos_z;
 cv::Mat img;
 int object_position_world[20][3];
-int frameId;
+//int frameId;
+const char* frameId;
 bool isReach[20];
 vector<std::string> fileName;
 int objectCentroidWorld[20][3];
@@ -68,26 +73,30 @@ ros::ServiceClient classifyClient;
 object_perception::classifyObject classifySrv;
 
 //is reachable service 
-ros::ServiceClient isManipulatableClient;
-//manipulator::isManipulatable isManipulatableSrv;
+ros::ServiceClient isManipulableClient;
+manipulator::isManipulable isManipulatableSrv;
+
 tf::TransformListener* listener;
 
-/*
+
 bool isObjectReachable(int x,int y,int z){
 	int xWorld,yWorld,zWorld;
 	char* robot_frame = "";
 
 	try{
-		pcl17::PointCloudT<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloudT), cloud_obj (new pcl17::PointCloudT);
-		cloud->push_back(pcl17::PointT(x,y,z));
+		//pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_obj (new pcl17::PointCloud<pcl17::PointXYZ>);
+		pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_obj (new pcl17::PointCloud<pcl17::PointXYZ>);
+
+		//cloud->push_back(pcl17::PointXYZ(x,y,z));
+		cloud->push_back(pcl17::PointXYZ(x,y,z));
 
 //		PointCloudT::Ptr cloud (new PointCloudT);
 //		pcl::fromROSMsg(*cloud_in,*cloud);
 		listener->waitForTransform(robot_frame, frameId, ros::Time::now(), ros::Duration(1.0));
-		pcl_ros::transformPointCloud(robot_frame, *cloud, *cloud_obj, *listener);
-		xWorld = cloud_obj->x;
-		yWorld = cloud_obj->y;
-		zWorld = cloud_obj->z;
+		pcl17_ros::transformPointCloud(robot_frame, *cloud, *cloud_obj, *listener);
+		xWorld = cloud_obj->begin()->x;
+		yWorld = cloud_obj->begin()->y;
+		zWorld = cloud_obj->begin()->z;
 	}
 	catch(tf::TransformException& ex){
 		//ROS_ERROR("Received an exception trying to transform a point from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
@@ -98,14 +107,13 @@ bool isObjectReachable(int x,int y,int z){
 	isManipulatableSrv.request.y = y;
 	isManipulatableSrv.request.z = z;
 
-	if(isManipulatableClient.call(isManipulatableSrv))
-		return isManipulatableSrv.response.isReachable
+	if(isManipulableClient.call(isManipulatableSrv))
+		return isManipulatableSrv.response.isManipulable;
 	else
 		ROS_ERROR("Failed to call service ConvertToWorld");
 
 	return true;
 }
-*/
 
 //ros::Publisher pub,cropped_object_pub,cropped_msg_pub,pubObjectNum,center_pub;
 ros::Publisher pub,pubObjectNum,center_pub;
@@ -449,6 +457,7 @@ void getObjectPoint(){
 	}while(false);
 
 
+/*
 	if(reachable){
 		for(int k=0;k<j;k++){
 			classifySrv.request.filepath = fileName[k];
@@ -464,6 +473,7 @@ void getObjectPoint(){
 	else{
 		//do nothing, no object can manipulate in this range.
 	}
+	*/
 	
 	
 
@@ -628,8 +638,8 @@ int main (int argc, char** argv)
 	classifyClient = n.serviceClient<object_perception::classifyObject>("classifyObject");
 	object_perception::classifyObject classifySrv;
 
-	//isReachableClient = n.serviceClient<manipulator::isReachableClient>("isManipulatable");
-	//manipulator::isManipulatable isManipulatableSrv;
+	isManipulableClient = n.serviceClient<manipulator::isManipulable>("isManipulable");
+	manipulator::isManipulable isManipulatableSrv;
 
 	ros::spin();
 
