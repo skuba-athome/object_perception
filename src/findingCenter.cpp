@@ -89,14 +89,21 @@ bool isObjectReachable(int x,int y,int z){
 
 		//cloud->push_back(pcl17::PointXYZ(x,y,z));
 		cloud->push_back(pcl17::PointXYZ(x,y,z));
+		cloud->width = 1;
+		cloud->height = 1;
+		
 
 //		PointCloudT::Ptr cloud (new PointCloudT);
 //		pcl::fromROSMsg(*cloud_in,*cloud);
+
+		cout << "--------------------------------------------" << endl;
 		listener->waitForTransform(robot_frame, frameId, ros::Time::now(), ros::Duration(1.0));
-		pcl17_ros::transformPointCloud(robot_frame, *cloud, *cloud_obj, *listener);
-		xWorld = cloud_obj->begin()->x;
-		yWorld = cloud_obj->begin()->y;
-		zWorld = cloud_obj->begin()->z;
+		cout << "--------------------------------------------" << endl;
+		//pcl17_ros::transformPointCloud(robot_frame, *cloud, *cloud_obj, *listener);
+		cout << "--------------------------------------------" << endl;
+		//xWorld = cloud_obj->begin()->x;
+		//yWorld = cloud_obj->begin()->y;
+		//zWorld = cloud_obj->begin()->z;
 	}
 	catch(tf::TransformException& ex){
 		//ROS_ERROR("Received an exception trying to transform a point from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
@@ -126,6 +133,7 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 		//frameId = cloud->header.frame_id;
 		pcl17::fromROSMsg(cloud, *cloud_pcl);
 		//ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
+		cout << "point cloud get" << endl;
 	} catch (std::runtime_error e) {
 		ROS_ERROR_STREAM("Error message: " << e.what());
 	}
@@ -186,7 +194,7 @@ void getObjectPoint(){
 	//Create the segmentation object for the planar model and set all the parameters
 
 
-	std::cout << "PointCloud after(cloud_filtered = cloud) filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; 
+//	std::cout << "PointCloud after(cloud_filtered = cloud) filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; 
 
 
 
@@ -245,6 +253,7 @@ void getObjectPoint(){
 		j++;
 	}
 
+		cout << "--------------------------------------------" << endl;
 	// Creating the KdTree object for the search method of the extraction
 
 	pcl17::search::KdTree<pcl17::PointXYZ>::Ptr tree (new pcl17::search::KdTree<pcl17::PointXYZ>);
@@ -269,6 +278,7 @@ void getObjectPoint(){
 	int objectNum=0;
 	bool reachable;
 	j = 0;
+
 	reachableCount=0;
 	do{
 		reachable=true;
@@ -313,10 +323,8 @@ void getObjectPoint(){
 			if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT)
 				continue;
 
-			/*
 			if(isObjectReachable(x,y,z))
 				reachableCount++;
-				*/
 
 
 	//		if(size > maxArea){
@@ -640,7 +648,6 @@ int main (int argc, char** argv)
 
 	isManipulableClient = n.serviceClient<manipulator::isManipulable>("isManipulable");
 	manipulator::isManipulable isManipulatableSrv;
-
 	ros::spin();
 
 	return (0);
