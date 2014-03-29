@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from sklearn import neighbors, datasets
 import roslib
 roslib.load_manifest('object_perception')
@@ -20,7 +21,7 @@ class objectRecognition:
 		self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
 		self.clf.fit(feature, self.labels) 
 
-		rospy.Service('classifyObject',classifyObject,classifyObjectService)
+		rospy.Service('classifyObject',classifyObject,self.classifyObjectService)
 
 		rospy.loginfo('Verification Start')
 		rospy.spin()
@@ -61,7 +62,7 @@ class objectRecognition:
 		return classifyObjectResponse(category)
 
 	def predictObject(self,featureFileName):
-		queryFeature,label = self.loadFeature(featureFileName)
+		queryFeature,label = self.loadFeature(featureFileName,'-1')
 		if len(queryFeature) == 0:
 			return -1
 

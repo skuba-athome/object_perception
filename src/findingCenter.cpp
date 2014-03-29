@@ -455,9 +455,10 @@ void getObjectPoint(){
 			//classifySrv.request.x = objectCentroidWorld[k][0];
 			//classifySrv.request.y = objectCentroidWorld[k][1];
 			//classifySrv.request.z = objectCentroidWorld[k][2];
+			cout << "--------------------------" << fileName[k] << endl;
 
 			if(classifyClient.call(classifySrv))
-				cout << classifySrv.response.objectIndex;
+				cout << "response from server : " << classifySrv.response.objectIndex << endl;
 		}
 	}
 	else{
@@ -624,7 +625,7 @@ int main (int argc, char** argv)
 	ros::Subscriber sub_ = n.subscribe("localization",1,localizeCb);
 	sub_imageColor = it_.subscribe("/camera/rgb/image_color", 1, imageColorCb);
 
-	classifyClient = n.serviceClient<object_perception::classifyObject>("classifyObject'");
+	classifyClient = n.serviceClient<object_perception::classifyObject>("classifyObject");
 	object_perception::classifyObject classifySrv;
 
 	//isReachableClient = n.serviceClient<manipulator::isReachableClient>("isManipulatable");
