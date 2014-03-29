@@ -22,6 +22,7 @@
   <depend package="tf"/>
   <depend package="pcl17"/>
   <depend package="pcl17_ros"/>
+  <depend package="manipulator"/>
   
 </package>
 
