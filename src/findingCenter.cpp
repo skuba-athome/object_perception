@@ -2,7 +2,9 @@
 #include <sensor_msgs/PointCloud2.h>
 //#include <my_pcl/cropped_object.h>
 //#include <my_pcl/cropped_msg.h>
-#include <object_perception/cropped_msg.h>
+//#include <object_perception/cropped_msg.h>
+#include <object_perception/classifyObject.h>
+//#include <manipulator/isManipulable.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Vector3.h>
 #include <pcl17/ros/conversions.h>
@@ -25,6 +27,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <algorithm>
+#include <tf/transform_listener.h>
 
 using namespace std;
 
@@ -43,20 +46,76 @@ using namespace std;
 #define TUNED_H_DISTANCE 0
 #define TUNED_V_DISTANCE 0
 #define ARM_RAIDUS 1.15
-
 int maxArea=0;
 float pixel_x,pixel_y;
 float pos_x,pos_y,pos_z;
 cv::Mat img;
+int object_position_world[20][3];
+int frameId;
+bool isReach[20];
+vector<std::string> fileName;
+int objectCentroidWorld[20][3];
 
-ros::Publisher pub,cropped_object_pub,cropped_msg_pub,pubObjectNum,center_pub;
+std::string robot_frame = "/base_link";
+std::string pan_frame = "/pan_link";
+
+//convert to world frame service 
+//ros::ServiceClient convertClient;
+//object_perception::ConvertToWorld convertSrv;
+
+//verification service 
+ros::ServiceClient classifyClient;
+object_perception::classifyObject classifySrv;
+
+//is reachable service 
+ros::ServiceClient isManipulatableClient;
+//manipulator::isManipulatable isManipulatableSrv;
+tf::TransformListener* listener;
+
+/*
+bool isObjectReachable(int x,int y,int z){
+	int xWorld,yWorld,zWorld;
+	char* robot_frame = "";
+
+	try{
+		pcl17::PointCloudT<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloudT), cloud_obj (new pcl17::PointCloudT);
+		cloud->push_back(pcl17::PointT(x,y,z));
+
+//		PointCloudT::Ptr cloud (new PointCloudT);
+//		pcl::fromROSMsg(*cloud_in,*cloud);
+		listener->waitForTransform(robot_frame, frameId, ros::Time::now(), ros::Duration(1.0));
+		pcl_ros::transformPointCloud(robot_frame, *cloud, *cloud_obj, *listener);
+		xWorld = cloud_obj->x;
+		yWorld = cloud_obj->y;
+		zWorld = cloud_obj->z;
+	}
+	catch(tf::TransformException& ex){
+		//ROS_ERROR("Received an exception trying to transform a point from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
+		ROS_ERROR("Received an exception trying to transform a point.");// from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
+	}
+
+	isManipulatableSrv.request.x = x;
+	isManipulatableSrv.request.y = y;
+	isManipulatableSrv.request.z = z;
+
+	if(isManipulatableClient.call(isManipulatableSrv))
+		return isManipulatableSrv.response.isReachable
+	else
+		ROS_ERROR("Failed to call service ConvertToWorld");
+
+	return true;
+}
+*/
+
+//ros::Publisher pub,cropped_object_pub,cropped_msg_pub,pubObjectNum,center_pub;
+ros::Publisher pub,pubObjectNum,center_pub;
 static pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_pcl (new pcl17::PointCloud<pcl17::PointXYZ>);
-
 
 void depthCB(const sensor_msgs::PointCloud2& cloud) {
 	if ((cloud.width * cloud.height) == 0)
 		return; //return if the cloud is not dense!
 	try {
+		//frameId = cloud->header.frame_id;
 		pcl17::fromROSMsg(cloud, *cloud_pcl);
 		//ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
 	} catch (std::runtime_error e) {
@@ -65,12 +124,12 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 }
 
 void getObjectPoint(){
+	 pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>)    ,cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
 	//Read in the cloud data
 	//pcl17::PCDReader reader;
-	pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>),cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
-
 	//reader.read ("1389374538.210053381.pcd", *cloud);
 	
+	int reachableCount=0;
 	std::stringstream center_ss;
 	cloud = cloud_pcl;
 
@@ -200,154 +259,211 @@ void getObjectPoint(){
 
 
 	int objectNum=0;
+	bool reachable;
 	j = 0;
-	for (std::vector<pcl17::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
-	{
-		float x=0,y=0,z=0;
-		float pixel_x_max = 0, pixel_y_max = 0, pixel_x_min = 640, pixel_y_min = 480;
+	reachableCount=0;
+	do{
+		reachable=true;
+		for (std::vector<pcl17::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
+		{
+			float x=0,y=0,z=0;
+			float pixel_x_max = 0, pixel_y_max = 0, pixel_x_min = 640, pixel_y_min = 480;
 
-		pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_cluster (new pcl17::PointCloud<pcl17::PointXYZ>);
-		for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++){
-			float tmpX,tmpY;
-			cloud_cluster->points.push_back (cloud_filtered->points[*pit]); 
-			x += cloud_filtered->points[*pit].x;
-			y += cloud_filtered->points[*pit].y;
-			z += cloud_filtered->points[*pit].z;
+			pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_cluster (new pcl17::PointCloud<pcl17::PointXYZ>);
+			for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++){
+				float tmpX,tmpY;
+				cloud_cluster->points.push_back (cloud_filtered->points[*pit]); 
+				x += cloud_filtered->points[*pit].x;
+				y += cloud_filtered->points[*pit].y;
+				z += cloud_filtered->points[*pit].z;
 
-			tmpX = cloud_filtered->points[*pit].x*FOCAL_LENGTH/cloud_filtered->points[*pit].z + CENTER_IMAGE_X;
-			tmpY = cloud_filtered->points[*pit].y*FOCAL_LENGTH/cloud_filtered->points[*pit].z + CENTER_IMAGE_Y;
+				tmpX = cloud_filtered->points[*pit].x*FOCAL_LENGTH/cloud_filtered->points[*pit].z + CENTER_IMAGE_X;
+				tmpY = cloud_filtered->points[*pit].y*FOCAL_LENGTH/cloud_filtered->points[*pit].z + CENTER_IMAGE_Y;
 
-			if(tmpX > pixel_x_max) pixel_x_max = tmpX;
-			if(tmpY > pixel_y_max) pixel_y_max = tmpY;
-			if(tmpX < pixel_x_min) pixel_x_min = tmpX;
-			if(tmpY < pixel_y_min) pixel_y_min = tmpY;
+				if(tmpX > pixel_x_max) pixel_x_max = tmpX;
+				if(tmpY > pixel_y_max) pixel_y_max = tmpY;
+				if(tmpX < pixel_x_min) pixel_x_min = tmpX;
+				if(tmpY < pixel_y_min) pixel_y_min = tmpY;
 
+			}
+
+			pixel_x_min = pixel_x_min > 0 ? pixel_x_min : 0;
+			pixel_y_min = pixel_y_min > 0 ? pixel_y_min : 0;
+			pixel_x_max = pixel_x_max < 2*CENTER_IMAGE_X ? pixel_x_max : 2*CENTER_IMAGE_X;
+			pixel_y_max = pixel_y_max < 2*CENTER_IMAGE_Y ? pixel_y_max : 2*CENTER_IMAGE_Y;
+
+			int size = std::distance(it->indices.begin(), it->indices.end());
+			x/=size;
+			y/=size;
+			z/=size;
+
+			//if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT || y < PLANE_RIGHT)
+		//	if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT)
+		//		continue;
+
+
+			if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT)
+				continue;
+
+			/*
+			if(isObjectReachable(x,y,z))
+				reachableCount++;
+				*/
+
+
+	//		if(size > maxArea){
+	//			maxArea = size;
+	//			pos_x = x;
+	//			pos_y = y;
+	//			pos_z = z;
+	//		}
+	//		else
+	//			continue;
+
+			printf("(%f,%f,%f)\n",x,y,z);
+
+			pixel_x = x*FOCAL_LENGTH/z + CENTER_IMAGE_X;
+			pixel_y = y*FOCAL_LENGTH/z + CENTER_IMAGE_Y;
+
+			center_ss << pixel_x << " " << pixel_y << " ";
+
+			cv::Mat m = img.clone();
+			IplImage* iplImage = new IplImage(m);
+			//IplImage* iplImage = new IplImage(m);
+			//img.copyTo(iplImage);
+			//iplImage = cvCreateImage(cvGetSize(img), IPL_DEPTH_8U, 3); 
+			//iplImage = 
+
+			cvSetImageROI(iplImage,cv::Rect(pixel_x_min-TUNED_H_DISTANCE,pixel_y_min+TUNED_V_DISTANCE,pixel_x_max-pixel_x_min,pixel_y_max-pixel_y_min));
+			//cvSetImageROI(iplImage,cv::Rect(0,0,CENTER_IMAGE_X,CENTER_IMAGE_Y));
+
+			ROS_INFO("write picture.%d with (%f,%f,%f,%f) iplimage->size() : %d img.size() : %d",j,pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max,iplImage->width*iplImage->height,img.rows*img.cols);
+			std::stringstream ss_;
+			ss_ << "/home/skuba/skuba_athome/object_perception/picture" << j << ".jpg";
+
+			bool bSuccess = imwrite(ss_.str(), cv::Mat(iplImage), compression_params); //write the image to file
+
+
+			//------------------------------------------------------
+
+			char comm[1000];
+			sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /home/skuba/skuba_athome/object_perception/picture%d.jpg /home/skuba/skuba_athome/object_perception/feature%d",j,j);
+			system(comm);
+
+			//------------------------------------------------------
+
+
+
+			cv_bridge::CvImage cv_ptr;
+
+			ROS_INFO("BEFORE ASSIGN cv_ptr->image = cv::Mat(iplImage)\n");
+			cv_ptr.image = cv::Mat(iplImage);
+			ROS_INFO("AFTER ASSIGN cv_ptr->image = cv::Mat(iplImage)\n");
+
+			//my_pcl_tutorial::cropped_object co;
+
+			//ROS_INFO("BEFORE co.img = *(cv_ptr->toImageMsg())\n");
+			//co.img = *(cv_ptr.toImageMsg());
+			//ROS_INFO("AFTER co.img = *(cv_ptr->toImageMsg())\n");
+			//
+			//sensor_msgs::Image img_;
+			//img_ = cv_ptr->toImageMsg();
+			//co.img = cv_ptr->toImageMsg();
+
+			geometry_msgs::Vector3 vector_;
+			vector_.x = pixel_x;
+			vector_.y = pixel_y;
+
+			//co.vector = vector_;
+
+			//cropped_object_pub.publish(co);
+
+
+			//object_perception::cropped_msg cms[20];
+			//cms[j].vector = vector_;
+			//object_perception::cropped_msg cm;
+			//cm.vector = vector_;
+
+
+			std::stringstream sf;
+			sf << "/home/skuba/skuba_athome/object_perception/feature" << j;
+
+			fileName.push_back(sf.str());
+			printf("fileName = %s\n",fileName[j].c_str());
+			//have to change to centroid, now it's the center of object in 2d domain
+			objectCentroidWorld[j][0] = pixel_x;
+			objectCentroidWorld[j][1] = pixel_y;
+			//objectCentroidWorld[j][2] = z;
+			
+
+
+			//cm.filePath = sf.str();
+			//cms[j].filePath = sf.str();
+			//sending message, must be changed!
+			//cropped_msg_pub.publish(cm);
+
+
+			//cv::imshow("window",cv::Mat(iplImage));
+
+			//result position
+			//ROS_INFO("(pos_x : %f, pos_y : %f, pos_z : %f\n",pos_x,pos_y,pos_z);
+			ROS_INFO("(object's point in RGB (%f,%f)\n",pixel_x,pixel_y);
+			ROS_INFO("TOPLEFT : (%f,%f) TOP_RIGHT : (%f,%f)\n",pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max);
+
+			//pcl17::PointCloud<pcl17::PointXYZ> point;
+
+			//pcl17::PointXYZ point;
+			//point.x = x;  point.y = y;  point.z = z;
+			//cloud_center->push_back(point);
+			
+			cloud_center->push_back(pcl17::PointXYZ(x,y,z));
+
+			//cloud_center->push_back(new pcl17::PointXYZ(x,y,z));
+			ROS_INFO("center of clustering no.%d : (%f,%f,%f) \n",j,x,y,z);
+
+			cloud_cluster->width = cloud_cluster->points.size ();
+			cloud_cluster->height = 1;
+			cloud_cluster->is_dense = true;
+
+			std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
+			std::stringstream ss;
+			ss << "/home/skuba/skuba_athome/object_perception/cloud_cluster_" << j << ".pcd";
+			writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
+			j++;
 		}
-
-		pixel_x_min = pixel_x_min > 0 ? pixel_x_min : 0;
-		pixel_y_min = pixel_y_min > 0 ? pixel_y_min : 0;
-		pixel_x_max = pixel_x_max < 2*CENTER_IMAGE_X ? pixel_x_max : 2*CENTER_IMAGE_X;
-		pixel_y_max = pixel_y_max < 2*CENTER_IMAGE_Y ? pixel_y_max : 2*CENTER_IMAGE_Y;
-
-		int size = std::distance(it->indices.begin(), it->indices.end());
-		x/=size;
-		y/=size;
-		z/=size;
-
-		//if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT || y < PLANE_RIGHT)
-	//	if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT)
-	//		continue;
-
-
-		if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT)
-			continue;
-
-//		if(size > maxArea){
-//			maxArea = size;
-//			pos_x = x;
-//			pos_y = y;
-//			pos_z = z;
-//		}
-//		else
-//			continue;
-
-		printf("(%f,%f,%f)\n",x,y,z);
-
-		pixel_x = x*FOCAL_LENGTH/z + CENTER_IMAGE_X;
-		pixel_y = y*FOCAL_LENGTH/z + CENTER_IMAGE_Y;
-
-		center_ss << pixel_x << " " << pixel_y << " ";
-
-		cv::Mat m = img.clone();
-		IplImage* iplImage = new IplImage(m);
-		//IplImage* iplImage = new IplImage(m);
-		//img.copyTo(iplImage);
-		//iplImage = cvCreateImage(cvGetSize(img), IPL_DEPTH_8U, 3); 
-		//iplImage = 
-
-		cvSetImageROI(iplImage,cv::Rect(pixel_x_min-TUNED_H_DISTANCE,pixel_y_min+TUNED_V_DISTANCE,pixel_x_max-pixel_x_min,pixel_y_max-pixel_y_min));
-		//cvSetImageROI(iplImage,cv::Rect(0,0,CENTER_IMAGE_X,CENTER_IMAGE_Y));
-
-		ROS_INFO("write picture.%d with (%f,%f,%f,%f) iplimage->size() : %d img.size() : %d",j,pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max,iplImage->width*iplImage->height,img.rows*img.cols);
-		std::stringstream ss_;
-		ss_ << "/home/skuba/skuba_athome/object_perception/picture" << j << ".jpg";
-
-		bool bSuccess = imwrite(ss_.str(), cv::Mat(iplImage), compression_params); //write the image to file
+		/*
+		if((float)reachableCount/j<0.7){
+			//demo
+			lumyai_navigation_msgs::NavGoalMsg goal_pose;
+			goal_pose.text_msg = "closering";
+			goal_pose.ref_frame = "relative";
+			goal_pose.pose2d.x = 0.05;
+			goal_pose.pose2d.y = 0;
+			goal_pose.pose2d.theta = 0;
+			goal_pub.publish(goal_pose);
+			reachable = false;
+			//delay, waiting for reaching the destination and for new frame of point cloud
+		}
+		*/
+	//}while((float)reachableCount/j<0.7);
+	}while(false);
 
 
-		//------------------------------------------------------
+	if(reachable){
+		for(int k=0;k<j;k++){
+			classifySrv.request.filepath = fileName[k];
+			//classifySrv.request.x = objectCentroidWorld[k][0];
+			//classifySrv.request.y = objectCentroidWorld[k][1];
+			//classifySrv.request.z = objectCentroidWorld[k][2];
 
-		char comm[1000];
-		sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /home/skuba/skuba_athome/object_perception/picture%d.jpg /home/skuba/skuba_athome/object_perception/feature%d",j,j);
-		system(comm);
-
-		//------------------------------------------------------
-
-
-
-		cv_bridge::CvImage cv_ptr;
-
-		ROS_INFO("BEFORE ASSIGN cv_ptr->image = cv::Mat(iplImage)\n");
-		cv_ptr.image = cv::Mat(iplImage);
-		ROS_INFO("AFTER ASSIGN cv_ptr->image = cv::Mat(iplImage)\n");
-
-		//my_pcl_tutorial::cropped_object co;
-
-		//ROS_INFO("BEFORE co.img = *(cv_ptr->toImageMsg())\n");
-		//co.img = *(cv_ptr.toImageMsg());
-		//ROS_INFO("AFTER co.img = *(cv_ptr->toImageMsg())\n");
-		//
-		//sensor_msgs::Image img_;
-		//img_ = cv_ptr->toImageMsg();
-		//co.img = cv_ptr->toImageMsg();
-
-		geometry_msgs::Vector3 vector_;
-		vector_.x = pixel_x;
-		vector_.y = pixel_y;
-
-		//co.vector = vector_;
-
-		//cropped_object_pub.publish(co);
-
-		object_perception::cropped_msg cm;
-		cm.vector = vector_;
-
-
-		std::stringstream sf;
-		sf << "/home/skuba/skuba_athome/object_perception/feature" << j;
-		cm.filePath = sf.str();
-		cropped_msg_pub.publish(cm);
-
-
-		//cv::imshow("window",cv::Mat(iplImage));
-
-		//result position
-		//ROS_INFO("(pos_x : %f, pos_y : %f, pos_z : %f\n",pos_x,pos_y,pos_z);
-		ROS_INFO("(object's point in RGB (%f,%f)\n",pixel_x,pixel_y);
-		ROS_INFO("TOPLEFT : (%f,%f) TOP_RIGHT : (%f,%f)\n",pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max);
-
-		//pcl17::PointCloud<pcl17::PointXYZ> point;
-
-		//pcl17::PointXYZ point;
-		//point.x = x;  point.y = y;  point.z = z;
-		//cloud_center->push_back(point);
-		
-		cloud_center->push_back(pcl17::PointXYZ(x,y,z));
-
-		//cloud_center->push_back(new pcl17::PointXYZ(x,y,z));
-		ROS_INFO("center of clustering no.%d : (%f,%f,%f) \n",j,x,y,z);
-
-		cloud_cluster->width = cloud_cluster->points.size ();
-		cloud_cluster->height = 1;
-		cloud_cluster->is_dense = true;
-
-		std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
-		std::stringstream ss;
-		ss << "/home/skuba/skuba_athome/object_perception/cloud_cluster_" << j << ".pcd";
-		writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
-		j++;
-
+			if(classifyClient.call(classifySrv))
+				cout << classifySrv.response.objectIndex;
+		}
 	}
+	else{
+		//do nothing, no object can manipulate in this range.
+	}
+	
 	
 
 	std_msgs::String string_msg;
@@ -500,13 +616,19 @@ int main (int argc, char** argv)
 
 	pub = n.advertise<geometry_msgs::Vector3>("largest_point", 1000);
 	pubObjectNum = n.advertise<std_msgs::String>("object_number", 1000);
-	cropped_msg_pub = n.advertise<object_perception::cropped_msg>("cropped_msg", 100);
+	//cropped_msg_pub = n.advertise<object_perception::cropped_msg>("cropped_msg", 100);
 	center_pub = n.advertise<std_msgs::String>("center_pcl_object", 1000);
-
+	//goal_pub = n.advertise<lumyai_navigation_msgs::NavGoalMsg>("/follow/point", 1);
 	ros::Subscriber sub = n.subscribe("/camera/depth_registered/points",1,depthCB);
 	//ros::Subscriber sub = n.subscribe("/camera/depth/points",1,depthCB);
 	ros::Subscriber sub_ = n.subscribe("localization",1,localizeCb);
 	sub_imageColor = it_.subscribe("/camera/rgb/image_color", 1, imageColorCb);
+
+	classifyClient = n.serviceClient<object_perception::classifyObject>("classifyObject'");
+	object_perception::classifyObject classifySrv;
+
+	//isReachableClient = n.serviceClient<manipulator::isReachableClient>("isManipulatable");
+	//manipulator::isManipulatable isManipulatableSrv;
 
 	ros::spin();
 
