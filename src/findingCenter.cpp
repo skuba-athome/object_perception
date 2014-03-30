@@ -37,7 +37,7 @@ using namespace std;
 
 //#define DEPTH_LIMIT 0.86
 #define DEPTH_LIMIT 1.25
-#define ACCEPTED_AREA 500
+#define ACCEPTED_AREA 200
 //#define PLANE_HEIGHT -1.5
 #define PLANE_HEIGHT 0.5
 #define PLANE_LEFT -0.35
@@ -80,7 +80,8 @@ tf::TransformListener* listener;
 
 
 bool isObjectReachable(int x,int y,int z){
-	int xWorld,yWorld,zWorld;
+	cout << "-------------------in isObjectReachable method-------------------------" << endl;
+	float xWorld,yWorld,zWorld;
 	char* robot_frame = "";
 
 	try{
@@ -96,28 +97,32 @@ bool isObjectReachable(int x,int y,int z){
 //		PointCloudT::Ptr cloud (new PointCloudT);
 //		pcl::fromROSMsg(*cloud_in,*cloud);
 
-		cout << "--------------------------------------------" << endl;
-		listener->waitForTransform(robot_frame, frameId, ros::Time::now(), ros::Duration(1.0));
-		cout << "--------------------------------------------" << endl;
+	//	listener->waitForTransform(robot_frame, frameId, ros::Time::now(), ros::Duration(1.0));
 		//pcl17_ros::transformPointCloud(robot_frame, *cloud, *cloud_obj, *listener);
-		cout << "--------------------------------------------" << endl;
 		//xWorld = cloud_obj->begin()->x;
 		//yWorld = cloud_obj->begin()->y;
 		//zWorld = cloud_obj->begin()->z;
+		xWorld = 1.3;
+		yWorld = 0.3;
+		zWorld = 0.3;
 	}
 	catch(tf::TransformException& ex){
 		//ROS_ERROR("Received an exception trying to transform a point from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
 		ROS_ERROR("Received an exception trying to transform a point.");// from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
 	}
 
-	isManipulatableSrv.request.x = x;
-	isManipulatableSrv.request.y = y;
-	isManipulatableSrv.request.z = z;
+	isManipulatableSrv.request.x = xWorld;
+	isManipulatableSrv.request.y = yWorld;
+	isManipulatableSrv.request.z = zWorld;
+	cout << "WORLD " << xWorld << " " << yWorld << " " << zWorld << endl;
 
-	if(isManipulableClient.call(isManipulatableSrv))
-		return isManipulatableSrv.response.isManipulable;
+	if(isManipulableClient.call(isManipulatableSrv)){
+		bool tmp_ = (bool)isManipulatableSrv.response.isManipulable;
+		cout << "response from isManipulable server : " << tmp_ << endl;
+		cout << "--------------------------------------------" << endl;
+	}
 	else
-		ROS_ERROR("Failed to call service ConvertToWorld");
+		ROS_ERROR("Failed to call isManipulable service");
 
 	return true;
 }
@@ -253,7 +258,6 @@ void getObjectPoint(){
 		j++;
 	}
 
-		cout << "--------------------------------------------" << endl;
 	// Creating the KdTree object for the search method of the extraction
 
 	pcl17::search::KdTree<pcl17::PointXYZ>::Ptr tree (new pcl17::search::KdTree<pcl17::PointXYZ>);
@@ -274,16 +278,21 @@ void getObjectPoint(){
 
 	pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_center (new pcl17::PointCloud<pcl17::PointXYZ>);
 
+	//cout << "-------------------after ece -------------------------" << endl;
 
 	int objectNum=0;
 	bool reachable;
 	j = 0;
 
+	//cout << "-------------------1-------------------------" << endl;
 	reachableCount=0;
 	do{
+		//cout << "-------------------2-------------------------" << endl;
+		//cout << "cluster_indece.begin() " << cluster_indices.begin() << endl;
 		reachable=true;
-		for (std::vector<pcl17::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
-		{
+		for (std::vector<pcl17::PointIndices>::const_iterator it = cluster_indices.begin(); it != cluster_indices.end(); ++it)
+		{	
+			//cout << "-------------------3-------------------------" << endl;
 			float x=0,y=0,z=0;
 			float pixel_x_max = 0, pixel_y_max = 0, pixel_x_min = 640, pixel_y_min = 480;
 
@@ -304,6 +313,7 @@ void getObjectPoint(){
 				if(tmpY < pixel_y_min) pixel_y_min = tmpY;
 
 			}
+			//cout << "-------------------after first loop-------------------------" << endl;
 
 			pixel_x_min = pixel_x_min > 0 ? pixel_x_min : 0;
 			pixel_y_min = pixel_y_min > 0 ? pixel_y_min : 0;
@@ -323,6 +333,7 @@ void getObjectPoint(){
 			if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT)
 				continue;
 
+			//cout << "-------------------before isObjectReachable method-------------------------" << endl;
 			if(isObjectReachable(x,y,z))
 				reachableCount++;
 
@@ -444,6 +455,8 @@ void getObjectPoint(){
 			std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
 			std::stringstream ss;
 			ss << "/home/skuba/skuba_athome/object_perception/cloud_cluster_" << j << ".pcd";
+
+//------------------------------------cloud_cluster -------------------------
 			writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
 			j++;
 		}
@@ -541,6 +554,7 @@ void getObjectPoint(){
 //	}
 //
 //
+//--------------------------------------------------centerOfObject-------------------------
 	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/centerOfObject.pcd", *enlarged_cloud, false); 
 //	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/y_scope_cloud.pcd", *y_scope_cloud, false); 
 //	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/z_scope_cloud.pcd", *z_scope_cloud, false); 
