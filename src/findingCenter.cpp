@@ -9,7 +9,9 @@
 #include <object_perception/classifyObject.h>
 #include <manipulator/isManipulable.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Header.h>
 #include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/Point.h>
 #include <pcl17_ros/transforms.h>
 #include <pcl17/ros/conversions.h>
 #include <pcl17/ModelCoefficients.h>
@@ -55,14 +57,16 @@ float pixel_x,pixel_y;
 float pos_x,pos_y,pos_z;
 cv::Mat img;
 int object_position_world[20][3];
-//int frameId;
-const char* frameId;
 bool isReach[20];
 vector<std::string> fileName;
 int objectCentroidWorld[20][3];
 
-std::string robot_frame = "/base_link";
-std::string pan_frame = "/pan_link";
+
+std::string frameId;
+std::string robot_frame = "base_link";
+std::string pan_frame = "pan_link";
+//std::string robot_frame = "/base_link";
+//std::string pan_frame = "/pan_link";
 
 //convert to world frame service 
 //ros::ServiceClient convertClient;
@@ -77,14 +81,16 @@ ros::ServiceClient isManipulableClient;
 manipulator::isManipulable isManipulatableSrv;
 
 tf::TransformListener* listener;
+double timeStamp=0;
 
 
-bool isObjectReachable(int x,int y,int z){
+bool isObjectReachable(float x,float y,float z){
 	cout << "-------------------in isObjectReachable method-------------------------" << endl;
+	cout << "centroid of object :  (x,y,z) = " << x << " " << y << " " << z << endl;
 	float xWorld,yWorld,zWorld;
-	char* robot_frame = "";
+	//char* robot_frame = "";
 
-	try{
+	//try{
 		//pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_obj (new pcl17::PointCloud<pcl17::PointXYZ>);
 		pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_obj (new pcl17::PointCloud<pcl17::PointXYZ>);
 
@@ -96,21 +102,55 @@ bool isObjectReachable(int x,int y,int z){
 
 //		PointCloudT::Ptr cloud (new PointCloudT);
 //		pcl::fromROSMsg(*cloud_in,*cloud);
+		
+		geometry_msgs::PointStamped kinect_point;
+		geometry_msgs::PointStamped base_point;
+//		geometry_msgs::Point point;
+//		std_msgs::Header header;
 
-	//	listener->waitForTransform(robot_frame, frameId, ros::Time::now(), ros::Duration(1.0));
-		//pcl17_ros::transformPointCloud(robot_frame, *cloud, *cloud_obj, *listener);
-		//xWorld = cloud_obj->begin()->x;
-		//yWorld = cloud_obj->begin()->y;
-		//zWorld = cloud_obj->begin()->z;
-		xWorld = 1.3;
-		yWorld = 0.3;
-		zWorld = 0.3;
-	}
-	catch(tf::TransformException& ex){
-		//ROS_ERROR("Received an exception trying to transform a point from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
-		ROS_ERROR("Received an exception trying to transform a point.");// from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
-	}
+		kinect_point.header.frame_id = "camera_rgb_optical_frame";
+		kinect_point.header.stamp = ros::Time();
+		kinect_point.point.x = 0;
+		kinect_point.point.y = 0;
+		kinect_point.point.z = 1;
 
+//		header.stamp = ros::Time::now();//?
+//		//header.frame_id = frameId;
+//		header.frame_id = "camera_rgb_optical_frame";
+//
+//		point.x = 0;
+//		point.y = 0;
+//		point.z = 0;
+//		point.x = x;
+//		point.y = y;
+//		point.z = z;
+
+//		kinect_point.header = header;
+//		kinect_point.point = point;
+
+
+		cout << "robot_frame = " << robot_frame << ", frameId = " << frameId << endl;
+		//listener->transformPoint(robot_frame,ros::Time::now(),kinect_point,pan_frame, base_point);
+		listener->transformPoint(robot_frame,kinect_point,base_point);
+
+
+		cout << "returned pointStamped from transformPoint function : (" << base_point.point.x << "," << base_point.point.y << "," << base_point.point.z << ")" <<endl;
+
+//		listener->waitForTransform(robot_frame, frameId, ros::Time::now(), ros::Duration(1.0));
+		//pcl17_ros::transformPointCloud("base_link", *cloud, *cloud_obj, *listener);
+
+//		xWorld = cloud_obj->begin()->x;
+//		yWorld = cloud_obj->begin()->y;
+//		zWorld = cloud_obj->begin()->z;
+		//xWorld = 1.3;
+		//yWorld = 0.3;
+		//zWorld = 0.3;
+//	}
+//	catch(tf::TransformException& ex){
+//		//ROS_ERROR("Received an exception trying to transform a point from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
+//		ROS_ERROR("Received an exception trying to transform a point.");// from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
+//	}
+//
 	isManipulatableSrv.request.x = xWorld;
 	isManipulatableSrv.request.y = yWorld;
 	isManipulatableSrv.request.z = zWorld;
@@ -135,7 +175,8 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 	if ((cloud.width * cloud.height) == 0)
 		return; //return if the cloud is not dense!
 	try {
-		//frameId = cloud->header.frame_id;
+		frameId = cloud.header.frame_id;
+		//timeStamp = cloud.header.frame_id;
 		pcl17::fromROSMsg(cloud, *cloud_pcl);
 		//ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
 		cout << "point cloud get" << endl;
@@ -284,6 +325,9 @@ void getObjectPoint(){
 	bool reachable;
 	j = 0;
 
+
+	cout << "cluster_indeces.size() = " << cluster_indices.size() << endl;
+
 	//cout << "-------------------1-------------------------" << endl;
 	reachableCount=0;
 	do{
@@ -361,32 +405,42 @@ void getObjectPoint(){
 			//iplImage = cvCreateImage(cvGetSize(img), IPL_DEPTH_8U, 3); 
 			//iplImage = 
 
-			cvSetImageROI(iplImage,cv::Rect(pixel_x_min-TUNED_H_DISTANCE,pixel_y_min+TUNED_V_DISTANCE,pixel_x_max-pixel_x_min,pixel_y_max-pixel_y_min));
+//use thie one
+			//cvSetImageROI(iplImage,cv::Rect(pixel_x_min-TUNED_H_DISTANCE,pixel_y_min+TUNED_V_DISTANCE,pixel_x_max-pixel_x_min,pixel_y_max-pixel_y_min));
 			//cvSetImageROI(iplImage,cv::Rect(0,0,CENTER_IMAGE_X,CENTER_IMAGE_Y));
 
 			ROS_INFO("write picture.%d with (%f,%f,%f,%f) iplimage->size() : %d img.size() : %d",j,pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max,iplImage->width*iplImage->height,img.rows*img.cols);
 			std::stringstream ss_;
-			ss_ << "/home/skuba/skuba_athome/object_perception/picture" << j << ".jpg";
 
-			bool bSuccess = imwrite(ss_.str(), cv::Mat(iplImage), compression_params); //write the image to file
+//use this one
+//			ss_ << "/home/skuba/skuba_athome/object_perception/picture" << j << ".jpg";
 
+//use this one
+//			bool bSuccess = imwrite(ss_.str(), cv::Mat(iplImage), compression_params); //write the image to file
+
+
+
+//use this one
+			//------------------------------------------------------
+
+//			char comm[1000];
+//			sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /home/skuba/skuba_athome/object_perception/picture%d.jpg /home/skuba/skuba_athome/object_perception/feature%d",j,j);
+//			system(comm);
 
 			//------------------------------------------------------
 
-			char comm[1000];
-			sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /home/skuba/skuba_athome/object_perception/picture%d.jpg /home/skuba/skuba_athome/object_perception/feature%d",j,j);
-			system(comm);
 
+
+//use this one
 			//------------------------------------------------------
+			//cv_bridge::CvImage cv_ptr;
 
-
+			//ROS_INFO("BEFORE ASSIGN cv_ptr->image = cv::Mat(iplImage)\n");
+			//cv_ptr.image = cv::Mat(iplImage);
+			//ROS_INFO("AFTER ASSIGN cv_ptr->image = cv::Mat(iplImage)\n");
+			//------------------------------------------------------
 
 			cv_bridge::CvImage cv_ptr;
-
-			ROS_INFO("BEFORE ASSIGN cv_ptr->image = cv::Mat(iplImage)\n");
-			cv_ptr.image = cv::Mat(iplImage);
-			ROS_INFO("AFTER ASSIGN cv_ptr->image = cv::Mat(iplImage)\n");
-
 			//my_pcl_tutorial::cropped_object co;
 
 			//ROS_INFO("BEFORE co.img = *(cv_ptr->toImageMsg())\n");
@@ -457,7 +511,7 @@ void getObjectPoint(){
 			ss << "/home/skuba/skuba_athome/object_perception/cloud_cluster_" << j << ".pcd";
 
 //------------------------------------cloud_cluster -------------------------
-			writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
+//			writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
 			j++;
 		}
 		/*
@@ -662,6 +716,8 @@ int main (int argc, char** argv)
 
 	isManipulableClient = n.serviceClient<manipulator::isManipulable>("isManipulable");
 	manipulator::isManipulable isManipulatableSrv;
+
+	listener = new tf::TransformListener();
 	ros::spin();
 
 	return (0);
