@@ -49,8 +49,10 @@ using namespace std;
 #define FOCAL_LENGTH 525
 #define CENTER_IMAGE_X 320
 #define CENTER_IMAGE_Y 240
-#define TUNED_H_DISTANCE 0
-#define TUNED_V_DISTANCE 0
+#define TUNED_H_DISTANCE_TOP_LEFT 10
+#define TUNED_H_DISTANCE_BOTTOM_RIGHT 10
+#define TUNED_V_DISTANCE_TOP_LEFT -10
+#define TUNED_V_DISTANCE_BOTTOM_RIGHT 20
 #define ARM_RAIDUS 1.15
 int maxArea=0;
 float pixel_x,pixel_y;
@@ -86,19 +88,13 @@ double timeStamp=0;
 
 bool isObjectReachable(float x,float y,float z){
 	cout << "-------------------in isObjectReachable method-------------------------" << endl;
-	cout << "centroid of object :  (x,y,z) = " << x << " " << y << " " << z << endl;
+	cout << "centroid of object in kinect :  (x,y,z) = " << x << " " << y << " " << z << endl;
 	float xWorld,yWorld,zWorld;
 	//char* robot_frame = "";
 
 	//try{
 		//pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_obj (new pcl17::PointCloud<pcl17::PointXYZ>);
 		pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_obj (new pcl17::PointCloud<pcl17::PointXYZ>);
-
-		//cloud->push_back(pcl17::PointXYZ(x,y,z));
-		cloud->push_back(pcl17::PointXYZ(x,y,z));
-		cloud->width = 1;
-		cloud->height = 1;
-		
 
 //		PointCloudT::Ptr cloud (new PointCloudT);
 //		pcl::fromROSMsg(*cloud_in,*cloud);
@@ -110,24 +106,9 @@ bool isObjectReachable(float x,float y,float z){
 
 		kinect_point.header.frame_id = "camera_rgb_optical_frame";
 		kinect_point.header.stamp = ros::Time();
-		kinect_point.point.x = 0;
-		kinect_point.point.y = 0;
-		kinect_point.point.z = 1;
-
-//		header.stamp = ros::Time::now();//?
-//		//header.frame_id = frameId;
-//		header.frame_id = "camera_rgb_optical_frame";
-//
-//		point.x = 0;
-//		point.y = 0;
-//		point.z = 0;
-//		point.x = x;
-//		point.y = y;
-//		point.z = z;
-
-//		kinect_point.header = header;
-//		kinect_point.point = point;
-
+		kinect_point.point.x = x;
+		kinect_point.point.y = y;
+		kinect_point.point.z = z;
 
 		cout << "robot_frame = " << robot_frame << ", frameId = " << frameId << endl;
 		//listener->transformPoint(robot_frame,ros::Time::now(),kinect_point,pan_frame, base_point);
@@ -167,7 +148,6 @@ bool isObjectReachable(float x,float y,float z){
 	return true;
 }
 
-//ros::Publisher pub,cropped_object_pub,cropped_msg_pub,pubObjectNum,center_pub;
 ros::Publisher pub,pubObjectNum,center_pub;
 static pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_pcl (new pcl17::PointCloud<pcl17::PointXYZ>);
 
@@ -179,7 +159,7 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 		//timeStamp = cloud.header.frame_id;
 		pcl17::fromROSMsg(cloud, *cloud_pcl);
 		//ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
-		cout << "point cloud get" << endl;
+//		cout << "point cloud get" << endl;
 	} catch (std::runtime_error e) {
 		ROS_ERROR_STREAM("Error message: " << e.what());
 	}
@@ -202,13 +182,13 @@ void getObjectPoint(){
 	compression_params.push_back(98); //specify the compression quality
 
 	//bool bSuccess_ = imwrite("first.jpg", img, compression_params); //write the image to file
-	bool bSuccess_ = imwrite("/home/skuba/skuba_athome/object_perception/first.jpg", img, compression_params); //write the image to file
+	bool bSuccess_ = imwrite("/run/shm/object_perception/first.jpg", img, compression_params); //write the image to file
 	
 	   //pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>);
 	   
 	std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
 	pcl17::PCDWriter writer;
-	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/first.pcd", *cloud, false); 
+	writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/first.pcd", *cloud, false); 
 
 
 	for (pcl17::PointCloud<pcl17::PointXYZ>::iterator it = cloud->begin(); it != cloud->end(); ++it){
@@ -244,7 +224,7 @@ void getObjectPoint(){
 
 
 
-	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/cloud_filtered.pcd", *cloud_filtered, false); 
+	writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/cloud_filtered.pcd", *cloud_filtered, false); 
 
 	pcl17::SACSegmentation<pcl17::PointXYZ> seg;
 	pcl17::PointIndices::Ptr inliers (new pcl17::PointIndices);
@@ -294,7 +274,7 @@ void getObjectPoint(){
 
 
 		std::stringstream plane_name;
-		plane_name << "/home/skuba/skuba_athome/object_perception/segmenged_plane" << j << ".pcd";
+		plane_name << "/run/shm/object_perception/segmenged_plane" << j << ".pcd";
 		writer.write<pcl17::PointXYZ> (plane_name.str (), *cloud_plane, false); 
 		j++;
 	}
@@ -378,6 +358,7 @@ void getObjectPoint(){
 				continue;
 
 			//cout << "-------------------before isObjectReachable method-------------------------" << endl;
+			//
 			if(isObjectReachable(x,y,z))
 				reachableCount++;
 
@@ -405,27 +386,37 @@ void getObjectPoint(){
 			//iplImage = cvCreateImage(cvGetSize(img), IPL_DEPTH_8U, 3); 
 			//iplImage = 
 
-//use thie one
-			//cvSetImageROI(iplImage,cv::Rect(pixel_x_min-TUNED_H_DISTANCE,pixel_y_min+TUNED_V_DISTANCE,pixel_x_max-pixel_x_min,pixel_y_max-pixel_y_min));
-			//cvSetImageROI(iplImage,cv::Rect(0,0,CENTER_IMAGE_X,CENTER_IMAGE_Y));
 
-			ROS_INFO("write picture.%d with (%f,%f,%f,%f) iplimage->size() : %d img.size() : %d",j,pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max,iplImage->width*iplImage->height,img.rows*img.cols);
+//use thie one
+			//printf("pixel_x_min : %f, pixel_y_min : %f, pixel_x_max : %f, pixel_y_max : %f\n",pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max);
+			//printf("top left : (%f,%f)\n",max(pixel_x_min-TUNED_H_DISTANCE_TOP_LEFT,(float)0),max(pixel_y_min+TUNED_V_DISTANCE_TOP_LEFT,(float)0));
+			//printf("bottom right : (%f,%f)\n",min(pixel_x_max-pixel_x_min+TUNED_H_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_X)),min(pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_Y)));
+			//ROS_INFO("write picture.%d with (%f,%f,%f,%f) iplimage->size() : %d img.size() : %d",j,pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max,iplImage->width*iplImage->height,img.rows*img.cols);
+
+			cvSetImageROI(iplImage,cv::Rect(max(pixel_x_min-TUNED_H_DISTANCE_TOP_LEFT,(float)0),
+										    max(pixel_y_min+TUNED_V_DISTANCE_TOP_LEFT,(float)0),
+											min(pixel_x_max-pixel_x_min+TUNED_H_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_X)),
+											min(pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_Y))));
+
+
+
 			std::stringstream ss_;
 
 //use this one
-//			ss_ << "/home/skuba/skuba_athome/object_perception/picture" << j << ".jpg";
+			ss_ << "/run/shm/object_perception/picture" << j << ".jpg";
 
 //use this one
-//			bool bSuccess = imwrite(ss_.str(), cv::Mat(iplImage), compression_params); //write the image to file
+			bool bSuccess = imwrite(ss_.str(), cv::Mat(iplImage), compression_params); //write the image to file
 
 
 
 //use this one
 			//------------------------------------------------------
 
-//			char comm[1000];
-//			sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /home/skuba/skuba_athome/object_perception/picture%d.jpg /home/skuba/skuba_athome/object_perception/feature%d",j,j);
-//			system(comm);
+			char comm[1000];
+			//sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /home/skuba/skuba_athome/object_perception/picture%d.jpg /home/skuba/skuba_athome/object_perception/feature%d",j,j);
+			sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /run/shm/object_perception/picture%d.jpg /run/shm/object_perception/feature%d",j,j);
+			system(comm);
 
 			//------------------------------------------------------
 
@@ -457,7 +448,6 @@ void getObjectPoint(){
 
 			//co.vector = vector_;
 
-			//cropped_object_pub.publish(co);
 
 
 			//object_perception::cropped_msg cms[20];
@@ -467,7 +457,7 @@ void getObjectPoint(){
 
 
 			std::stringstream sf;
-			sf << "/home/skuba/skuba_athome/object_perception/feature" << j;
+			sf << "/run/shm/object_perception/feature" << j;
 
 			fileName.push_back(sf.str());
 			printf("fileName = %s\n",fileName[j].c_str());
@@ -508,12 +498,13 @@ void getObjectPoint(){
 
 			std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
 			std::stringstream ss;
-			ss << "/home/skuba/skuba_athome/object_perception/cloud_cluster_" << j << ".pcd";
+			ss << "/run/shm/object_perception/cloud_cluster_" << j << ".pcd";
 
 //------------------------------------cloud_cluster -------------------------
-//			writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
+			writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
 			j++;
 		}
+
 		/*
 		if((float)reachableCount/j<0.7){
 			//demo
@@ -531,9 +522,11 @@ void getObjectPoint(){
 	//}while((float)reachableCount/j<0.7);
 	}while(false);
 
+	cout << "isReachable : " << reachableCount << endl;
 
-/*
-	if(reachable){
+
+
+	if(true){
 		for(int k=0;k<j;k++){
 			classifySrv.request.filepath = fileName[k];
 			//classifySrv.request.x = objectCentroidWorld[k][0];
@@ -548,7 +541,7 @@ void getObjectPoint(){
 	else{
 		//do nothing, no object can manipulate in this range.
 	}
-	*/
+	
 	
 	
 
@@ -563,13 +556,6 @@ void getObjectPoint(){
 	pubObjectNum.publish(msg_);
 //
 	pcl17::PointCloud<pcl17::PointXYZ>::Ptr enlarged_cloud (new pcl17::PointCloud<pcl17::PointXYZ>);
-//	pcl17::PointCloud<pcl17::PointXYZ>::Ptr z_scope_cloud (new pcl17::PointCloud<pcl17::PointXYZ>);
-//	pcl17::PointCloud<pcl17::PointXYZ>::Ptr y_scope_cloud (new pcl17::PointCloud<pcl17::PointXYZ>);
-//	pcl17::PointCloud<pcl17::PointXYZ>::Ptr left_scope_cloud (new pcl17::PointCloud<pcl17::PointXYZ>);
-//	pcl17::PointCloud<pcl17::PointXYZ>::Ptr right_scope_cloud (new pcl17::PointCloud<pcl17::PointXYZ>);
-//
-//	ROS_INFO("cloud_center.size() = %d\n",cloud_center->size());
-//
 	//create center of object cloud
 	for(size_t t = 0; t < cloud_center->size(); t++){
 		for(float i=-0.007;i<=0.007;i+=0.001){
@@ -580,40 +566,10 @@ void getObjectPoint(){
 			}
 		}
 	}
-//
-//	//draw z-plane
-//	for(float i=PLANE_LEFT;i<=PLANE_RIGHT;i+=0.01){
-//		for(float j=-PLANE_HEIGHT;j<=-PLANE_HEIGHT+1;j+=0.01)
-//			z_scope_cloud->push_back(pcl17::PointXYZ(i,j,DEPTH_LIMIT));
-//	}
-//
-//
-//	//draw y-plane
-//	for(float i=PLANE_LEFT;i<=PLANE_RIGHT;i+=0.01){
-//		for(float j=DEPTH_LIMIT-1;j<=DEPTH_LIMIT;j+=0.01)
-//			y_scope_cloud->push_back(pcl17::PointXYZ(i,PLANE_HEIGHT,j));
-//	}
-//
-//
-//	//draw x_left-plane
-//	for(float i=-PLANE_HEIGHT;i<=-PLANE_HEIGHT+1;i+=0.01){
-//		for(float j=DEPTH_LIMIT-1;j<=DEPTH_LIMIT;j+=0.01)
-//			left_scope_cloud->push_back(pcl17::PointXYZ(PLANE_LEFT,i,j));
-//	}
-//
-//	//draw x_right-plane
-//	for(float i=-PLANE_HEIGHT;i<=-PLANE_HEIGHT+1;i+=0.01){
-//		for(float j=DEPTH_LIMIT-1;j<=DEPTH_LIMIT;j+=0.01)
-//			right_scope_cloud->push_back(pcl17::PointXYZ(PLANE_RIGHT,i,j));
-//	}
-//
-//
+
+
 //--------------------------------------------------centerOfObject-------------------------
-	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/centerOfObject.pcd", *enlarged_cloud, false); 
-//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/y_scope_cloud.pcd", *y_scope_cloud, false); 
-//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/z_scope_cloud.pcd", *z_scope_cloud, false); 
-//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/left_scope_cloud.pcd", *left_scope_cloud, false); 
-//	writer.write<pcl17::PointXYZ> ("/home/skuba/skuba_athome/object_perception/right_scope_cloud.pcd", *right_scope_cloud, false); 
+	writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/centerOfObject.pcd", *enlarged_cloud, false); 
 //
 	if(maxArea == 0){
 		ROS_ERROR("No object in this range.");
@@ -649,11 +605,6 @@ void getObjectPoint(){
 
 
 
-	//std::string str_pub("P1(");
-	//str_pub.append(1);
-	//str_pub.append(",");
-	//str_pub.append("2");
-	//str_pub.append(")");
 	/*
 	   pixel_x = pos_x*FOCAL_LENGTH/pos_z + CENTER_IMAGE_X;
 	   pixel_y = pos_y*FOCAL_LENGTH/pos_z + CENTER_IMAGE_Y;
@@ -699,7 +650,6 @@ int main (int argc, char** argv)
 
 	image_transport::ImageTransport it_(nh);
 	image_transport::Subscriber sub_imageColor;
-	//cropped_object_pub = n.advertise<my_pcl_tutorial::cropped_object>("cropped_object",100);
 
 	pub = n.advertise<geometry_msgs::Vector3>("largest_point", 1000);
 	pubObjectNum = n.advertise<std_msgs::String>("object_number", 1000);
