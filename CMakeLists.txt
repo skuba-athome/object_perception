@@ -111,3 +111,4 @@ rosbuild_add_boost_directories()
 rosbuild_link_boost(findingCenter filesystem system)
 
 rosbuild_add_executable(extractSURF src/extractSURF.cpp)
+rosbuild_add_executable(image_view src/image_view.cpp)
