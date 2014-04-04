@@ -1,11 +1,5 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
-//#include <my_pcl/cropped_object.h>
-//#include <my_pcl/cropped_msg.h>
-//#include <object_perception/cropped_msg.h>
-//#include <pcl_ros/transforms.h>
-//#include <pcl/ros/conversions.h>
-//#include <pcl/point_types.h>
 #include <object_perception/classifyObject.h>
 #include <manipulator/isManipulable.h>
 #include <std_msgs/String.h>
@@ -67,6 +61,8 @@ int objectCentroidWorld[20][3];
 std::string frameId;
 std::string robot_frame = "base_link";
 std::string pan_frame = "pan_link";
+
+std::string category;
 //std::string robot_frame = "/base_link";
 //std::string pan_frame = "/pan_link";
 
@@ -86,7 +82,7 @@ tf::TransformListener* listener;
 double timeStamp=0;
 
 
-bool isObjectReachable(float x,float y,float z){
+bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* objectWorldY,float* objectWorldZ){
 	cout << "-------------------in isObjectReachable method-------------------------" << endl;
 	cout << "centroid of object in kinect :  (x,y,z) = " << x << " " << y << " " << z << endl;
 	float xWorld,yWorld,zWorld;
@@ -116,6 +112,10 @@ bool isObjectReachable(float x,float y,float z){
 
 
 		cout << "returned pointStamped from transformPoint function : (" << base_point.point.x << "," << base_point.point.y << "," << base_point.point.z << ")" <<endl;
+
+		*objectWorldX = base_point.point.x;
+		*objectWorldY = base_point.point.y;
+		*objectWorldZ = base_point.point.z;
 
 //		listener->waitForTransform(robot_frame, frameId, ros::Time::now(), ros::Duration(1.0));
 		//pcl17_ros::transformPointCloud("base_link", *cloud, *cloud_obj, *listener);
@@ -195,11 +195,8 @@ void getObjectPoint(){
 		float x = it->x;
 		float y = it->y;
 		float z = it->z;
-		//countOut++;
-		if( sqrt(x*x+y*y+z*z) < ARM_RAIDUS){
-			//countIn++;
+		if( sqrt(x*x+y*y+z*z) < ARM_RAIDUS)
 			cloud_tmp->push_back(pcl17::PointXYZ(it->x,it->y,it->z));
-		}
 	}
 	
 
@@ -343,8 +340,15 @@ void getObjectPoint(){
 		if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT)
 			continue;
 
-		if(isObjectReachable(x,y,z))
+		float objectWorldX,objectWorldY,objectWorldZ;
+
+		if(isObjectReachable(x,y,z,&objectWorldX,&objectWorldY,&objectWorldZ))
 			reachableCount++;
+
+//		if(objectWorldZ < PLANE_HEIGHT)
+//			category = "other/";
+//		else
+			//category = "object/";
 
 		pixel_x = x*FOCAL_LENGTH/z + CENTER_IMAGE_X;
 		pixel_y = y*FOCAL_LENGTH/z + CENTER_IMAGE_Y;
@@ -373,12 +377,15 @@ void getObjectPoint(){
 
 
 		std::stringstream ss_;
+		std::stringstream ss_category_;
 
 //use this one
-		ss_ << "/run/shm/object_perception/picture" << j << ".jpg";
-
+		ss_<< "/run/shm/object_perception/picture" << j << ".jpg";
 //use this one
 		bool bSuccess = imwrite(ss_.str(), cv::Mat(iplImage), compression_params); //write the image to file
+
+		//ss_category_ << "/run/shm/object_perception/" << category.c_str() << "picture" << j << ".jpg";
+		//bSuccess = imwrite(ss_category_.str(), cv::Mat(iplImage), compression_params); //write the image to file
 
 
 
@@ -394,8 +401,8 @@ void getObjectPoint(){
 
 
 		std::stringstream sf;
-		sf << "/run/shm/object_perception/feature" << j;
-
+		//sf << "/run/shm/object_perception/feature" << j;
+		sf << "/run/shm/object_perception/picture" << j << ".jpg";
 		fileName.push_back(sf.str());
 		printf("fileName = %s\n",fileName[j].c_str());
 		//have to change to centroid, now it's the center of object in 2d domain
@@ -437,8 +444,12 @@ void getObjectPoint(){
 		std::stringstream ss;
 		ss << "/run/shm/object_perception/cloud_cluster_" << j << ".pcd";
 
+//		std::stringstream ss_category;
+//		ss_category << "/run/shm/object_perception/" << category.c_str() << "cloud_cluster_" << j << ".pcd";
+
 //------------------------------------cloud_cluster -------------------------
 		writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
+		//writer.write<pcl17::PointXYZ> (ss_category.str (), *cloud_cluster, false); 
 		j++;
 	}
 
@@ -446,6 +457,7 @@ void getObjectPoint(){
 
 
 
+	std::stringstream verification_result;
 	for(int k=0;k<j;k++){
 		classifySrv.request.filepath = fileName[k];
 		//classifySrv.request.x = objectCentroidWorld[k][0];
@@ -453,13 +465,12 @@ void getObjectPoint(){
 		//classifySrv.request.z = objectCentroidWorld[k][2];
 		cout << "--------------------------" << fileName[k] << endl;
 
-		if(classifyClient.call(classifySrv))
+		if(classifyClient.call(classifySrv)){
 			cout << "response from server : " << classifySrv.response.objectIndex << endl;
+			verification_result << classifySrv.response.objectIndex << " | " ;
+		}
 	}
 	
-	
-	
-
 	std_msgs::String string_msg;
 	string_msg.data = center_ss.str();
 	center_pub.publish(string_msg);
