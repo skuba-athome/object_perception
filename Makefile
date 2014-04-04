@@ -174,45 +174,6 @@ clean-test-results/fast:
 .PHONY : clean-test-results/fast
 
 #=============================================================================
-# Target rules for targets named color
-
-# Build rule for target.
-color: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 color
-.PHONY : color
-
-# fast build rule for target.
-color/fast:
-	$(MAKE) -f CMakeFiles/color.dir/build.make CMakeFiles/color.dir/build
-.PHONY : color/fast
-
-#=============================================================================
-# Target rules for targets named color2
-
-# Build rule for target.
-color2: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 color2
-.PHONY : color2
-
-# fast build rule for target.
-color2/fast:
-	$(MAKE) -f CMakeFiles/color2.dir/build.make CMakeFiles/color2.dir/build
-.PHONY : color2/fast
-
-#=============================================================================
-# Target rules for targets named ece
-
-# Build rule for target.
-ece: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ece
-.PHONY : ece
-
-# fast build rule for target.
-ece/fast:
-	$(MAKE) -f CMakeFiles/ece.dir/build.make CMakeFiles/ece.dir/build
-.PHONY : ece/fast
-
-#=============================================================================
 # Target rules for targets named extractSURF
 
 # Build rule for target.
@@ -237,97 +198,6 @@ findingCenter: cmake_check_build_system
 findingCenter/fast:
 	$(MAKE) -f CMakeFiles/findingCenter.dir/build.make CMakeFiles/findingCenter.dir/build
 .PHONY : findingCenter/fast
-
-#=============================================================================
-# Target rules for targets named main
-
-# Build rule for target.
-main: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 main
-.PHONY : main
-
-# fast build rule for target.
-main/fast:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
-.PHONY : main/fast
-
-#=============================================================================
-# Target rules for targets named nearest_neighbors
-
-# Build rule for target.
-nearest_neighbors: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 nearest_neighbors
-.PHONY : nearest_neighbors
-
-# fast build rule for target.
-nearest_neighbors/fast:
-	$(MAKE) -f CMakeFiles/nearest_neighbors.dir/build.make CMakeFiles/nearest_neighbors.dir/build
-.PHONY : nearest_neighbors/fast
-
-#=============================================================================
-# Target rules for targets named object_surf
-
-# Build rule for target.
-object_surf: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 object_surf
-.PHONY : object_surf
-
-# fast build rule for target.
-object_surf/fast:
-	$(MAKE) -f CMakeFiles/object_surf.dir/build.make CMakeFiles/object_surf.dir/build
-.PHONY : object_surf/fast
-
-#=============================================================================
-# Target rules for targets named open_door
-
-# Build rule for target.
-open_door: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 open_door
-.PHONY : open_door
-
-# fast build rule for target.
-open_door/fast:
-	$(MAKE) -f CMakeFiles/open_door.dir/build.make CMakeFiles/open_door.dir/build
-.PHONY : open_door/fast
-
-#=============================================================================
-# Target rules for targets named pcd_color_viewer
-
-# Build rule for target.
-pcd_color_viewer: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 pcd_color_viewer
-.PHONY : pcd_color_viewer
-
-# fast build rule for target.
-pcd_color_viewer/fast:
-	$(MAKE) -f CMakeFiles/pcd_color_viewer.dir/build.make CMakeFiles/pcd_color_viewer.dir/build
-.PHONY : pcd_color_viewer/fast
-
-#=============================================================================
-# Target rules for targets named pcd_viewer
-
-# Build rule for target.
-pcd_viewer: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 pcd_viewer
-.PHONY : pcd_viewer
-
-# fast build rule for target.
-pcd_viewer/fast:
-	$(MAKE) -f CMakeFiles/pcd_viewer.dir/build.make CMakeFiles/pcd_viewer.dir/build
-.PHONY : pcd_viewer/fast
-
-#=============================================================================
-# Target rules for targets named pic
-
-# Build rule for target.
-pic: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 pic
-.PHONY : pic
-
-# fast build rule for target.
-pic/fast:
-	$(MAKE) -f CMakeFiles/pic.dir/build.make CMakeFiles/pic.dir/build
-.PHONY : pic/fast
 
 #=============================================================================
 # Target rules for targets named rosbuild_precompile
@@ -421,19 +291,6 @@ rospack_gensrv_all/fast:
 .PHONY : rospack_gensrv_all/fast
 
 #=============================================================================
-# Target rules for targets named surf_libs
-
-# Build rule for target.
-surf_libs: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 surf_libs
-.PHONY : surf_libs
-
-# fast build rule for target.
-surf_libs/fast:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/build
-.PHONY : surf_libs/fast
-
-#=============================================================================
 # Target rules for targets named test
 
 # Build rule for target.
@@ -486,32 +343,6 @@ test-results-run/fast:
 .PHONY : test-results-run/fast
 
 #=============================================================================
-# Target rules for targets named tester
-
-# Build rule for target.
-tester: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 tester
-.PHONY : tester
-
-# fast build rule for target.
-tester/fast:
-	$(MAKE) -f CMakeFiles/tester.dir/build.make CMakeFiles/tester.dir/build
-.PHONY : tester/fast
-
-#=============================================================================
-# Target rules for targets named tester_color
-
-# Build rule for target.
-tester_color: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 tester_color
-.PHONY : tester_color
-
-# fast build rule for target.
-tester_color/fast:
-	$(MAKE) -f CMakeFiles/tester_color.dir/build.make CMakeFiles/tester_color.dir/build
-.PHONY : tester_color/fast
-
-#=============================================================================
 # Target rules for targets named tests
 
 # Build rule for target.
@@ -523,36 +354,6 @@ tests: cmake_check_build_system
 tests/fast:
 	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/build
 .PHONY : tests/fast
-
-# target to build an object file
-src/color.o:
-	$(MAKE) -f CMakeFiles/color2.dir/build.make CMakeFiles/color2.dir/src/color.o
-.PHONY : src/color.o
-
-# target to preprocess a source file
-src/color.i:
-	$(MAKE) -f CMakeFiles/color2.dir/build.make CMakeFiles/color2.dir/src/color.i
-.PHONY : src/color.i
-
-# target to generate assembly for a file
-src/color.s:
-	$(MAKE) -f CMakeFiles/color2.dir/build.make CMakeFiles/color2.dir/src/color.s
-.PHONY : src/color.s
-
-# target to build an object file
-src/ece.o:
-	$(MAKE) -f CMakeFiles/ece.dir/build.make CMakeFiles/ece.dir/src/ece.o
-.PHONY : src/ece.o
-
-# target to preprocess a source file
-src/ece.i:
-	$(MAKE) -f CMakeFiles/ece.dir/build.make CMakeFiles/ece.dir/src/ece.i
-.PHONY : src/ece.i
-
-# target to generate assembly for a file
-src/ece.s:
-	$(MAKE) -f CMakeFiles/ece.dir/build.make CMakeFiles/ece.dir/src/ece.s
-.PHONY : src/ece.s
 
 # target to build an object file
 src/extractSURF.o:
@@ -570,21 +371,6 @@ src/extractSURF.s:
 .PHONY : src/extractSURF.s
 
 # target to build an object file
-src/fasthessian.o:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/fasthessian.o
-.PHONY : src/fasthessian.o
-
-# target to preprocess a source file
-src/fasthessian.i:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/fasthessian.i
-.PHONY : src/fasthessian.i
-
-# target to generate assembly for a file
-src/fasthessian.s:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/fasthessian.s
-.PHONY : src/fasthessian.s
-
-# target to build an object file
 src/findingCenter.o:
 	$(MAKE) -f CMakeFiles/findingCenter.dir/build.make CMakeFiles/findingCenter.dir/src/findingCenter.o
 .PHONY : src/findingCenter.o
@@ -599,216 +385,6 @@ src/findingCenter.s:
 	$(MAKE) -f CMakeFiles/findingCenter.dir/build.make CMakeFiles/findingCenter.dir/src/findingCenter.s
 .PHONY : src/findingCenter.s
 
-# target to build an object file
-src/integral.o:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/integral.o
-.PHONY : src/integral.o
-
-# target to preprocess a source file
-src/integral.i:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/integral.i
-.PHONY : src/integral.i
-
-# target to generate assembly for a file
-src/integral.s:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/integral.s
-.PHONY : src/integral.s
-
-# target to build an object file
-src/ipoint.o:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/ipoint.o
-.PHONY : src/ipoint.o
-
-# target to preprocess a source file
-src/ipoint.i:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/ipoint.i
-.PHONY : src/ipoint.i
-
-# target to generate assembly for a file
-src/ipoint.s:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/ipoint.s
-.PHONY : src/ipoint.s
-
-# target to build an object file
-src/main.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.o
-.PHONY : src/main.o
-
-# target to preprocess a source file
-src/main.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.i
-.PHONY : src/main.i
-
-# target to generate assembly for a file
-src/main.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.s
-.PHONY : src/main.s
-
-# target to build an object file
-src/mainSurf.o:
-	$(MAKE) -f CMakeFiles/object_surf.dir/build.make CMakeFiles/object_surf.dir/src/mainSurf.o
-.PHONY : src/mainSurf.o
-
-# target to preprocess a source file
-src/mainSurf.i:
-	$(MAKE) -f CMakeFiles/object_surf.dir/build.make CMakeFiles/object_surf.dir/src/mainSurf.i
-.PHONY : src/mainSurf.i
-
-# target to generate assembly for a file
-src/mainSurf.s:
-	$(MAKE) -f CMakeFiles/object_surf.dir/build.make CMakeFiles/object_surf.dir/src/mainSurf.s
-.PHONY : src/mainSurf.s
-
-# target to build an object file
-src/nearest_neighbors.o:
-	$(MAKE) -f CMakeFiles/nearest_neighbors.dir/build.make CMakeFiles/nearest_neighbors.dir/src/nearest_neighbors.o
-.PHONY : src/nearest_neighbors.o
-
-# target to preprocess a source file
-src/nearest_neighbors.i:
-	$(MAKE) -f CMakeFiles/nearest_neighbors.dir/build.make CMakeFiles/nearest_neighbors.dir/src/nearest_neighbors.i
-.PHONY : src/nearest_neighbors.i
-
-# target to generate assembly for a file
-src/nearest_neighbors.s:
-	$(MAKE) -f CMakeFiles/nearest_neighbors.dir/build.make CMakeFiles/nearest_neighbors.dir/src/nearest_neighbors.s
-.PHONY : src/nearest_neighbors.s
-
-# target to build an object file
-src/obj_color.o:
-	$(MAKE) -f CMakeFiles/color.dir/build.make CMakeFiles/color.dir/src/obj_color.o
-.PHONY : src/obj_color.o
-
-# target to preprocess a source file
-src/obj_color.i:
-	$(MAKE) -f CMakeFiles/color.dir/build.make CMakeFiles/color.dir/src/obj_color.i
-.PHONY : src/obj_color.i
-
-# target to generate assembly for a file
-src/obj_color.s:
-	$(MAKE) -f CMakeFiles/color.dir/build.make CMakeFiles/color.dir/src/obj_color.s
-.PHONY : src/obj_color.s
-
-# target to build an object file
-src/open_door.o:
-	$(MAKE) -f CMakeFiles/open_door.dir/build.make CMakeFiles/open_door.dir/src/open_door.o
-.PHONY : src/open_door.o
-
-# target to preprocess a source file
-src/open_door.i:
-	$(MAKE) -f CMakeFiles/open_door.dir/build.make CMakeFiles/open_door.dir/src/open_door.i
-.PHONY : src/open_door.i
-
-# target to generate assembly for a file
-src/open_door.s:
-	$(MAKE) -f CMakeFiles/open_door.dir/build.make CMakeFiles/open_door.dir/src/open_door.s
-.PHONY : src/open_door.s
-
-# target to build an object file
-src/pcd_color_viewer.o:
-	$(MAKE) -f CMakeFiles/pcd_color_viewer.dir/build.make CMakeFiles/pcd_color_viewer.dir/src/pcd_color_viewer.o
-.PHONY : src/pcd_color_viewer.o
-
-# target to preprocess a source file
-src/pcd_color_viewer.i:
-	$(MAKE) -f CMakeFiles/pcd_color_viewer.dir/build.make CMakeFiles/pcd_color_viewer.dir/src/pcd_color_viewer.i
-.PHONY : src/pcd_color_viewer.i
-
-# target to generate assembly for a file
-src/pcd_color_viewer.s:
-	$(MAKE) -f CMakeFiles/pcd_color_viewer.dir/build.make CMakeFiles/pcd_color_viewer.dir/src/pcd_color_viewer.s
-.PHONY : src/pcd_color_viewer.s
-
-# target to build an object file
-src/pcd_viewer.o:
-	$(MAKE) -f CMakeFiles/pcd_viewer.dir/build.make CMakeFiles/pcd_viewer.dir/src/pcd_viewer.o
-.PHONY : src/pcd_viewer.o
-
-# target to preprocess a source file
-src/pcd_viewer.i:
-	$(MAKE) -f CMakeFiles/pcd_viewer.dir/build.make CMakeFiles/pcd_viewer.dir/src/pcd_viewer.i
-.PHONY : src/pcd_viewer.i
-
-# target to generate assembly for a file
-src/pcd_viewer.s:
-	$(MAKE) -f CMakeFiles/pcd_viewer.dir/build.make CMakeFiles/pcd_viewer.dir/src/pcd_viewer.s
-.PHONY : src/pcd_viewer.s
-
-# target to build an object file
-src/pic.o:
-	$(MAKE) -f CMakeFiles/pic.dir/build.make CMakeFiles/pic.dir/src/pic.o
-.PHONY : src/pic.o
-
-# target to preprocess a source file
-src/pic.i:
-	$(MAKE) -f CMakeFiles/pic.dir/build.make CMakeFiles/pic.dir/src/pic.i
-.PHONY : src/pic.i
-
-# target to generate assembly for a file
-src/pic.s:
-	$(MAKE) -f CMakeFiles/pic.dir/build.make CMakeFiles/pic.dir/src/pic.s
-.PHONY : src/pic.s
-
-# target to build an object file
-src/surf.o:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/surf.o
-.PHONY : src/surf.o
-
-# target to preprocess a source file
-src/surf.i:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/surf.i
-.PHONY : src/surf.i
-
-# target to generate assembly for a file
-src/surf.s:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/surf.s
-.PHONY : src/surf.s
-
-# target to build an object file
-src/test.o:
-	$(MAKE) -f CMakeFiles/tester.dir/build.make CMakeFiles/tester.dir/src/test.o
-.PHONY : src/test.o
-
-# target to preprocess a source file
-src/test.i:
-	$(MAKE) -f CMakeFiles/tester.dir/build.make CMakeFiles/tester.dir/src/test.i
-.PHONY : src/test.i
-
-# target to generate assembly for a file
-src/test.s:
-	$(MAKE) -f CMakeFiles/tester.dir/build.make CMakeFiles/tester.dir/src/test.s
-.PHONY : src/test.s
-
-# target to build an object file
-src/test_color.o:
-	$(MAKE) -f CMakeFiles/tester_color.dir/build.make CMakeFiles/tester_color.dir/src/test_color.o
-.PHONY : src/test_color.o
-
-# target to preprocess a source file
-src/test_color.i:
-	$(MAKE) -f CMakeFiles/tester_color.dir/build.make CMakeFiles/tester_color.dir/src/test_color.i
-.PHONY : src/test_color.i
-
-# target to generate assembly for a file
-src/test_color.s:
-	$(MAKE) -f CMakeFiles/tester_color.dir/build.make CMakeFiles/tester_color.dir/src/test_color.s
-.PHONY : src/test_color.s
-
-# target to build an object file
-src/utils.o:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/utils.o
-.PHONY : src/utils.o
-
-# target to preprocess a source file
-src/utils.i:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/utils.i
-.PHONY : src/utils.i
-
-# target to generate assembly for a file
-src/utils.s:
-	$(MAKE) -f CMakeFiles/surf_libs.dir/build.make CMakeFiles/surf_libs.dir/src/utils.s
-.PHONY : src/utils.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -821,19 +397,9 @@ help:
 	@echo "... ROSBUILD_gensrv_lisp"
 	@echo "... ROSBUILD_gensrv_py"
 	@echo "... clean-test-results"
-	@echo "... color"
-	@echo "... color2"
-	@echo "... ece"
 	@echo "... edit_cache"
 	@echo "... extractSURF"
 	@echo "... findingCenter"
-	@echo "... main"
-	@echo "... nearest_neighbors"
-	@echo "... object_surf"
-	@echo "... open_door"
-	@echo "... pcd_color_viewer"
-	@echo "... pcd_viewer"
-	@echo "... pic"
 	@echo "... rebuild_cache"
 	@echo "... rosbuild_precompile"
 	@echo "... rosbuild_premsgsrvgen"
@@ -842,71 +408,17 @@ help:
 	@echo "... rospack_genmsg_libexe"
 	@echo "... rospack_gensrv"
 	@echo "... rospack_gensrv_all"
-	@echo "... surf_libs"
 	@echo "... test"
 	@echo "... test-future"
 	@echo "... test-results"
 	@echo "... test-results-run"
-	@echo "... tester"
-	@echo "... tester_color"
 	@echo "... tests"
-	@echo "... src/color.o"
-	@echo "... src/color.i"
-	@echo "... src/color.s"
-	@echo "... src/ece.o"
-	@echo "... src/ece.i"
-	@echo "... src/ece.s"
 	@echo "... src/extractSURF.o"
 	@echo "... src/extractSURF.i"
 	@echo "... src/extractSURF.s"
-	@echo "... src/fasthessian.o"
-	@echo "... src/fasthessian.i"
-	@echo "... src/fasthessian.s"
 	@echo "... src/findingCenter.o"
 	@echo "... src/findingCenter.i"
 	@echo "... src/findingCenter.s"
-	@echo "... src/integral.o"
-	@echo "... src/integral.i"
-	@echo "... src/integral.s"
-	@echo "... src/ipoint.o"
-	@echo "... src/ipoint.i"
-	@echo "... src/ipoint.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
-	@echo "... src/mainSurf.o"
-	@echo "... src/mainSurf.i"
-	@echo "... src/mainSurf.s"
-	@echo "... src/nearest_neighbors.o"
-	@echo "... src/nearest_neighbors.i"
-	@echo "... src/nearest_neighbors.s"
-	@echo "... src/obj_color.o"
-	@echo "... src/obj_color.i"
-	@echo "... src/obj_color.s"
-	@echo "... src/open_door.o"
-	@echo "... src/open_door.i"
-	@echo "... src/open_door.s"
-	@echo "... src/pcd_color_viewer.o"
-	@echo "... src/pcd_color_viewer.i"
-	@echo "... src/pcd_color_viewer.s"
-	@echo "... src/pcd_viewer.o"
-	@echo "... src/pcd_viewer.i"
-	@echo "... src/pcd_viewer.s"
-	@echo "... src/pic.o"
-	@echo "... src/pic.i"
-	@echo "... src/pic.s"
-	@echo "... src/surf.o"
-	@echo "... src/surf.i"
-	@echo "... src/surf.s"
-	@echo "... src/test.o"
-	@echo "... src/test.i"
-	@echo "... src/test.s"
-	@echo "... src/test_color.o"
-	@echo "... src/test_color.i"
-	@echo "... src/test_color.s"
-	@echo "... src/utils.o"
-	@echo "... src/utils.i"
-	@echo "... src/utils.s"
 .PHONY : help
 
 
