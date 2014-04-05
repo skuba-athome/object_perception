@@ -159,7 +159,7 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 		//timeStamp = cloud.header.frame_id;
 		pcl17::fromROSMsg(cloud, *cloud_pcl);
 		//ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
-//		cout << "point cloud get" << endl;
+		cout << "point cloud get" << endl;
 	} catch (std::runtime_error e) {
 		ROS_ERROR_STREAM("Error message: " << e.what());
 	}
