@@ -36,7 +36,7 @@ def write_feature_file(file_name, descriptors):
     print 'Write '+file_ptr.name+' complete'
 
 def write_kmeans_config(centers):
-    file_ptr = open("centroids.config", "w")
+    file_ptr = open("cluster.config", "w")
     file_ptr.write(str(len(centers))+"\n")
     for centroid_vector in centers:
         line = map((lambda x: '%.15f' % (x)), centroid_vector)

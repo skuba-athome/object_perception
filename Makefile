@@ -200,6 +200,19 @@ findingCenter/fast:
 .PHONY : findingCenter/fast
 
 #=============================================================================
+# Target rules for targets named image_view
+
+# Build rule for target.
+image_view: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 image_view
+.PHONY : image_view
+
+# fast build rule for target.
+image_view/fast:
+	$(MAKE) -f CMakeFiles/image_view.dir/build.make CMakeFiles/image_view.dir/build
+.PHONY : image_view/fast
+
+#=============================================================================
 # Target rules for targets named rosbuild_precompile
 
 # Build rule for target.
@@ -355,6 +368,19 @@ tests/fast:
 	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/build
 .PHONY : tests/fast
 
+#=============================================================================
+# Target rules for targets named verify_object_service
+
+# Build rule for target.
+verify_object_service: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 verify_object_service
+.PHONY : verify_object_service
+
+# fast build rule for target.
+verify_object_service/fast:
+	$(MAKE) -f CMakeFiles/verify_object_service.dir/build.make CMakeFiles/verify_object_service.dir/build
+.PHONY : verify_object_service/fast
+
 # target to build an object file
 src/extractSURF.o:
 	$(MAKE) -f CMakeFiles/extractSURF.dir/build.make CMakeFiles/extractSURF.dir/src/extractSURF.o
@@ -385,6 +411,36 @@ src/findingCenter.s:
 	$(MAKE) -f CMakeFiles/findingCenter.dir/build.make CMakeFiles/findingCenter.dir/src/findingCenter.s
 .PHONY : src/findingCenter.s
 
+# target to build an object file
+src/image_view.o:
+	$(MAKE) -f CMakeFiles/image_view.dir/build.make CMakeFiles/image_view.dir/src/image_view.o
+.PHONY : src/image_view.o
+
+# target to preprocess a source file
+src/image_view.i:
+	$(MAKE) -f CMakeFiles/image_view.dir/build.make CMakeFiles/image_view.dir/src/image_view.i
+.PHONY : src/image_view.i
+
+# target to generate assembly for a file
+src/image_view.s:
+	$(MAKE) -f CMakeFiles/image_view.dir/build.make CMakeFiles/image_view.dir/src/image_view.s
+.PHONY : src/image_view.s
+
+# target to build an object file
+src/verify_object.o:
+	$(MAKE) -f CMakeFiles/verify_object_service.dir/build.make CMakeFiles/verify_object_service.dir/src/verify_object.o
+.PHONY : src/verify_object.o
+
+# target to preprocess a source file
+src/verify_object.i:
+	$(MAKE) -f CMakeFiles/verify_object_service.dir/build.make CMakeFiles/verify_object_service.dir/src/verify_object.i
+.PHONY : src/verify_object.i
+
+# target to generate assembly for a file
+src/verify_object.s:
+	$(MAKE) -f CMakeFiles/verify_object_service.dir/build.make CMakeFiles/verify_object_service.dir/src/verify_object.s
+.PHONY : src/verify_object.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -400,6 +456,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... extractSURF"
 	@echo "... findingCenter"
+	@echo "... image_view"
 	@echo "... rebuild_cache"
 	@echo "... rosbuild_precompile"
 	@echo "... rosbuild_premsgsrvgen"
@@ -413,12 +470,19 @@ help:
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tests"
+	@echo "... verify_object_service"
 	@echo "... src/extractSURF.o"
 	@echo "... src/extractSURF.i"
 	@echo "... src/extractSURF.s"
 	@echo "... src/findingCenter.o"
 	@echo "... src/findingCenter.i"
 	@echo "... src/findingCenter.s"
+	@echo "... src/image_view.o"
+	@echo "... src/image_view.i"
+	@echo "... src/image_view.s"
+	@echo "... src/verify_object.o"
+	@echo "... src/verify_object.i"
+	@echo "... src/verify_object.s"
 .PHONY : help
 
 
