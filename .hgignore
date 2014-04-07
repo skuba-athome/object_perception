@@ -1,0 +1,14 @@
+syntax: glob
+
+*.pyc
+*~
+build
+bin
+*.tmp
+CMakeCache.txt
+CMakeFiles
+*.svn*
+msg_gen
+srv_gen
+src/object_perception/*
+.idea
