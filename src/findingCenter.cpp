@@ -29,13 +29,16 @@
 #include <algorithm>
 #include <tf/transform_listener.h>
 
+#include <object_perception/Object.h>
+#include <object_perception/ObjectContainer.h>
+
 using namespace std;
 
 //#define DEPTH_LIMIT 0.86
 #define DEPTH_LIMIT 1.25
 #define ACCEPTED_AREA 200
 //#define PLANE_HEIGHT -1.5
-#define PLANE_HEIGHT 0.5
+#define PLANE_HEIGHT 0.75
 #define PLANE_LEFT -0.35
 #define PLANE_RIGHT 0.35
 //IR 580
@@ -52,10 +55,11 @@ int maxArea=0;
 float pixel_x,pixel_y;
 float pos_x,pos_y,pos_z;
 cv::Mat img;
-int object_position_world[20][3];
+float object_position_world[20][3];
 bool isReach[20];
 vector<std::string> fileName;
-int objectCentroidWorld[20][3];
+float objectCentroidWorld[20][3];
+bool isObjectManipulable[20];
 
 
 std::string frameId;
@@ -79,10 +83,15 @@ ros::ServiceClient isManipulableClient;
 manipulator::isManipulable isManipulatableSrv;
 
 tf::TransformListener* listener;
-double timeStamp=0;
+ros::Time timeStamp,timeStamp_;
 
+ros::Publisher pub,pubObjectNum,center_pub,pub_detectedObject;
+static pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_pcl (new pcl17::PointCloud<pcl17::PointXYZ>);
 
 bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* objectWorldY,float* objectWorldZ){
+    //x=0;
+    //y=0;
+    //z=1;
 	cout << "-------------------in isObjectReachable method-------------------------" << endl;
 	cout << "centroid of object in kinect :  (x,y,z) = " << x << " " << y << " " << z << endl;
 	float xWorld,yWorld,zWorld;
@@ -101,12 +110,12 @@ bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* object
 //		std_msgs::Header header;
 
 		kinect_point.header.frame_id = "camera_rgb_optical_frame";
-		kinect_point.header.stamp = ros::Time();
+		kinect_point.header.stamp = timeStamp_;
 		kinect_point.point.x = x;
 		kinect_point.point.y = y;
 		kinect_point.point.z = z;
 
-		cout << "robot_frame = " << robot_frame << ", frameId = " << frameId << endl;
+		//cout << "robot_frame = " << robot_frame << ", frameId = " << frameId << endl;
 		//listener->transformPoint(robot_frame,ros::Time::now(),kinect_point,pan_frame, base_point);
 		listener->transformPoint(robot_frame,kinect_point,base_point);
 
@@ -132,41 +141,41 @@ bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* object
 //		ROS_ERROR("Received an exception trying to transform a point.");// from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
 //	}
 //
-	isManipulatableSrv.request.x = xWorld;
-	isManipulatableSrv.request.y = yWorld;
-	isManipulatableSrv.request.z = zWorld;
-	cout << "WORLD " << xWorld << " " << yWorld << " " << zWorld << endl;
+	isManipulatableSrv.request.x = base_point.point.x;
+	isManipulatableSrv.request.y = base_point.point.y;
+	isManipulatableSrv.request.z = base_point.point.z;
+	//cout << "WORLD " << xWorld << " " << yWorld << " " << zWorld << endl;
 
 	if(isManipulableClient.call(isManipulatableSrv)){
 		bool tmp_ = (bool)isManipulatableSrv.response.isManipulable;
 		cout << "response from isManipulable server : " << tmp_ << endl;
 		cout << "--------------------------------------------" << endl;
+        return tmp_;
 	}
 	else
 		ROS_ERROR("Failed to call isManipulable service");
 
-	return true;
+	return false;
 }
 
-ros::Publisher pub,pubObjectNum,center_pub;
-static pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_pcl (new pcl17::PointCloud<pcl17::PointXYZ>);
 
 void depthCB(const sensor_msgs::PointCloud2& cloud) {
 	if ((cloud.width * cloud.height) == 0)
 		return; //return if the cloud is not dense!
 	try {
 		frameId = cloud.header.frame_id;
-		//timeStamp = cloud.header.frame_id;
+        timeStamp = cloud.header.stamp;
 		pcl17::fromROSMsg(cloud, *cloud_pcl);
 		//ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
-		cout << "point cloud get" << endl;
+	//	cout << "point cloud get" << endl;
 	} catch (std::runtime_error e) {
 		ROS_ERROR_STREAM("Error message: " << e.what());
 	}
 }
 
 void getObjectPoint(){
-	 pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>)    ,cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
+    timeStamp_ = timeStamp;
+    pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>)    ,cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
 	//Read in the cloud data
 	//pcl17::PCDReader reader;
 	//reader.read ("1389374538.210053381.pcd", *cloud);
@@ -177,16 +186,16 @@ void getObjectPoint(){
 
 	vector<int> compression_params; //vector that stores the compression parameters of the image
 
-	compression_params.push_back(CV_IMWRITE_JPEG_QUALITY); //specify the compression technique
+	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION); //specify the compression technique
 
-	compression_params.push_back(98); //specify the compression quality
+	compression_params.push_back(9); //specify the compression quality
 
 	//bool bSuccess_ = imwrite("first.jpg", img, compression_params); //write the image to file
-	bool bSuccess_ = imwrite("/run/shm/object_perception/first.jpg", img, compression_params); //write the image to file
+	bool bSuccess_ = imwrite("/run/shm/object_perception/first.png", img, compression_params); //write the image to file
 	
 	   //pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>);
 	   
-	std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
+	//std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
 	pcl17::PCDWriter writer;
 	writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/first.pcd", *cloud, false); 
 
@@ -211,8 +220,8 @@ void getObjectPoint(){
 	//vg.setLeafSize (0.1f, 0.1f, 0.1f);
 	vg.filter (*cloud_filtered);
 
-	std::cout << "PointCloud(cloud) before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
-	std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
+//	std::cout << "PointCloud(cloud) before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
+//	std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
 
 	//Create the segmentation object for the planar model and set all the parameters
 
@@ -302,7 +311,6 @@ void getObjectPoint(){
 
 	cout << "cluster_indeces.size() = " << cluster_indices.size() << endl;
 
-	reachableCount=0;
 	for (std::vector<pcl17::PointIndices>::const_iterator it = cluster_indices.begin(); it != cluster_indices.end(); ++it)
 	{	
 		float x=0,y=0,z=0;
@@ -342,11 +350,19 @@ void getObjectPoint(){
 
 		float objectWorldX,objectWorldY,objectWorldZ;
 
-		if(isObjectReachable(x,y,z,&objectWorldX,&objectWorldY,&objectWorldZ))
+		//if( (isObjectManipulable[j] = isObjectReachable(x,y,z,&objectWorldX,&objectWorldY,&objectWorldZ) ))
 			reachableCount++;
 
-//		if(objectWorldZ < PLANE_HEIGHT)
-//			category = "other/";
+        objectCentroidWorld[j][0] = x;
+        objectCentroidWorld[j][1] = y;
+        objectCentroidWorld[j][2] = z;
+
+        //objectCentroidWorld[j][0] = objectWorldX;
+        //objectCentroidWorld[j][1] = objectWorldY;
+        //objectCentroidWorld[j][2] = objectWorldZ;
+
+		if(objectWorldZ < PLANE_HEIGHT)
+			category = "other/";
 //		else
 			//category = "object/";
 
@@ -380,12 +396,12 @@ void getObjectPoint(){
 		std::stringstream ss_category_;
 
 //use this one
-		ss_<< "/run/shm/object_perception/picture" << j << ".jpg";
+		ss_<< "/run/shm/object_perception/picture" << j << ".png";
 //use this one
 		bool bSuccess = imwrite(ss_.str(), cv::Mat(iplImage), compression_params); //write the image to file
 
-		//ss_category_ << "/run/shm/object_perception/" << category.c_str() << "picture" << j << ".jpg";
-		//bSuccess = imwrite(ss_category_.str(), cv::Mat(iplImage), compression_params); //write the image to file
+		ss_category_ << "/run/shm/object_perception/" << category.c_str() << "picture" << j << ".png";
+		bSuccess = imwrite(ss_category_.str(), cv::Mat(iplImage), compression_params); //write the image to file
 
 
 
@@ -394,20 +410,20 @@ void getObjectPoint(){
 
 		char comm[1000];
 		//sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /home/skuba/skuba_athome/object_perception/picture%d.jpg /home/skuba/skuba_athome/object_perception/feature%d",j,j);
-		sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /run/shm/object_perception/picture%d.jpg /run/shm/object_perception/feature%d",j,j);
+		sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /run/shm/object_perception/picture%d.png /run/shm/object_perception/feature%d",j,j);
 		system(comm);
 
 		//------------------------------------------------------
 
 
 		std::stringstream sf;
-		//sf << "/run/shm/object_perception/feature" << j;
-		sf << "/run/shm/object_perception/picture" << j << ".jpg";
+		sf << "/run/shm/object_perception/feature" << j;
+		//sf << "/run/shm/object_perception/picture" << j << ".png";
 		fileName.push_back(sf.str());
 		printf("fileName = %s\n",fileName[j].c_str());
 		//have to change to centroid, now it's the center of object in 2d domain
-		objectCentroidWorld[j][0] = pixel_x;
-		objectCentroidWorld[j][1] = pixel_y;
+		//objectCentroidWorld[j][0] = pixel_x;
+		//objectCentroidWorld[j][1] = pixel_y;
 		//objectCentroidWorld[j][2] = z;
 		
 
@@ -440,7 +456,7 @@ void getObjectPoint(){
 		cloud_cluster->height = 1;
 		cloud_cluster->is_dense = true;
 
-		std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
+		//std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
 		std::stringstream ss;
 		ss << "/run/shm/object_perception/cloud_cluster_" << j << ".pcd";
 
@@ -455,25 +471,61 @@ void getObjectPoint(){
 
 	cout << "isReachable : " << reachableCount << endl;
 
+	//object_perception::Object objects[j];
+	object_perception::ObjectContainer objectContainer;
 
+	//if((float)reachableCount/j < 0.8){
+	if(false){
+		objectContainer.isMove = true;
+		return;
+	}
+	else{
 
-	std::stringstream verification_result;
-	for(int k=0;k<j;k++){
-		classifySrv.request.filepath = fileName[k];
-		//classifySrv.request.x = objectCentroidWorld[k][0];
-		//classifySrv.request.y = objectCentroidWorld[k][1];
-		//classifySrv.request.z = objectCentroidWorld[k][2];
-		cout << "--------------------------" << fileName[k] << endl;
+		objectContainer.isMove = false;
+		for(int k=0;k<j;k++){
+			classifySrv.request.filepath = fileName[k];
 
-		if(classifyClient.call(classifySrv)){
-			cout << "response from server : " << classifySrv.response.objectIndex << endl;
-			verification_result << classifySrv.response.objectIndex << " | " ;
+			if(classifyClient.call(classifySrv)){
+				cout << "response from server : " << classifySrv.response.objectIndex << endl;
+
+				cout << objectCentroidWorld[k][0] << " " << objectCentroidWorld[k][1] << " " <<objectCentroidWorld[k][2] << " " <<endl;
+				object_perception::Object object;
+				object.point.x = objectCentroidWorld[k][0];
+				object.point.y = objectCentroidWorld[k][1];
+				object.point.z = objectCentroidWorld[k][2];
+				object.category = classifySrv.response.objectIndex;
+				object.isManipulable = isObjectManipulable[k];
+				objectContainer.objects.push_back(object);
+//
+//
+				//objectContainer.objects[k].point.x = objectCentroidWorld[k][0];
+//				objectContainer.objects[k].point.x = objectCentroidWorld[k][0];
+//				objectContainer.objects[k].point.y = objectCentroidWorld[k][1];
+//				objectContainer.objects[k].point.z = objectCentroidWorld[k][2];
+//				objectContainer.objects[k].category = classifySrv.response.objectIndex;
+//				objectContainer.objects[k].isManipulable = isObjectManipulable[k];
+			}
 		}
 	}
+	pub_detectedObject.publish(objectContainer);
+//	std::stringstream verification_result;
+//    verification_result << (float)reachableCount/j<< "|";
+//	for(int k=0;k<j;k++){
+//		classifySrv.request.filepath = fileName[k];
+//		//cout << "--------------------------" << fileName[k] << endl;
+//
+//
+//		if(classifyClient.call(classifySrv)){
+//			cout << "response from server : " << classifySrv.response.objectIndex << endl;
+//			verification_result << classifySrv.response.objectIndex  << " " << objectCentroidWorld[k][0] << " " << objectCentroidWorld[k][1] << " " << objectCentroidWorld[k][2] << "|" ;
+//		}
+//	}
+
+    //cout << verification_result.str() << endl;
 	
 	std_msgs::String string_msg;
-	string_msg.data = center_ss.str();
-	center_pub.publish(string_msg);
+	//string_msg.data = verification_result.str();
+	//pub_verificationResult.publish(string_msg);
 
 	std::stringstream tmpSs;
 	tmpSs <<  j << "";
@@ -539,6 +591,7 @@ int main (int argc, char** argv)
 
 	pubObjectNum = n.advertise<std_msgs::String>("object_number", 1000);
 	center_pub = n.advertise<std_msgs::String>("center_pcl_object", 1000);
+	pub_detectedObject = n.advertise<object_perception::ObjectContainer>("/detected_object", 1000);
 	ros::Subscriber sub = n.subscribe("/camera/depth_registered/points",1,depthCB);
 	//ros::Subscriber sub = n.subscribe("/camera/depth/points",1,depthCB);
 	ros::Subscriber sub_ = n.subscribe("localization",1,localizeCb);
