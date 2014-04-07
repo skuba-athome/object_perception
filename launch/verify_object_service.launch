@@ -1,6 +1,8 @@
 <launch>
     <node pkg="object_perception" type="verify_object_service" name="verify_object_service" output="screen">
-        <param name="cluster_file" value="/home/skuba/.ros/cluster.config"/>
+     <!--   <param name="cluster_file" value="/home/skuba/.ros/cluster.config"/> -->
     </node>
+
+    <node pkg="object_perception" type="test_verify_object.py" name="test_verify_object_service" output="screen"/>
 
 </launch>

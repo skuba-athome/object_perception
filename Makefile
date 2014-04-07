@@ -187,19 +187,6 @@ extractSURF/fast:
 .PHONY : extractSURF/fast
 
 #=============================================================================
-# Target rules for targets named findingCenter
-
-# Build rule for target.
-findingCenter: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 findingCenter
-.PHONY : findingCenter
-
-# fast build rule for target.
-findingCenter/fast:
-	$(MAKE) -f CMakeFiles/findingCenter.dir/build.make CMakeFiles/findingCenter.dir/build
-.PHONY : findingCenter/fast
-
-#=============================================================================
 # Target rules for targets named image_view
 
 # Build rule for target.
@@ -397,21 +384,6 @@ src/extractSURF.s:
 .PHONY : src/extractSURF.s
 
 # target to build an object file
-src/findingCenter.o:
-	$(MAKE) -f CMakeFiles/findingCenter.dir/build.make CMakeFiles/findingCenter.dir/src/findingCenter.o
-.PHONY : src/findingCenter.o
-
-# target to preprocess a source file
-src/findingCenter.i:
-	$(MAKE) -f CMakeFiles/findingCenter.dir/build.make CMakeFiles/findingCenter.dir/src/findingCenter.i
-.PHONY : src/findingCenter.i
-
-# target to generate assembly for a file
-src/findingCenter.s:
-	$(MAKE) -f CMakeFiles/findingCenter.dir/build.make CMakeFiles/findingCenter.dir/src/findingCenter.s
-.PHONY : src/findingCenter.s
-
-# target to build an object file
 src/image_view.o:
 	$(MAKE) -f CMakeFiles/image_view.dir/build.make CMakeFiles/image_view.dir/src/image_view.o
 .PHONY : src/image_view.o
@@ -455,7 +427,6 @@ help:
 	@echo "... clean-test-results"
 	@echo "... edit_cache"
 	@echo "... extractSURF"
-	@echo "... findingCenter"
 	@echo "... image_view"
 	@echo "... rebuild_cache"
 	@echo "... rosbuild_precompile"
@@ -474,9 +445,6 @@ help:
 	@echo "... src/extractSURF.o"
 	@echo "... src/extractSURF.i"
 	@echo "... src/extractSURF.s"
-	@echo "... src/findingCenter.o"
-	@echo "... src/findingCenter.i"
-	@echo "... src/findingCenter.s"
 	@echo "... src/image_view.o"
 	@echo "... src/image_view.i"
 	@echo "... src/image_view.s"
