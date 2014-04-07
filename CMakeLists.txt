@@ -111,5 +111,6 @@ include_directories("/usr/include/openmpi")
 #rosbuild_link_boost(findingCenter filesystem system)
 
 rosbuild_add_executable(extractSURF src/extractSURF.cpp)
+rosbuild_add_executable(drawKeypoints src/drawKeypoints.cpp)
 rosbuild_add_executable(image_view src/image_view.cpp)
 rosbuild_add_executable(verify_object_service src/verify_object.cpp)

@@ -174,6 +174,19 @@ clean-test-results/fast:
 .PHONY : clean-test-results/fast
 
 #=============================================================================
+# Target rules for targets named drawKeypoints
+
+# Build rule for target.
+drawKeypoints: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 drawKeypoints
+.PHONY : drawKeypoints
+
+# fast build rule for target.
+drawKeypoints/fast:
+	$(MAKE) -f CMakeFiles/drawKeypoints.dir/build.make CMakeFiles/drawKeypoints.dir/build
+.PHONY : drawKeypoints/fast
+
+#=============================================================================
 # Target rules for targets named extractSURF
 
 # Build rule for target.
@@ -369,6 +382,21 @@ verify_object_service/fast:
 .PHONY : verify_object_service/fast
 
 # target to build an object file
+src/drawKeypoints.o:
+	$(MAKE) -f CMakeFiles/drawKeypoints.dir/build.make CMakeFiles/drawKeypoints.dir/src/drawKeypoints.o
+.PHONY : src/drawKeypoints.o
+
+# target to preprocess a source file
+src/drawKeypoints.i:
+	$(MAKE) -f CMakeFiles/drawKeypoints.dir/build.make CMakeFiles/drawKeypoints.dir/src/drawKeypoints.i
+.PHONY : src/drawKeypoints.i
+
+# target to generate assembly for a file
+src/drawKeypoints.s:
+	$(MAKE) -f CMakeFiles/drawKeypoints.dir/build.make CMakeFiles/drawKeypoints.dir/src/drawKeypoints.s
+.PHONY : src/drawKeypoints.s
+
+# target to build an object file
 src/extractSURF.o:
 	$(MAKE) -f CMakeFiles/extractSURF.dir/build.make CMakeFiles/extractSURF.dir/src/extractSURF.o
 .PHONY : src/extractSURF.o
@@ -425,6 +453,7 @@ help:
 	@echo "... ROSBUILD_gensrv_lisp"
 	@echo "... ROSBUILD_gensrv_py"
 	@echo "... clean-test-results"
+	@echo "... drawKeypoints"
 	@echo "... edit_cache"
 	@echo "... extractSURF"
 	@echo "... image_view"
@@ -442,6 +471,9 @@ help:
 	@echo "... test-results-run"
 	@echo "... tests"
 	@echo "... verify_object_service"
+	@echo "... src/drawKeypoints.o"
+	@echo "... src/drawKeypoints.i"
+	@echo "... src/drawKeypoints.s"
 	@echo "... src/extractSURF.o"
 	@echo "... src/extractSURF.i"
 	@echo "... src/extractSURF.s"
