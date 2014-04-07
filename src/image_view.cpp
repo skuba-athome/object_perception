@@ -11,7 +11,7 @@ using namespace cv;
 
 Mat img;
 vector<int> compression_params; //vector that stores the compression parameters of the image
-int frameIndex=0;
+int frameIndex=20;
 
 void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
