@@ -21,7 +21,7 @@ def list_image_in_directory(dir):
             continue
         pic_dic[str(object_dir)] = []
         for object_pic in os.listdir(object_dir_path):
-            if object_pic.endswith(".jpg"):
+            if object_pic.endswith(".jpg") or object_pic.endswith(".png"):
                 pic_dic[str(object_dir)].append(str(os.path.join(object_dir_path, object_pic)))
     return pic_dic
 
@@ -55,7 +55,9 @@ def extract_feature_from_images(image_list, object_name):
     for image_name in image_list:
         image = cv2.imread(image_name, 0)
         key_points, descriptors = surf.detectAndCompute(image, None)
-        object_feature[object_name].append(descriptors)
+        if len(key_points) == 0:
+            continue
+        object_feature[object_name].append((image_name, descriptors))
         print "Extract feature for " + image_name
 
         basename = os.path.splitext(os.path.basename(image_name))[0]
@@ -64,7 +66,7 @@ def extract_feature_from_images(image_list, object_name):
 def create_kmean_train_data():
     data = []
     for object_name in object_feature:
-        for descriptors in object_feature[object_name]:
+        for image_name,descriptors in object_feature[object_name]:
             for descriptor in descriptors:
                 data.append(descriptor)
     return numpy.float32(data)
@@ -81,21 +83,23 @@ def create_histogram_train_data(knn_model):
     object_histogram = {}
     for object_name in object_feature:
         object_histogram[object_name] = []
-        for descriptors in object_feature[object_name]:
-            object_histogram[object_name].append(create_histogram_from_features(descriptors, knn_model))
+        for image_name, descriptors in object_feature[object_name]:
+            object_histogram[object_name].append((image_name, len(descriptors), create_histogram_from_features(descriptors, knn_model)))
 
 def get_svm_train_data(select_object_name):
     data = []
     labels = []
+    information = []
     # get object data
     for object_name in object_histogram:
-        for histogram in object_histogram[object_name]:
+        for image_name, descriptor_count, histogram in object_histogram[object_name]:
             data.append(histogram)
+            information.append("[ "+image_name+" Features count : "+str(descriptor_count)+" ]")
             if object_name == select_object_name:
                 labels.append(1)
             else:
                 labels.append(-1)
-    return numpy.float32(data), numpy.float32(labels)
+    return numpy.float32(data), numpy.float32(labels), information
 
 def write_svm_config(object_name,svm_model):
     if not os.path.exists('svm_configs/'):
@@ -117,14 +121,17 @@ if __name__ == '__main__':
 
     # perform K-means
     kmean_max_iter = int(rospy.get_param('~kmean_max_iter', '300'))
-    kmean_epsilon = float(rospy.get_param('~kmean_epsilon', '0.00001'))
+    kmean_epsilon = float(rospy.get_param('~kmean_epsilon', '0.000001'))
     kmean_k_cluster = int(rospy.get_param('~kmean_k_cluster', '300'))
     kmean_attempts = int(rospy.get_param('~kmean_attempts', '20'))
 
+    print "Start K-means"
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, kmean_max_iter, kmean_epsilon)
     train_data = create_kmean_train_data()
+    print "Features count : ", len(train_data)
     compactness, labels, centers = cv2.kmeans(train_data, kmean_k_cluster, criteria, kmean_attempts, cv2.KMEANS_RANDOM_CENTERS)
 
+    print "Compactness : ",compactness
     write_kmeans_config(centers)
 
     # create KNN
@@ -141,7 +148,7 @@ if __name__ == '__main__':
     # create histogram train data
     create_histogram_train_data(knn_model)
     for object_name in object_histogram:
-        train_data, labels = get_svm_train_data(object_name)
+        train_data, labels, histogram_info = get_svm_train_data(object_name)
 
         # build SVM model
         svm_model = cv2.SVM()
@@ -149,7 +156,10 @@ if __name__ == '__main__':
 
         #test model
         predict_labels = svm_model.predict_all(train_data)
-        fault = len(labels) - sum(map((lambda x, y: (x*y)), labels, predict_labels))
-        print object_name, "fault : ", fault
+        print "----------------------------------------------"
+        print object_name, "fault : "
+        for histogram_index in range(len(train_data)):
+            if predict_labels[histogram_index]*labels[histogram_index] < 0.0:
+                print histogram_info[histogram_index]
 
         write_svm_config(object_name, svm_model)
