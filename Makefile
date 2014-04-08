@@ -200,6 +200,32 @@ drawKeypoints/fast:
 .PHONY : drawKeypoints/fast
 
 #=============================================================================
+# Target rules for targets named drawKeypointsAll
+
+# Build rule for target.
+drawKeypointsAll: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 drawKeypointsAll
+.PHONY : drawKeypointsAll
+
+# fast build rule for target.
+drawKeypointsAll/fast:
+	$(MAKE) -f CMakeFiles/drawKeypointsAll.dir/build.make CMakeFiles/drawKeypointsAll.dir/build
+.PHONY : drawKeypointsAll/fast
+
+#=============================================================================
+# Target rules for targets named drawKeypointsArch
+
+# Build rule for target.
+drawKeypointsArch: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 drawKeypointsArch
+.PHONY : drawKeypointsArch
+
+# fast build rule for target.
+drawKeypointsArch/fast:
+	$(MAKE) -f CMakeFiles/drawKeypointsArch.dir/build.make CMakeFiles/drawKeypointsArch.dir/build
+.PHONY : drawKeypointsArch/fast
+
+#=============================================================================
 # Target rules for targets named extractSURF
 
 # Build rule for target.
@@ -410,6 +436,36 @@ src/drawKeypoints.s:
 .PHONY : src/drawKeypoints.s
 
 # target to build an object file
+src/drawKeypointsAll.o:
+	$(MAKE) -f CMakeFiles/drawKeypointsAll.dir/build.make CMakeFiles/drawKeypointsAll.dir/src/drawKeypointsAll.o
+.PHONY : src/drawKeypointsAll.o
+
+# target to preprocess a source file
+src/drawKeypointsAll.i:
+	$(MAKE) -f CMakeFiles/drawKeypointsAll.dir/build.make CMakeFiles/drawKeypointsAll.dir/src/drawKeypointsAll.i
+.PHONY : src/drawKeypointsAll.i
+
+# target to generate assembly for a file
+src/drawKeypointsAll.s:
+	$(MAKE) -f CMakeFiles/drawKeypointsAll.dir/build.make CMakeFiles/drawKeypointsAll.dir/src/drawKeypointsAll.s
+.PHONY : src/drawKeypointsAll.s
+
+# target to build an object file
+src/drawKeypointsArch.o:
+	$(MAKE) -f CMakeFiles/drawKeypointsArch.dir/build.make CMakeFiles/drawKeypointsArch.dir/src/drawKeypointsArch.o
+.PHONY : src/drawKeypointsArch.o
+
+# target to preprocess a source file
+src/drawKeypointsArch.i:
+	$(MAKE) -f CMakeFiles/drawKeypointsArch.dir/build.make CMakeFiles/drawKeypointsArch.dir/src/drawKeypointsArch.i
+.PHONY : src/drawKeypointsArch.i
+
+# target to generate assembly for a file
+src/drawKeypointsArch.s:
+	$(MAKE) -f CMakeFiles/drawKeypointsArch.dir/build.make CMakeFiles/drawKeypointsArch.dir/src/drawKeypointsArch.s
+.PHONY : src/drawKeypointsArch.s
+
+# target to build an object file
 src/extractSURF.o:
 	$(MAKE) -f CMakeFiles/extractSURF.dir/build.make CMakeFiles/extractSURF.dir/src/extractSURF.o
 .PHONY : src/extractSURF.o
@@ -468,6 +524,8 @@ help:
 	@echo "... ROSBUILD_gensrv_py"
 	@echo "... clean-test-results"
 	@echo "... drawKeypoints"
+	@echo "... drawKeypointsAll"
+	@echo "... drawKeypointsArch"
 	@echo "... edit_cache"
 	@echo "... extractSURF"
 	@echo "... image_view"
@@ -488,6 +546,12 @@ help:
 	@echo "... src/drawKeypoints.o"
 	@echo "... src/drawKeypoints.i"
 	@echo "... src/drawKeypoints.s"
+	@echo "... src/drawKeypointsAll.o"
+	@echo "... src/drawKeypointsAll.i"
+	@echo "... src/drawKeypointsAll.s"
+	@echo "... src/drawKeypointsArch.o"
+	@echo "... src/drawKeypointsArch.i"
+	@echo "... src/drawKeypointsArch.s"
 	@echo "... src/extractSURF.o"
 	@echo "... src/extractSURF.i"
 	@echo "... src/extractSURF.s"

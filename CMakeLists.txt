@@ -114,3 +114,11 @@ rosbuild_add_executable(extractSURF src/extractSURF.cpp)
 rosbuild_add_executable(drawKeypoints src/drawKeypoints.cpp)
 rosbuild_add_executable(image_view src/image_view.cpp)
 rosbuild_add_executable(verify_object_service src/verify_object.cpp)
+
+rosbuild_add_executable(drawKeypointsArch src/drawKeypointsArch.cpp)
+target_link_libraries(drawKeypointsArch /opt/ros/fuerte/lib/libopencv_legacy.so)
+
+rosbuild_add_executable(drawKeypointsAll src/drawKeypointsAll.cpp)
+target_link_libraries(drawKeypointsAll /opt/ros/fuerte/lib/libopencv_legacy.so)
+#target_link_libraries(drawKeypointsArch /opt/ros/fuerte/lib/libopencv_legacy.so.2.4)
+#target_link_libraries(drawKeypointsArch /opt/ros/fuerte/lib/libopencv_legacy.so.2.4.2)

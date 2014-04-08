@@ -187,7 +187,7 @@ void getObjectPoint(){
 	vector<int> compression_params; //vector that stores the compression parameters of the image
 
 	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION); //specify the compression technique
-
+	//compression_params.push_back(CV_IMWRITE_JPEG_QUALITY); //specify the compression technique
 	compression_params.push_back(9); //specify the compression quality
 
 	//bool bSuccess_ = imwrite("first.jpg", img, compression_params); //write the image to file
