@@ -1,0 +1,10 @@
+<launch>
+	<node pkg="dynamic_reconfigure" type="dynparam" name="kinect_set" args="set_from_parameters /camera/driver">
+		<param name="image_mode" value="2" />
+		<param name="depth_mode" value="2" />
+		<param name="depth_registration" value="true" />
+	</node>
+	
+	<node pkg="object_perception" type="click_object" name="click_object" output="screen"/>
+
+</launch>

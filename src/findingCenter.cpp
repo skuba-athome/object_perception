@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <object_perception/classifyObject.h>
+#include <object_perception/verifyObject.h>
 #include <manipulator/isManipulable.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Header.h>
@@ -48,8 +49,8 @@ using namespace std;
 #define CENTER_IMAGE_Y 240
 #define TUNED_H_DISTANCE_TOP_LEFT 10
 #define TUNED_H_DISTANCE_BOTTOM_RIGHT 10
-#define TUNED_V_DISTANCE_TOP_LEFT -10
-#define TUNED_V_DISTANCE_BOTTOM_RIGHT 20
+#define TUNED_V_DISTANCE_TOP_LEFT 5
+#define TUNED_V_DISTANCE_BOTTOM_RIGHT 40
 #define ARM_RAIDUS 1.15
 int maxArea=0;
 float pixel_x,pixel_y;
@@ -78,6 +79,9 @@ std::string category;
 ros::ServiceClient classifyClient;
 object_perception::classifyObject classifySrv;
 
+ros::ServiceClient verifyClient;
+object_perception::verifyObject verifySrv;
+
 //is reachable service 
 ros::ServiceClient isManipulableClient;
 manipulator::isManipulable isManipulatableSrv;
@@ -89,9 +93,9 @@ ros::Publisher pub,pubObjectNum,center_pub,pub_detectedObject;
 static pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_pcl (new pcl17::PointCloud<pcl17::PointXYZ>);
 
 bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* objectWorldY,float* objectWorldZ){
-    //x=0;
-    //y=0;
-    //z=1;
+    x=0;
+    y=0;
+    z=0;
 	cout << "-------------------in isObjectReachable method-------------------------" << endl;
 	cout << "centroid of object in kinect :  (x,y,z) = " << x << " " << y << " " << z << endl;
 	float xWorld,yWorld,zWorld;
@@ -416,11 +420,13 @@ void getObjectPoint(){
 		//------------------------------------------------------
 
 
+        char picturePath[100];
+        sprintf(picturePath,"/run/shm/object_perception/picture%d.png",j);
 		std::stringstream sf;
-		sf << "/run/shm/object_perception/feature" << j;
-		//sf << "/run/shm/object_perception/picture" << j << ".png";
-		fileName.push_back(sf.str());
-		printf("fileName = %s\n",fileName[j].c_str());
+		//sf << "/run/shm/object_perception/feature" << j;
+		sf << "/run/shm/object_perception/picture" << j << ".png";
+		fileName.push_back(picturePath);
+		//printf("fileName = %s\n",fileName[j].c_str());
 		//have to change to centroid, now it's the center of object in 2d domain
 		//objectCentroidWorld[j][0] = pixel_x;
 		//objectCentroidWorld[j][1] = pixel_y;
@@ -483,8 +489,29 @@ void getObjectPoint(){
 
 		objectContainer.isMove = false;
 		for(int k=0;k<j;k++){
-			classifySrv.request.filepath = fileName[k];
+			//classifySrv.request.filepath = fileName[k];
+			verifySrv.request.objectPictureFilePath = fileName[k];
+			cout << "path : " << fileName[k] << endl;
 
+			//if(classifyClient.call(classifySrv)){
+			if(verifyClient.call(verifySrv)){
+				//cout << "response from server : " << classifySrv.response.objectIndex << endl;
+				cout << "response from server : " << verifySrv.response.objectName << endl;
+
+				cout << "position of centroid : " << objectCentroidWorld[k][0] << " " << objectCentroidWorld[k][1] << " " <<objectCentroidWorld[k][2] << " " <<endl;
+				object_perception::Object object;
+				object.point.x = objectCentroidWorld[k][0];
+				object.point.y = objectCentroidWorld[k][1];
+				object.point.z = objectCentroidWorld[k][2];
+				//object.category = classifySrv.response.objectIndex;
+				//object.category = verifySrv.response.objectName;
+				object.isManipulable = isObjectManipulable[k];
+				objectContainer.objects.push_back(object);
+			}
+			else{
+				cout << "no response from server" << endl;
+			}
+			/*
 			if(classifyClient.call(classifySrv)){
 				cout << "response from server : " << classifySrv.response.objectIndex << endl;
 
@@ -505,6 +532,7 @@ void getObjectPoint(){
 //				objectContainer.objects[k].category = classifySrv.response.objectIndex;
 //				objectContainer.objects[k].isManipulable = isObjectManipulable[k];
 			}
+			*/
 		}
 	}
 	pub_detectedObject.publish(objectContainer);
@@ -581,7 +609,6 @@ void imageColorCb(const sensor_msgs::ImageConstPtr& msg)
 
 int main (int argc, char** argv)
 {
-
 	ros::init(argc,argv,"findCenter");
 	ros::NodeHandle n;
 	ros::NodeHandle nh("~");
@@ -597,8 +624,12 @@ int main (int argc, char** argv)
 	ros::Subscriber sub_ = n.subscribe("localization",1,localizeCb);
 	sub_imageColor = it_.subscribe("/camera/rgb/image_color", 1, imageColorCb);
 
+	
+	verifyClient = n.serviceClient<object_perception::verifyObject>("verifyObject");
+	//object_perception::verifyObject verifySrv;
+
 	classifyClient = n.serviceClient<object_perception::classifyObject>("classifyObject");
-	object_perception::classifyObject classifySrv;
+	//object_perception::classifyObject classifySrv;
 
 	isManipulableClient = n.serviceClient<manipulator::isManipulable>("isManipulable");
 	manipulator::isManipulable isManipulatableSrv;
