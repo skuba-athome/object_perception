@@ -1,227 +1,922 @@
-1,learn/PicCut/oishi/oishi21.txt
-1,learn/PicCut/oishi/oishi5.txt
-1,learn/PicCut/oishi/oishi8.txt
-1,learn/PicCut/oishi/oishi19.txt
-1,learn/PicCut/oishi/oishi6.txt
-1,learn/PicCut/oishi/oishi4.txt
-1,learn/PicCut/oishi/oishi13.txt
-1,learn/PicCut/oishi/oishi10.txt
-1,learn/PicCut/oishi/oishi14.txt
-1,learn/PicCut/oishi/oishi15.txt
-1,learn/PicCut/oishi/oishi23.txt
-1,learn/PicCut/oishi/oishi24.txt
-1,learn/PicCut/oishi/oishi11.txt
-1,learn/PicCut/oishi/oishi20.txt
-1,learn/PicCut/oishi/oishi2.txt
-1,learn/PicCut/oishi/oishi0.txt
-1,learn/PicCut/oishi/oishi9.txt
-1,learn/PicCut/oishi/oishi1.txt
-1,learn/PicCut/oishi/oishi16.txt
-1,learn/PicCut/oishi/oishi22.txt
-1,learn/PicCut/oishi/oishi3.txt
-1,learn/PicCut/oishi/oishi17.txt
-1,learn/PicCut/oishi/oishi18.txt
-2,learn/PicCut/singh/singh_1.txt
-2,learn/PicCut/singh/singh_9.txt
-2,learn/PicCut/singh/singh_21.txt
-2,learn/PicCut/singh/singh_4.txt
-2,learn/PicCut/singh/singh_24.txt
-2,learn/PicCut/singh/singh_12.txt
-2,learn/PicCut/singh/singh_20.txt
-2,learn/PicCut/singh/singh_5.txt
-2,learn/PicCut/singh/singh_2.txt
-2,learn/PicCut/singh/singh_16.txt
-2,learn/PicCut/singh/singh_26.txt
-2,learn/PicCut/singh/singh_14.txt
-2,learn/PicCut/singh/singh_13.txt
-2,learn/PicCut/singh/singh_3.txt
-2,learn/PicCut/singh/singh_10.txt
-2,learn/PicCut/singh/singh_6.txt
-2,learn/PicCut/singh/singh_23.txt
-2,learn/PicCut/singh/singh_18.txt
-2,learn/PicCut/singh/singh_27.txt
-2,learn/PicCut/singh/singh_7.txt
-2,learn/PicCut/singh/singh_11.txt
-2,learn/PicCut/singh/singh_19.txt
-2,learn/PicCut/singh/singh_15.txt
-2,learn/PicCut/singh/singh_22.txt
-2,learn/PicCut/singh/singh_25.txt
-2,learn/PicCut/singh/singh_17.txt
-3,learn/PicCut/est/est_21.txt
-3,learn/PicCut/est/est_18.txt
-3,learn/PicCut/est/est_16.txt
-3,learn/PicCut/est/est_10.txt
-3,learn/PicCut/est/est_6.txt
-3,learn/PicCut/est/est_11.txt
-3,learn/PicCut/est/est_20.txt
-3,learn/PicCut/est/est_26.txt
-3,learn/PicCut/est/est_15.txt
-3,learn/PicCut/est/est_5.txt
-3,learn/PicCut/est/est_3.txt
-3,learn/PicCut/est/est_12.txt
-3,learn/PicCut/est/est_13.txt
-3,learn/PicCut/est/est_17.txt
-3,learn/PicCut/est/est_4.txt
-3,learn/PicCut/est/est_14.txt
-3,learn/PicCut/est/est_9.txt
-3,learn/PicCut/est/est_22.txt
-3,learn/PicCut/est/est_1.txt
-3,learn/PicCut/est/est_8.txt
-3,learn/PicCut/est/est_7.txt
-3,learn/PicCut/est/est_2.txt
-4,learn/PicCut/fanta/fanta_22.txt
-4,learn/PicCut/fanta/fanta_10.txt
-4,learn/PicCut/fanta/fanta_18.txt
-4,learn/PicCut/fanta/fanta_3.txt
-4,learn/PicCut/fanta/fanta_11.txt
-4,learn/PicCut/fanta/fanta_14.txt
-4,learn/PicCut/fanta/fanta_5.txt
-4,learn/PicCut/fanta/fanta_13.txt
-4,learn/PicCut/fanta/fanta_12.txt
-4,learn/PicCut/fanta/fanta_26.txt
-4,learn/PicCut/fanta/fanta_8.txt
-4,learn/PicCut/fanta/fanta_27.txt
-4,learn/PicCut/fanta/fanta_23.txt
-4,learn/PicCut/fanta/fanta_25.txt
-4,learn/PicCut/fanta/fanta_17.txt
-4,learn/PicCut/fanta/fanta_21.txt
-4,learn/PicCut/fanta/fanta_6.txt
-4,learn/PicCut/fanta/fanta_1.txt
-4,learn/PicCut/fanta/fanta_15.txt
-4,learn/PicCut/fanta/fanta_9.txt
-4,learn/PicCut/fanta/fanta_20.txt
-4,learn/PicCut/fanta/fanta_16.txt
-4,learn/PicCut/fanta/fanta_24.txt
-4,learn/PicCut/fanta/fanta_19.txt
-4,learn/PicCut/fanta/fanta_4.txt
-4,learn/PicCut/fanta/fanta_2.txt
-5,learn/PicCut/cornflakes/cornflakes_6.txt
-5,learn/PicCut/cornflakes/cornflakes_19.txt
-5,learn/PicCut/cornflakes/cornflakes_4.txt
-5,learn/PicCut/cornflakes/cornflakes_9.txt
-5,learn/PicCut/cornflakes/cornflakes_3.txt
-5,learn/PicCut/cornflakes/cornflakes_17.txt
-5,learn/PicCut/cornflakes/cornflakes_15.txt
-5,learn/PicCut/cornflakes/cornflakes_23.txt
-5,learn/PicCut/cornflakes/cornflakes_12.txt
-5,learn/PicCut/cornflakes/cornflakes_8.txt
-5,learn/PicCut/cornflakes/cornflakes_1.txt
-5,learn/PicCut/cornflakes/cornflakes_22.txt
-5,learn/PicCut/cornflakes/cornflakes_10.txt
-5,learn/PicCut/cornflakes/cornflakes_13.txt
-5,learn/PicCut/cornflakes/cornflakes_2.txt
-5,learn/PicCut/cornflakes/cornflakes_5.txt
-5,learn/PicCut/cornflakes/cornflakes_18.txt
-5,learn/PicCut/cornflakes/cornflakes_14.txt
-5,learn/PicCut/cornflakes/cornflakes_21.txt
-5,learn/PicCut/cornflakes/cornflakes_16.txt
-5,learn/PicCut/cornflakes/cornflakes_20.txt
-5,learn/PicCut/cornflakes/cornflakes_7.txt
-6,learn/PicCut/lay/lay_11.txt
-6,learn/PicCut/lay/lay_3.txt
-6,learn/PicCut/lay/lay_1.txt
-6,learn/PicCut/lay/lay_7.txt
-6,learn/PicCut/lay/lay_17.txt
-6,learn/PicCut/lay/lay_12.txt
-6,learn/PicCut/lay/lay_9.txt
-6,learn/PicCut/lay/lay_14.txt
-6,learn/PicCut/lay/lay_22.txt
-6,learn/PicCut/lay/lay_5.txt
-6,learn/PicCut/lay/lay_4.txt
-6,learn/PicCut/lay/lay_2.txt
-6,learn/PicCut/lay/lay_8.txt
-6,learn/PicCut/lay/lay_19.txt
-6,learn/PicCut/lay/lay_20.txt
-6,learn/PicCut/lay/lay_6.txt
-6,learn/PicCut/lay/lay_21.txt
-6,learn/PicCut/lay/lay_16.txt
-6,learn/PicCut/lay/lay_10.txt
-6,learn/PicCut/lay/lay_15.txt
-6,learn/PicCut/lay/lay_23.txt
-6,learn/PicCut/lay/lay_18.txt
-7,learn/PicCut/pringles/pringles1.txt
-7,learn/PicCut/pringles/pringles16.txt
-7,learn/PicCut/pringles/pringles9.txt
-7,learn/PicCut/pringles/pringles18.txt
-7,learn/PicCut/pringles/pringles13.txt
-7,learn/PicCut/pringles/pringles14.txt
-7,learn/PicCut/pringles/pringles17.txt
-7,learn/PicCut/pringles/pringles0.txt
-7,learn/PicCut/pringles/pringles15.txt
-7,learn/PicCut/pringles/pringles21.txt
-7,learn/PicCut/pringles/pringles3.txt
-7,learn/PicCut/pringles/pringles2.txt
-7,learn/PicCut/pringles/pringles11.txt
-7,learn/PicCut/pringles/pringles12.txt
-7,learn/PicCut/pringles/pringles8.txt
-7,learn/PicCut/pringles/pringles6.txt
-7,learn/PicCut/pringles/pringles10.txt
-7,learn/PicCut/pringles/pringles23.txt
-7,learn/PicCut/pringles/pringles19.txt
-7,learn/PicCut/pringles/pringles22.txt
-7,learn/PicCut/pringles/pringles20.txt
-7,learn/PicCut/pringles/pringles4.txt
-7,learn/PicCut/pringles/pringles5.txt
-8,learn/PicCut/lactasoy/lactasoy2.txt
-8,learn/PicCut/lactasoy/lactasoy7.txt
-8,learn/PicCut/lactasoy/lactasoy3.txt
-8,learn/PicCut/lactasoy/lactasoy8.txt
-8,learn/PicCut/lactasoy/lactasoy16.txt
-8,learn/PicCut/lactasoy/lactasoy15.txt
-8,learn/PicCut/lactasoy/lactasoy24.txt
-8,learn/PicCut/lactasoy/lactasoy14.txt
-8,learn/PicCut/lactasoy/lactasoy11.txt
-8,learn/PicCut/lactasoy/lactasoy18.txt
-8,learn/PicCut/lactasoy/lactasoy13.txt
-8,learn/PicCut/lactasoy/lactasoy12.txt
-8,learn/PicCut/lactasoy/lactasoy20.txt
-8,learn/PicCut/lactasoy/lactasoy4.txt
-8,learn/PicCut/lactasoy/lactasoy23.txt
-8,learn/PicCut/lactasoy/lactasoy19.txt
-8,learn/PicCut/lactasoy/lactasoy5.txt
-8,learn/PicCut/lactasoy/lactasoy21.txt
-8,learn/PicCut/lactasoy/lactasoy6.txt
-8,learn/PicCut/lactasoy/lactasoy17.txt
-8,learn/PicCut/lactasoy/lactasoy1.txt
-8,learn/PicCut/lactasoy/lactasoy0.txt
-8,learn/PicCut/lactasoy/lactasoy22.txt
-9,learn/PicCut/miniteMaid/miniteMaid_17.txt
-9,learn/PicCut/miniteMaid/miniteMaid_7.txt
-9,learn/PicCut/miniteMaid/miniteMaid_21.txt
-9,learn/PicCut/miniteMaid/miniteMaid_3.txt
-9,learn/PicCut/miniteMaid/miniteMaid_9.txt
-9,learn/PicCut/miniteMaid/miniteMaid_10.txt
-9,learn/PicCut/miniteMaid/miniteMaid_14.txt
-9,learn/PicCut/miniteMaid/miniteMaid_1.txt
-9,learn/PicCut/miniteMaid/miniteMaid_22.txt
-9,learn/PicCut/miniteMaid/miniteMaid_23.txt
-9,learn/PicCut/miniteMaid/miniteMaid_11.txt
-9,learn/PicCut/miniteMaid/miniteMaid_16.txt
-9,learn/PicCut/miniteMaid/miniteMaid_12.txt
-9,learn/PicCut/miniteMaid/miniteMaid_6.txt
-9,learn/PicCut/miniteMaid/miniteMaid_2.txt
-9,learn/PicCut/miniteMaid/miniteMaid_5.txt
-9,learn/PicCut/miniteMaid/miniteMaid_19.txt
-9,learn/PicCut/miniteMaid/miniteMaid_15.txt
-9,learn/PicCut/miniteMaid/miniteMaid_18.txt
-9,learn/PicCut/miniteMaid/miniteMaid_4.txt
-9,learn/PicCut/miniteMaid/miniteMaid_20.txt
-9,learn/PicCut/miniteMaid/miniteMaid_8.txt
-10,learn/PicCut/milo/milo_19.txt
-10,learn/PicCut/milo/milo_7.txt
-10,learn/PicCut/milo/milo_2.txt
-10,learn/PicCut/milo/milo_6.txt
-10,learn/PicCut/milo/milo_14.txt
-10,learn/PicCut/milo/milo_21.txt
-10,learn/PicCut/milo/milo_10.txt
-10,learn/PicCut/milo/milo_8.txt
-10,learn/PicCut/milo/milo_1.txt
-10,learn/PicCut/milo/milo_97.txt
-10,learn/PicCut/milo/milo_20.txt
-10,learn/PicCut/milo/milo_5.txt
-10,learn/PicCut/milo/milo_11.txt
-10,learn/PicCut/milo/milo_9.txt
-10,learn/PicCut/milo/milo_12.txt
-10,learn/PicCut/milo/milo_3.txt
-10,learn/PicCut/milo/milo_13.txt
-10,learn/PicCut/milo/milo_4.txt
+1 PicCut/lactasoy/frame0019.txt
+1 PicCut/lactasoy/frame0005.txt
+1 PicCut/lactasoy/frame0009.txt
+1 PicCut/lactasoy/frame0018.txt
+1 PicCut/lactasoy/frame0010.txt
+1 PicCut/lactasoy/frame0003.txt
+1 PicCut/lactasoy/frame0031.txt
+1 PicCut/lactasoy/frame0012.txt
+1 PicCut/lactasoy/frame0006.txt
+1 PicCut/lactasoy/frame0024.txt
+1 PicCut/lactasoy/frame0016.txt
+1 PicCut/lactasoy/frame0029.txt
+1 PicCut/lactasoy/frame0007.txt
+1 PicCut/lactasoy/frame0002.txt
+1 PicCut/lactasoy/frame0004.txt
+1 PicCut/lactasoy/frame0023.txt
+1 PicCut/lactasoy/frame0036.txt
+1 PicCut/lactasoy/frame0014.txt
+1 PicCut/lactasoy/frame0008.txt
+1 PicCut/lactasoy/frame0001.txt
+1 PicCut/lactasoy/frame0025.txt
+1 PicCut/lactasoy/frame0037.txt
+1 PicCut/lactasoy/frame0022.txt
+1 PicCut/lactasoy/frame0021.txt
+1 PicCut/lactasoy/frame0030.txt
+1 PicCut/lactasoy/frame0038.txt
+1 PicCut/lactasoy/frame0011.txt
+1 PicCut/lactasoy/frame0028.txt
+1 PicCut/lactasoy/frame0033.txt
+1 PicCut/lactasoy/frame0032.txt
+1 PicCut/lactasoy/frame0020.txt
+1 PicCut/lactasoy/frame0000.txt
+1 PicCut/lactasoy/frame0017.txt
+1 PicCut/lactasoy/frame0035.txt
+1 PicCut/lactasoy/frame0034.txt
+1 PicCut/lactasoy/frame0013.txt
+1 PicCut/lactasoy/frame0015.txt
+2 PicCut/kewpie/frame0033.txt
+2 PicCut/kewpie/frame0000.txt
+2 PicCut/kewpie/frame0003.txt
+2 PicCut/kewpie/frame0008.txt
+2 PicCut/kewpie/frame0024.txt
+2 PicCut/kewpie/frame0020.txt
+2 PicCut/kewpie/frame0004.txt
+2 PicCut/kewpie/frame0001.txt
+2 PicCut/kewpie/frame0009.txt
+2 PicCut/kewpie/frame0019.txt
+2 PicCut/kewpie/frame0013.txt
+2 PicCut/kewpie/frame0014.txt
+2 PicCut/kewpie/frame0018.txt
+2 PicCut/kewpie/frame0017.txt
+2 PicCut/kewpie/frame0002.txt
+2 PicCut/kewpie/frame0034.txt
+2 PicCut/kewpie/frame0021.txt
+2 PicCut/kewpie/frame0032.txt
+2 PicCut/kewpie/frame0010.txt
+2 PicCut/kewpie/frame0007.txt
+2 PicCut/kewpie/frame0028.txt
+2 PicCut/kewpie/frame0030.txt
+2 PicCut/kewpie/frame0036.txt
+2 PicCut/kewpie/frame0023.txt
+2 PicCut/kewpie/frame0012.txt
+2 PicCut/kewpie/frame0011.txt
+2 PicCut/kewpie/frame0022.txt
+2 PicCut/kewpie/frame0015.txt
+2 PicCut/kewpie/frame0031.txt
+2 PicCut/kewpie/frame0027.txt
+2 PicCut/kewpie/frame0026.txt
+2 PicCut/kewpie/frame0016.txt
+2 PicCut/kewpie/frame0005.txt
+2 PicCut/kewpie/frame0035.txt
+2 PicCut/kewpie/frame0029.txt
+2 PicCut/kewpie/frame0038.txt
+2 PicCut/kewpie/frame0037.txt
+3 PicCut/minute_maid/frame0003.txt
+3 PicCut/minute_maid/frame0016.txt
+3 PicCut/minute_maid/frame0036.txt
+3 PicCut/minute_maid/frame0012.txt
+3 PicCut/minute_maid/frame0011.txt
+3 PicCut/minute_maid/frame0005.txt
+3 PicCut/minute_maid/frame0004.txt
+3 PicCut/minute_maid/frame0014.txt
+3 PicCut/minute_maid/frame0006.txt
+3 PicCut/minute_maid/frame0029.txt
+3 PicCut/minute_maid/frame0001.txt
+3 PicCut/minute_maid/frame0034.txt
+3 PicCut/minute_maid/frame0009.txt
+3 PicCut/minute_maid/frame0010.txt
+3 PicCut/minute_maid/frame0024.txt
+3 PicCut/minute_maid/frame0023.txt
+3 PicCut/minute_maid/frame0007.txt
+3 PicCut/minute_maid/frame0018.txt
+3 PicCut/minute_maid/frame0026.txt
+3 PicCut/minute_maid/frame0008.txt
+3 PicCut/minute_maid/frame0002.txt
+3 PicCut/minute_maid/frame0020.txt
+3 PicCut/minute_maid/frame0021.txt
+3 PicCut/minute_maid/frame0022.txt
+3 PicCut/minute_maid/frame0027.txt
+3 PicCut/minute_maid/frame0037.txt
+3 PicCut/minute_maid/frame0031.txt
+3 PicCut/minute_maid/frame0033.txt
+3 PicCut/minute_maid/frame0035.txt
+3 PicCut/minute_maid/frame0019.txt
+3 PicCut/minute_maid/frame0017.txt
+3 PicCut/minute_maid/frame0013.txt
+3 PicCut/minute_maid/frame0030.txt
+3 PicCut/minute_maid/frame0028.txt
+3 PicCut/minute_maid/frame0000.txt
+3 PicCut/minute_maid/frame0025.txt
+3 PicCut/minute_maid/frame0038.txt
+4 PicCut/wd/frame0029.txt
+4 PicCut/wd/frame0027.txt
+4 PicCut/wd/frame0032.txt
+4 PicCut/wd/frame0023.txt
+4 PicCut/wd/frame0006.txt
+4 PicCut/wd/frame0012.txt
+4 PicCut/wd/frame0035.txt
+4 PicCut/wd/frame0016.txt
+4 PicCut/wd/frame0028.txt
+4 PicCut/wd/frame0009.txt
+4 PicCut/wd/frame0003.txt
+4 PicCut/wd/frame0013.txt
+4 PicCut/wd/frame0025.txt
+4 PicCut/wd/frame0018.txt
+4 PicCut/wd/frame0037.txt
+4 PicCut/wd/frame0036.txt
+4 PicCut/wd/frame0031.txt
+4 PicCut/wd/frame0007.txt
+4 PicCut/wd/frame0000.txt
+4 PicCut/wd/frame0001.txt
+4 PicCut/wd/frame0008.txt
+4 PicCut/wd/frame0033.txt
+4 PicCut/wd/frame0005.txt
+4 PicCut/wd/frame0002.txt
+4 PicCut/wd/frame0034.txt
+4 PicCut/wd/frame0015.txt
+4 PicCut/wd/frame0021.txt
+4 PicCut/wd/frame0010.txt
+4 PicCut/wd/frame0022.txt
+4 PicCut/wd/frame0020.txt
+4 PicCut/wd/frame0019.txt
+4 PicCut/wd/frame0038.txt
+4 PicCut/wd/frame0011.txt
+4 PicCut/wd/frame0014.txt
+4 PicCut/wd/frame0004.txt
+4 PicCut/wd/frame0030.txt
+4 PicCut/wd/frame0024.txt
+5 PicCut/jeedjard/frame0005.txt
+5 PicCut/jeedjard/frame0029.txt
+5 PicCut/jeedjard/frame0024.txt
+5 PicCut/jeedjard/frame0014.txt
+5 PicCut/jeedjard/frame0033.txt
+5 PicCut/jeedjard/frame0017.txt
+5 PicCut/jeedjard/frame0021.txt
+5 PicCut/jeedjard/frame0008.txt
+5 PicCut/jeedjard/frame0030.txt
+5 PicCut/jeedjard/frame0000.txt
+5 PicCut/jeedjard/frame0009.txt
+5 PicCut/jeedjard/frame0011.txt
+5 PicCut/jeedjard/frame0032.txt
+5 PicCut/jeedjard/frame0027.txt
+5 PicCut/jeedjard/frame0007.txt
+5 PicCut/jeedjard/frame0037.txt
+5 PicCut/jeedjard/frame0031.txt
+5 PicCut/jeedjard/frame0019.txt
+5 PicCut/jeedjard/frame0004.txt
+5 PicCut/jeedjard/frame0010.txt
+5 PicCut/jeedjard/frame0025.txt
+5 PicCut/jeedjard/frame0022.txt
+5 PicCut/jeedjard/frame0015.txt
+5 PicCut/jeedjard/frame0012.txt
+5 PicCut/jeedjard/frame0018.txt
+5 PicCut/jeedjard/frame0003.txt
+5 PicCut/jeedjard/frame0013.txt
+5 PicCut/jeedjard/frame0020.txt
+5 PicCut/jeedjard/frame0028.txt
+5 PicCut/jeedjard/frame0002.txt
+5 PicCut/jeedjard/frame0016.txt
+5 PicCut/jeedjard/frame0001.txt
+5 PicCut/jeedjard/frame0034.txt
+5 PicCut/jeedjard/frame0036.txt
+5 PicCut/jeedjard/frame0006.txt
+5 PicCut/jeedjard/frame0035.txt
+5 PicCut/jeedjard/frame0023.txt
+6 PicCut/malee/frame0000.txt
+6 PicCut/malee/frame0035.txt
+6 PicCut/malee/frame0027.txt
+6 PicCut/malee/frame0022.txt
+6 PicCut/malee/frame0004.txt
+6 PicCut/malee/frame0030.txt
+6 PicCut/malee/frame0012.txt
+6 PicCut/malee/frame0013.txt
+6 PicCut/malee/frame0001.txt
+6 PicCut/malee/frame0002.txt
+6 PicCut/malee/frame0005.txt
+6 PicCut/malee/frame0003.txt
+6 PicCut/malee/frame0026.txt
+6 PicCut/malee/frame0007.txt
+6 PicCut/malee/frame0016.txt
+6 PicCut/malee/frame0010.txt
+6 PicCut/malee/frame0019.txt
+6 PicCut/malee/frame0037.txt
+6 PicCut/malee/frame0023.txt
+6 PicCut/malee/frame0034.txt
+6 PicCut/malee/frame0020.txt
+6 PicCut/malee/frame0021.txt
+6 PicCut/malee/frame0033.txt
+6 PicCut/malee/frame0029.txt
+6 PicCut/malee/frame0017.txt
+6 PicCut/malee/frame0011.txt
+6 PicCut/malee/frame0014.txt
+6 PicCut/malee/frame0008.txt
+6 PicCut/malee/frame0031.txt
+6 PicCut/malee/frame0018.txt
+6 PicCut/malee/frame0036.txt
+6 PicCut/malee/frame0028.txt
+6 PicCut/malee/frame0025.txt
+6 PicCut/malee/frame0006.txt
+6 PicCut/malee/frame0015.txt
+6 PicCut/malee/frame0009.txt
+6 PicCut/malee/frame0024.txt
+7 PicCut/colgate/frame0002.txt
+7 PicCut/colgate/frame0006.txt
+7 PicCut/colgate/frame0005.txt
+7 PicCut/colgate/frame0037.txt
+7 PicCut/colgate/frame0008.txt
+7 PicCut/colgate/frame0018.txt
+7 PicCut/colgate/frame0014.txt
+7 PicCut/colgate/frame0030.txt
+7 PicCut/colgate/frame0021.txt
+7 PicCut/colgate/frame0009.txt
+7 PicCut/colgate/frame0031.txt
+7 PicCut/colgate/frame0032.txt
+7 PicCut/colgate/frame0017.txt
+7 PicCut/colgate/frame0007.txt
+7 PicCut/colgate/frame0027.txt
+7 PicCut/colgate/frame0029.txt
+7 PicCut/colgate/frame0001.txt
+7 PicCut/colgate/frame0016.txt
+7 PicCut/colgate/frame0015.txt
+7 PicCut/colgate/frame0020.txt
+7 PicCut/colgate/frame0035.txt
+7 PicCut/colgate/frame0013.txt
+7 PicCut/colgate/frame0034.txt
+7 PicCut/colgate/frame0036.txt
+7 PicCut/colgate/frame0012.txt
+7 PicCut/colgate/frame0004.txt
+7 PicCut/colgate/frame0025.txt
+7 PicCut/colgate/frame0003.txt
+7 PicCut/colgate/frame0019.txt
+7 PicCut/colgate/frame0022.txt
+7 PicCut/colgate/frame0010.txt
+7 PicCut/colgate/frame0023.txt
+7 PicCut/colgate/frame0038.txt
+7 PicCut/colgate/frame0024.txt
+7 PicCut/colgate/frame0000.txt
+7 PicCut/colgate/frame0033.txt
+7 PicCut/colgate/frame0011.txt
+8 PicCut/axe/frame0038.txt
+8 PicCut/axe/frame0004.txt
+8 PicCut/axe/frame0005.txt
+8 PicCut/axe/frame0011.txt
+8 PicCut/axe/frame0026.txt
+8 PicCut/axe/frame0034.txt
+8 PicCut/axe/frame0013.txt
+8 PicCut/axe/frame0028.txt
+8 PicCut/axe/frame0014.txt
+8 PicCut/axe/frame0032.txt
+8 PicCut/axe/frame0007.txt
+8 PicCut/axe/frame0023.txt
+8 PicCut/axe/frame0031.txt
+8 PicCut/axe/frame0003.txt
+8 PicCut/axe/frame0022.txt
+8 PicCut/axe/frame0012.txt
+8 PicCut/axe/frame0000.txt
+8 PicCut/axe/frame0025.txt
+8 PicCut/axe/frame0035.txt
+8 PicCut/axe/frame0002.txt
+8 PicCut/axe/frame0017.txt
+8 PicCut/axe/frame0037.txt
+8 PicCut/axe/frame0016.txt
+8 PicCut/axe/frame0020.txt
+8 PicCut/axe/frame0015.txt
+8 PicCut/axe/frame0029.txt
+8 PicCut/axe/frame0001.txt
+8 PicCut/axe/frame0030.txt
+8 PicCut/axe/frame0010.txt
+8 PicCut/axe/frame0033.txt
+8 PicCut/axe/frame0024.txt
+8 PicCut/axe/frame0036.txt
+8 PicCut/axe/frame0008.txt
+8 PicCut/axe/frame0019.txt
+8 PicCut/axe/frame0006.txt
+8 PicCut/axe/frame0027.txt
+8 PicCut/axe/frame0021.txt
+9 PicCut/nescafe/frame0013.txt
+9 PicCut/nescafe/frame0009.txt
+9 PicCut/nescafe/frame0034.txt
+9 PicCut/nescafe/frame0003.txt
+9 PicCut/nescafe/frame0015.txt
+9 PicCut/nescafe/frame0018.txt
+9 PicCut/nescafe/frame0001.txt
+9 PicCut/nescafe/frame0016.txt
+9 PicCut/nescafe/frame0026.txt
+9 PicCut/nescafe/frame0036.txt
+9 PicCut/nescafe/frame0000.txt
+9 PicCut/nescafe/frame0032.txt
+9 PicCut/nescafe/frame0027.txt
+9 PicCut/nescafe/frame0011.txt
+9 PicCut/nescafe/frame0024.txt
+9 PicCut/nescafe/frame0038.txt
+9 PicCut/nescafe/frame0020.txt
+9 PicCut/nescafe/frame0025.txt
+9 PicCut/nescafe/frame0033.txt
+9 PicCut/nescafe/frame0035.txt
+9 PicCut/nescafe/frame0031.txt
+9 PicCut/nescafe/frame0029.txt
+9 PicCut/nescafe/frame0004.txt
+9 PicCut/nescafe/frame0019.txt
+9 PicCut/nescafe/frame0028.txt
+9 PicCut/nescafe/frame0021.txt
+9 PicCut/nescafe/frame0010.txt
+9 PicCut/nescafe/frame0037.txt
+9 PicCut/nescafe/frame0005.txt
+9 PicCut/nescafe/frame0014.txt
+9 PicCut/nescafe/frame0008.txt
+9 PicCut/nescafe/frame0022.txt
+9 PicCut/nescafe/frame0023.txt
+9 PicCut/nescafe/frame0002.txt
+9 PicCut/nescafe/frame0006.txt
+9 PicCut/nescafe/frame0007.txt
+9 PicCut/nescafe/frame0012.txt
+10 PicCut/loreal/frame0028.txt
+10 PicCut/loreal/frame0026.txt
+10 PicCut/loreal/frame0014.txt
+10 PicCut/loreal/frame0035.txt
+10 PicCut/loreal/frame0031.txt
+10 PicCut/loreal/frame0007.txt
+10 PicCut/loreal/frame0036.txt
+10 PicCut/loreal/frame0010.txt
+10 PicCut/loreal/frame0003.txt
+10 PicCut/loreal/frame0008.txt
+10 PicCut/loreal/frame0000.txt
+10 PicCut/loreal/frame0025.txt
+10 PicCut/loreal/frame0016.txt
+10 PicCut/loreal/frame0002.txt
+10 PicCut/loreal/frame0004.txt
+10 PicCut/loreal/frame0006.txt
+10 PicCut/loreal/frame0033.txt
+10 PicCut/loreal/frame0018.txt
+10 PicCut/loreal/frame0027.txt
+10 PicCut/loreal/frame0029.txt
+10 PicCut/loreal/frame0013.txt
+10 PicCut/loreal/frame0015.txt
+10 PicCut/loreal/frame0030.txt
+10 PicCut/loreal/frame0001.txt
+10 PicCut/loreal/frame0017.txt
+10 PicCut/loreal/frame0012.txt
+10 PicCut/loreal/frame0011.txt
+10 PicCut/loreal/frame0037.txt
+10 PicCut/loreal/frame0038.txt
+10 PicCut/loreal/frame0032.txt
+10 PicCut/loreal/frame0024.txt
+10 PicCut/loreal/frame0023.txt
+10 PicCut/loreal/frame0009.txt
+10 PicCut/loreal/frame0021.txt
+10 PicCut/loreal/frame0034.txt
+10 PicCut/loreal/frame0005.txt
+10 PicCut/loreal/frame0019.txt
+11 PicCut/quick/frame0030.txt
+11 PicCut/quick/frame0006.txt
+11 PicCut/quick/frame0001.txt
+11 PicCut/quick/frame0015.txt
+11 PicCut/quick/frame0023.txt
+11 PicCut/quick/frame0017.txt
+11 PicCut/quick/frame0012.txt
+11 PicCut/quick/frame0008.txt
+11 PicCut/quick/frame0036.txt
+11 PicCut/quick/frame0021.txt
+11 PicCut/quick/frame0003.txt
+11 PicCut/quick/frame0028.txt
+11 PicCut/quick/frame0034.txt
+11 PicCut/quick/frame0019.txt
+11 PicCut/quick/frame0014.txt
+11 PicCut/quick/frame0026.txt
+11 PicCut/quick/frame0038.txt
+11 PicCut/quick/frame0020.txt
+11 PicCut/quick/frame0032.txt
+11 PicCut/quick/frame0025.txt
+11 PicCut/quick/frame0000.txt
+11 PicCut/quick/frame0004.txt
+11 PicCut/quick/frame0024.txt
+11 PicCut/quick/frame0018.txt
+11 PicCut/quick/frame0027.txt
+11 PicCut/quick/frame0009.txt
+11 PicCut/quick/frame0035.txt
+11 PicCut/quick/frame0002.txt
+11 PicCut/quick/frame0033.txt
+11 PicCut/quick/frame0005.txt
+11 PicCut/quick/frame0013.txt
+11 PicCut/quick/frame0037.txt
+11 PicCut/quick/frame0022.txt
+11 PicCut/quick/frame0011.txt
+11 PicCut/quick/frame0029.txt
+11 PicCut/quick/frame0016.txt
+11 PicCut/quick/frame0010.txt
+12 PicCut/lays/frame0017.txt
+12 PicCut/lays/frame0018.txt
+12 PicCut/lays/frame0033.txt
+12 PicCut/lays/frame0024.txt
+12 PicCut/lays/frame0002.txt
+12 PicCut/lays/frame0029.txt
+12 PicCut/lays/frame0016.txt
+12 PicCut/lays/frame0028.txt
+12 PicCut/lays/frame0004.txt
+12 PicCut/lays/frame0001.txt
+12 PicCut/lays/frame0003.txt
+12 PicCut/lays/frame0008.txt
+12 PicCut/lays/frame0006.txt
+12 PicCut/lays/frame0011.txt
+12 PicCut/lays/frame0007.txt
+12 PicCut/lays/frame0037.txt
+12 PicCut/lays/frame0034.txt
+12 PicCut/lays/frame0021.txt
+12 PicCut/lays/frame0009.txt
+12 PicCut/lays/frame0000.txt
+12 PicCut/lays/frame0015.txt
+12 PicCut/lays/frame0035.txt
+12 PicCut/lays/frame0014.txt
+12 PicCut/lays/frame0005.txt
+12 PicCut/lays/frame0038.txt
+12 PicCut/lays/frame0020.txt
+12 PicCut/lays/frame0010.txt
+12 PicCut/lays/frame0030.txt
+12 PicCut/lays/frame0019.txt
+12 PicCut/lays/frame0022.txt
+12 PicCut/lays/frame0013.txt
+12 PicCut/lays/frame0036.txt
+12 PicCut/lays/frame0012.txt
+12 PicCut/lays/frame0025.txt
+12 PicCut/lays/frame0031.txt
+12 PicCut/lays/frame0027.txt
+12 PicCut/lays/frame0032.txt
+13 PicCut/vaseline/frame0011.txt
+13 PicCut/vaseline/frame0000.txt
+13 PicCut/vaseline/frame0001.txt
+13 PicCut/vaseline/frame0033.txt
+13 PicCut/vaseline/frame0010.txt
+13 PicCut/vaseline/frame0016.txt
+13 PicCut/vaseline/frame0034.txt
+13 PicCut/vaseline/frame0027.txt
+13 PicCut/vaseline/frame0014.txt
+13 PicCut/vaseline/frame0003.txt
+13 PicCut/vaseline/frame0015.txt
+13 PicCut/vaseline/frame0009.txt
+13 PicCut/vaseline/frame0022.txt
+13 PicCut/vaseline/frame0032.txt
+13 PicCut/vaseline/frame0025.txt
+13 PicCut/vaseline/frame0037.txt
+13 PicCut/vaseline/frame0038.txt
+13 PicCut/vaseline/frame0017.txt
+13 PicCut/vaseline/frame0007.txt
+13 PicCut/vaseline/frame0008.txt
+13 PicCut/vaseline/frame0023.txt
+13 PicCut/vaseline/frame0002.txt
+13 PicCut/vaseline/frame0030.txt
+13 PicCut/vaseline/frame0019.txt
+13 PicCut/vaseline/frame0026.txt
+13 PicCut/vaseline/frame0024.txt
+13 PicCut/vaseline/frame0013.txt
+13 PicCut/vaseline/frame0021.txt
+13 PicCut/vaseline/frame0031.txt
+13 PicCut/vaseline/frame0036.txt
+13 PicCut/vaseline/frame0018.txt
+13 PicCut/vaseline/frame0006.txt
+13 PicCut/vaseline/frame0012.txt
+13 PicCut/vaseline/frame0035.txt
+13 PicCut/vaseline/frame0004.txt
+13 PicCut/vaseline/frame0005.txt
+13 PicCut/vaseline/frame0020.txt
+14 PicCut/silicone/frame0004.txt
+14 PicCut/silicone/frame0030.txt
+14 PicCut/silicone/frame0002.txt
+14 PicCut/silicone/frame0013.txt
+14 PicCut/silicone/frame0011.txt
+14 PicCut/silicone/frame0029.txt
+14 PicCut/silicone/frame0003.txt
+14 PicCut/silicone/frame0024.txt
+14 PicCut/silicone/frame0014.txt
+14 PicCut/silicone/frame0034.txt
+14 PicCut/silicone/frame0027.txt
+14 PicCut/silicone/frame0000.txt
+14 PicCut/silicone/frame0031.txt
+14 PicCut/silicone/frame0009.txt
+14 PicCut/silicone/frame0010.txt
+14 PicCut/silicone/frame0022.txt
+14 PicCut/silicone/frame0033.txt
+14 PicCut/silicone/frame0021.txt
+14 PicCut/silicone/frame0028.txt
+14 PicCut/silicone/frame0015.txt
+14 PicCut/silicone/frame0035.txt
+14 PicCut/silicone/frame0018.txt
+14 PicCut/silicone/frame0006.txt
+14 PicCut/silicone/frame0012.txt
+14 PicCut/silicone/frame0026.txt
+14 PicCut/silicone/frame0017.txt
+14 PicCut/silicone/frame0038.txt
+14 PicCut/silicone/frame0025.txt
+14 PicCut/silicone/frame0023.txt
+14 PicCut/silicone/frame0036.txt
+14 PicCut/silicone/frame0007.txt
+14 PicCut/silicone/frame0019.txt
+14 PicCut/silicone/frame0008.txt
+14 PicCut/silicone/frame0005.txt
+14 PicCut/silicone/frame0037.txt
+14 PicCut/silicone/frame0032.txt
+14 PicCut/silicone/frame0001.txt
+15 PicCut/est/frame0004.txt
+15 PicCut/est/frame0036.txt
+15 PicCut/est/frame0033.txt
+15 PicCut/est/frame0016.txt
+15 PicCut/est/frame0023.txt
+15 PicCut/est/frame0034.txt
+15 PicCut/est/frame0022.txt
+15 PicCut/est/frame0001.txt
+15 PicCut/est/frame0006.txt
+15 PicCut/est/frame0028.txt
+15 PicCut/est/frame0009.txt
+15 PicCut/est/frame0032.txt
+15 PicCut/est/frame0017.txt
+15 PicCut/est/frame0003.txt
+15 PicCut/est/frame0027.txt
+15 PicCut/est/frame0020.txt
+15 PicCut/est/frame0021.txt
+15 PicCut/est/frame0026.txt
+15 PicCut/est/frame0008.txt
+15 PicCut/est/frame0031.txt
+15 PicCut/est/frame0012.txt
+15 PicCut/est/frame0002.txt
+15 PicCut/est/frame0011.txt
+15 PicCut/est/frame0024.txt
+15 PicCut/est/frame0019.txt
+15 PicCut/est/frame0018.txt
+15 PicCut/est/frame0037.txt
+15 PicCut/est/frame0010.txt
+15 PicCut/est/frame0005.txt
+15 PicCut/est/frame0007.txt
+15 PicCut/est/frame0014.txt
+15 PicCut/est/frame0038.txt
+15 PicCut/est/frame0029.txt
+15 PicCut/est/frame0035.txt
+15 PicCut/est/frame0030.txt
+15 PicCut/est/frame0015.txt
+16 PicCut/fanta_green/frame0020.txt
+16 PicCut/fanta_green/frame0026.txt
+16 PicCut/fanta_green/frame0015.txt
+16 PicCut/fanta_green/frame0019.txt
+16 PicCut/fanta_green/frame0022.txt
+16 PicCut/fanta_green/frame0032.txt
+16 PicCut/fanta_green/frame0030.txt
+16 PicCut/fanta_green/frame0031.txt
+16 PicCut/fanta_green/frame0007.txt
+16 PicCut/fanta_green/frame0002.txt
+16 PicCut/fanta_green/frame0025.txt
+16 PicCut/fanta_green/frame0029.txt
+16 PicCut/fanta_green/frame0024.txt
+16 PicCut/fanta_green/frame0012.txt
+16 PicCut/fanta_green/frame0021.txt
+16 PicCut/fanta_green/frame0008.txt
+16 PicCut/fanta_green/frame0009.txt
+16 PicCut/fanta_green/frame0038.txt
+16 PicCut/fanta_green/frame0000.txt
+16 PicCut/fanta_green/frame0035.txt
+16 PicCut/fanta_green/frame0003.txt
+16 PicCut/fanta_green/frame0017.txt
+16 PicCut/fanta_green/frame0033.txt
+16 PicCut/fanta_green/frame0023.txt
+16 PicCut/fanta_green/frame0027.txt
+16 PicCut/fanta_green/frame0004.txt
+16 PicCut/fanta_green/frame0001.txt
+16 PicCut/fanta_green/frame0036.txt
+16 PicCut/fanta_green/frame0010.txt
+16 PicCut/fanta_green/frame0006.txt
+16 PicCut/fanta_green/frame0037.txt
+16 PicCut/fanta_green/frame0014.txt
+16 PicCut/fanta_green/frame0018.txt
+16 PicCut/fanta_green/frame0028.txt
+16 PicCut/fanta_green/frame0011.txt
+16 PicCut/fanta_green/frame0013.txt
+16 PicCut/fanta_green/frame0016.txt
+17 PicCut/pringles/frame0016.txt
+17 PicCut/pringles/frame0005.txt
+17 PicCut/pringles/frame0003.txt
+17 PicCut/pringles/frame0030.txt
+17 PicCut/pringles/frame0038.txt
+17 PicCut/pringles/frame0032.txt
+17 PicCut/pringles/frame0028.txt
+17 PicCut/pringles/frame0014.txt
+17 PicCut/pringles/frame0033.txt
+17 PicCut/pringles/frame0022.txt
+17 PicCut/pringles/frame0020.txt
+17 PicCut/pringles/frame0036.txt
+17 PicCut/pringles/frame0018.txt
+17 PicCut/pringles/frame0024.txt
+17 PicCut/pringles/frame0027.txt
+17 PicCut/pringles/frame0012.txt
+17 PicCut/pringles/frame0023.txt
+17 PicCut/pringles/frame0007.txt
+17 PicCut/pringles/frame0013.txt
+17 PicCut/pringles/frame0006.txt
+17 PicCut/pringles/frame0009.txt
+17 PicCut/pringles/frame0015.txt
+17 PicCut/pringles/frame0001.txt
+17 PicCut/pringles/frame0037.txt
+17 PicCut/pringles/frame0010.txt
+17 PicCut/pringles/frame0031.txt
+17 PicCut/pringles/frame0034.txt
+17 PicCut/pringles/frame0029.txt
+17 PicCut/pringles/frame0011.txt
+17 PicCut/pringles/frame0004.txt
+17 PicCut/pringles/frame0035.txt
+17 PicCut/pringles/frame0017.txt
+17 PicCut/pringles/frame0008.txt
+17 PicCut/pringles/frame0002.txt
+17 PicCut/pringles/frame0025.txt
+17 PicCut/pringles/frame0026.txt
+17 PicCut/pringles/frame0021.txt
+18 PicCut/redondo/frame0024.txt
+18 PicCut/redondo/frame0028.txt
+18 PicCut/redondo/frame0015.txt
+18 PicCut/redondo/frame0027.txt
+18 PicCut/redondo/frame0030.txt
+18 PicCut/redondo/frame0017.txt
+18 PicCut/redondo/frame0016.txt
+18 PicCut/redondo/frame0026.txt
+18 PicCut/redondo/frame0025.txt
+18 PicCut/redondo/frame0005.txt
+18 PicCut/redondo/frame0003.txt
+18 PicCut/redondo/frame0023.txt
+18 PicCut/redondo/frame0029.txt
+18 PicCut/redondo/frame0021.txt
+18 PicCut/redondo/frame0002.txt
+18 PicCut/redondo/frame0014.txt
+18 PicCut/redondo/frame0038.txt
+18 PicCut/redondo/frame0009.txt
+18 PicCut/redondo/frame0004.txt
+18 PicCut/redondo/frame0037.txt
+18 PicCut/redondo/frame0010.txt
+18 PicCut/redondo/frame0035.txt
+18 PicCut/redondo/frame0012.txt
+18 PicCut/redondo/frame0008.txt
+18 PicCut/redondo/frame0018.txt
+18 PicCut/redondo/frame0033.txt
+18 PicCut/redondo/frame0032.txt
+18 PicCut/redondo/frame0034.txt
+18 PicCut/redondo/frame0013.txt
+18 PicCut/redondo/frame0036.txt
+18 PicCut/redondo/frame0006.txt
+18 PicCut/redondo/frame0001.txt
+18 PicCut/redondo/frame0020.txt
+18 PicCut/redondo/frame0022.txt
+18 PicCut/redondo/frame0007.txt
+18 PicCut/redondo/frame0011.txt
+18 PicCut/redondo/frame0019.txt
+19 PicCut/fanta_red/frame0007.txt
+19 PicCut/fanta_red/frame0019.txt
+19 PicCut/fanta_red/frame0018.txt
+19 PicCut/fanta_red/frame0006.txt
+19 PicCut/fanta_red/frame0038.txt
+19 PicCut/fanta_red/frame0013.txt
+19 PicCut/fanta_red/frame0021.txt
+19 PicCut/fanta_red/frame0025.txt
+19 PicCut/fanta_red/frame0028.txt
+19 PicCut/fanta_red/frame0016.txt
+19 PicCut/fanta_red/frame0010.txt
+19 PicCut/fanta_red/frame0001.txt
+19 PicCut/fanta_red/frame0031.txt
+19 PicCut/fanta_red/frame0034.txt
+19 PicCut/fanta_red/frame0033.txt
+19 PicCut/fanta_red/frame0017.txt
+19 PicCut/fanta_red/frame0011.txt
+19 PicCut/fanta_red/frame0027.txt
+19 PicCut/fanta_red/frame0024.txt
+19 PicCut/fanta_red/frame0012.txt
+19 PicCut/fanta_red/frame0004.txt
+19 PicCut/fanta_red/frame0015.txt
+19 PicCut/fanta_red/frame0029.txt
+19 PicCut/fanta_red/frame0003.txt
+19 PicCut/fanta_red/frame0023.txt
+19 PicCut/fanta_red/frame0008.txt
+19 PicCut/fanta_red/frame0026.txt
+19 PicCut/fanta_red/frame0002.txt
+19 PicCut/fanta_red/frame0032.txt
+19 PicCut/fanta_red/frame0030.txt
+19 PicCut/fanta_red/frame0014.txt
+19 PicCut/fanta_red/frame0022.txt
+19 PicCut/fanta_red/frame0036.txt
+19 PicCut/fanta_red/frame0020.txt
+19 PicCut/fanta_red/frame0037.txt
+19 PicCut/fanta_red/frame0009.txt
+19 PicCut/fanta_red/frame0035.txt
+20 PicCut/hokuyo/frame0033.txt
+20 PicCut/hokuyo/frame0029.txt
+20 PicCut/hokuyo/frame0009.txt
+20 PicCut/hokuyo/frame0020.txt
+20 PicCut/hokuyo/frame0000.txt
+20 PicCut/hokuyo/frame0008.txt
+20 PicCut/hokuyo/frame0035.txt
+20 PicCut/hokuyo/frame0026.txt
+20 PicCut/hokuyo/frame0016.txt
+20 PicCut/hokuyo/frame0021.txt
+20 PicCut/hokuyo/frame0003.txt
+20 PicCut/hokuyo/frame0013.txt
+20 PicCut/hokuyo/frame0012.txt
+20 PicCut/hokuyo/frame0032.txt
+20 PicCut/hokuyo/frame0002.txt
+20 PicCut/hokuyo/frame0015.txt
+20 PicCut/hokuyo/frame0025.txt
+20 PicCut/hokuyo/frame0027.txt
+20 PicCut/hokuyo/frame0018.txt
+20 PicCut/hokuyo/frame0037.txt
+20 PicCut/hokuyo/frame0034.txt
+20 PicCut/hokuyo/frame0014.txt
+20 PicCut/hokuyo/frame0001.txt
+20 PicCut/hokuyo/frame0028.txt
+20 PicCut/hokuyo/frame0004.txt
+20 PicCut/hokuyo/frame0017.txt
+20 PicCut/hokuyo/frame0022.txt
+20 PicCut/hokuyo/frame0011.txt
+20 PicCut/hokuyo/frame0010.txt
+20 PicCut/hokuyo/frame0030.txt
+20 PicCut/hokuyo/frame0006.txt
+20 PicCut/hokuyo/frame0038.txt
+20 PicCut/hokuyo/frame0023.txt
+20 PicCut/hokuyo/frame0019.txt
+20 PicCut/hokuyo/frame0031.txt
+20 PicCut/hokuyo/frame0007.txt
+20 PicCut/hokuyo/frame0005.txt
+21 PicCut/milo/frame0002.txt
+21 PicCut/milo/frame0011.txt
+21 PicCut/milo/frame0012.txt
+21 PicCut/milo/frame0031.txt
+21 PicCut/milo/frame0023.txt
+21 PicCut/milo/frame0034.txt
+21 PicCut/milo/frame0030.txt
+21 PicCut/milo/frame0005.txt
+21 PicCut/milo/frame0006.txt
+21 PicCut/milo/frame0032.txt
+21 PicCut/milo/frame0009.txt
+21 PicCut/milo/frame0003.txt
+21 PicCut/milo/frame0035.txt
+21 PicCut/milo/frame0013.txt
+21 PicCut/milo/frame0007.txt
+21 PicCut/milo/frame0027.txt
+21 PicCut/milo/frame0029.txt
+21 PicCut/milo/frame0022.txt
+21 PicCut/milo/frame0019.txt
+21 PicCut/milo/frame0028.txt
+21 PicCut/milo/frame0014.txt
+21 PicCut/milo/frame0001.txt
+21 PicCut/milo/frame0026.txt
+21 PicCut/milo/frame0008.txt
+21 PicCut/milo/frame0018.txt
+21 PicCut/milo/frame0036.txt
+21 PicCut/milo/frame0015.txt
+21 PicCut/milo/frame0025.txt
+21 PicCut/milo/frame0033.txt
+21 PicCut/milo/frame0000.txt
+21 PicCut/milo/frame0016.txt
+21 PicCut/milo/frame0038.txt
+21 PicCut/milo/frame0020.txt
+21 PicCut/milo/frame0024.txt
+21 PicCut/milo/frame0010.txt
+21 PicCut/milo/frame0004.txt
+21 PicCut/milo/frame0017.txt
+22 PicCut/knorr/frame0032.txt
+22 PicCut/knorr/frame0018.txt
+22 PicCut/knorr/frame0000.txt
+22 PicCut/knorr/frame0035.txt
+22 PicCut/knorr/frame0030.txt
+22 PicCut/knorr/frame0027.txt
+22 PicCut/knorr/frame0022.txt
+22 PicCut/knorr/frame0037.txt
+22 PicCut/knorr/frame0029.txt
+22 PicCut/knorr/frame0024.txt
+22 PicCut/knorr/frame0003.txt
+22 PicCut/knorr/frame0020.txt
+22 PicCut/knorr/frame0010.txt
+22 PicCut/knorr/frame0038.txt
+22 PicCut/knorr/frame0021.txt
+22 PicCut/knorr/frame0025.txt
+22 PicCut/knorr/frame0034.txt
+22 PicCut/knorr/frame0019.txt
+22 PicCut/knorr/frame0002.txt
+22 PicCut/knorr/frame0033.txt
+22 PicCut/knorr/frame0009.txt
+22 PicCut/knorr/frame0026.txt
+22 PicCut/knorr/frame0001.txt
+22 PicCut/knorr/frame0006.txt
+22 PicCut/knorr/frame0011.txt
+22 PicCut/knorr/frame0031.txt
+22 PicCut/knorr/frame0008.txt
+22 PicCut/knorr/frame0004.txt
+22 PicCut/knorr/frame0016.txt
+22 PicCut/knorr/frame0036.txt
+22 PicCut/knorr/frame0014.txt
+22 PicCut/knorr/frame0015.txt
+22 PicCut/knorr/frame0012.txt
+22 PicCut/knorr/frame0028.txt
+22 PicCut/knorr/frame0017.txt
+22 PicCut/knorr/frame0005.txt
+22 PicCut/knorr/frame0023.txt
+23 PicCut/meter/frame0033.txt
+23 PicCut/meter/frame0031.txt
+23 PicCut/meter/frame0001.txt
+23 PicCut/meter/frame0028.txt
+23 PicCut/meter/frame0011.txt
+23 PicCut/meter/frame0000.txt
+23 PicCut/meter/frame0002.txt
+23 PicCut/meter/frame0037.txt
+23 PicCut/meter/frame0034.txt
+23 PicCut/meter/frame0012.txt
+23 PicCut/meter/frame0005.txt
+23 PicCut/meter/frame0018.txt
+23 PicCut/meter/frame0014.txt
+23 PicCut/meter/frame0016.txt
+23 PicCut/meter/frame0026.txt
+23 PicCut/meter/frame0010.txt
+23 PicCut/meter/frame0004.txt
+23 PicCut/meter/frame0025.txt
+23 PicCut/meter/frame0024.txt
+23 PicCut/meter/frame0036.txt
+23 PicCut/meter/frame0003.txt
+23 PicCut/meter/frame0022.txt
+23 PicCut/meter/frame0021.txt
+23 PicCut/meter/frame0008.txt
+23 PicCut/meter/frame0035.txt
+23 PicCut/meter/frame0038.txt
+23 PicCut/meter/frame0027.txt
+23 PicCut/meter/frame0029.txt
+23 PicCut/meter/frame0009.txt
+23 PicCut/meter/frame0015.txt
+23 PicCut/meter/frame0013.txt
+23 PicCut/meter/frame0006.txt
+23 PicCut/meter/frame0017.txt
+23 PicCut/meter/frame0023.txt
+23 PicCut/meter/frame0019.txt
+23 PicCut/meter/frame0007.txt
+23 PicCut/meter/frame0030.txt
+24 PicCut/blaster/frame0007.txt
+24 PicCut/blaster/frame0033.txt
+24 PicCut/blaster/frame0015.txt
+24 PicCut/blaster/frame0019.txt
+24 PicCut/blaster/frame0002.txt
+24 PicCut/blaster/frame0000.txt
+24 PicCut/blaster/frame0035.txt
+24 PicCut/blaster/frame0014.txt
+24 PicCut/blaster/frame0026.txt
+24 PicCut/blaster/frame0018.txt
+24 PicCut/blaster/frame0001.txt
+24 PicCut/blaster/frame0003.txt
+24 PicCut/blaster/frame0028.txt
+24 PicCut/blaster/frame0006.txt
+24 PicCut/blaster/frame0009.txt
+24 PicCut/blaster/frame0027.txt
+24 PicCut/blaster/frame0034.txt
+24 PicCut/blaster/frame0004.txt
+24 PicCut/blaster/frame0024.txt
+24 PicCut/blaster/frame0022.txt
+24 PicCut/blaster/frame0031.txt
+24 PicCut/blaster/frame0017.txt
+24 PicCut/blaster/frame0037.txt
+24 PicCut/blaster/frame0038.txt
+24 PicCut/blaster/frame0030.txt
+24 PicCut/blaster/frame0005.txt
+24 PicCut/blaster/frame0016.txt
+24 PicCut/blaster/frame0020.txt
+24 PicCut/blaster/frame0032.txt
+24 PicCut/blaster/frame0021.txt
+24 PicCut/blaster/frame0029.txt
+24 PicCut/blaster/frame0023.txt
+24 PicCut/blaster/frame0012.txt
+24 PicCut/blaster/frame0010.txt
+24 PicCut/blaster/frame0025.txt
+25 PicCut/sunlight/frame0020.txt
+25 PicCut/sunlight/frame0038.txt
+25 PicCut/sunlight/frame0003.txt
+25 PicCut/sunlight/frame0022.txt
+25 PicCut/sunlight/frame0016.txt
+25 PicCut/sunlight/frame0009.txt
+25 PicCut/sunlight/frame0023.txt
+25 PicCut/sunlight/frame0013.txt
+25 PicCut/sunlight/frame0006.txt
+25 PicCut/sunlight/frame0000.txt
+25 PicCut/sunlight/frame0007.txt
+25 PicCut/sunlight/frame0019.txt
+25 PicCut/sunlight/frame0026.txt
+25 PicCut/sunlight/frame0030.txt
+25 PicCut/sunlight/frame0014.txt
+25 PicCut/sunlight/frame0008.txt
+25 PicCut/sunlight/frame0012.txt
+25 PicCut/sunlight/frame0001.txt
+25 PicCut/sunlight/frame0032.txt
+25 PicCut/sunlight/frame0015.txt
+25 PicCut/sunlight/frame0017.txt
+25 PicCut/sunlight/frame0028.txt
+25 PicCut/sunlight/frame0024.txt
+25 PicCut/sunlight/frame0005.txt
+25 PicCut/sunlight/frame0004.txt
+25 PicCut/sunlight/frame0002.txt
+25 PicCut/sunlight/frame0037.txt
+25 PicCut/sunlight/frame0034.txt
+25 PicCut/sunlight/frame0010.txt
+25 PicCut/sunlight/frame0025.txt
+25 PicCut/sunlight/frame0027.txt
+25 PicCut/sunlight/frame0021.txt
+25 PicCut/sunlight/frame0035.txt
+25 PicCut/sunlight/frame0011.txt
+25 PicCut/sunlight/frame0029.txt
+25 PicCut/sunlight/frame0018.txt
+25 PicCut/sunlight/frame0031.txt

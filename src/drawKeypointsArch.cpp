@@ -19,12 +19,23 @@ using namespace std;
 int main(int argc, char** argv)
 {
 
-    for(int k=0;k<38;k++){
+	int sum=0;
+	cout << argc << endl;
+	for(int i=0;i<argc;i++)
+		cout << "i : " << i << " " << argv[i] << endl;
+    for(int k=0;k<=38;k++){
 
         char fileName[100],output[100];
 
-        sprintf(fileName,"/home/skuba/skuba_athome/object_perception/data/%s/frame%04d.png",argv[1],k);
+		if(argc == 2)
+			if(strcmp(argv[1],"-s") == 0){
+				sprintf(fileName,"/run/shm/object_perception/picture%d.png",k);
+			}
+		else
+			sprintf(fileName,"/home/skuba/skuba_athome/object_perception/data/%s/frame%04d.png",argv[1],k);
         sprintf(output,"/home/skuba/skuba_athome/object_perception/tmp/frame%04d_feature.png",k);
+
+		//cout << fileName << endl;
 
         CvMemStorage* storage = cvCreateMemStorage(0);
         cvNamedWindow("Image", 1);
@@ -38,6 +49,9 @@ int main(int argc, char** argv)
 
 
         Mat img = imread(fileName);//, CV_LOAD_IMAGE_GRAYSCALE );
+		//cout << "img.empty() : " << img.empty() << endl;
+		if(img.empty())
+			continue;
         frame = new IplImage(img);
 
         //    cvShowImage( "Image", frame );
@@ -56,11 +70,12 @@ int main(int argc, char** argv)
         int i;
 
         //Extract SURF points by initializing parameters
-        CvSURFParams params = cvSURFParams(500, 1);
+        CvSURFParams params = cvSURFParams(400, 1);
         //cvExtractSURF( image, 0, &imageKeypoints, &imageDescriptors, storage, params );
 
         cvExtractSURF( image, 0, &imageKeypoints, &imageDescriptors, storage, params );
-        printf("Image Descriptors: %d\n", imageDescriptors->total);
+        printf("path : %s Image Descriptors: %d\n",fileName,imageDescriptors->total);
+		sum+=imageDescriptors->total;
 
 //---------------------------------------------------------
         int minHessian = 400;
@@ -98,6 +113,8 @@ int main(int argc, char** argv)
 
         cvDestroyWindow("Image");
     }
+
+	printf("avg number of descriptor: %f\n",sum/38.0);
 //
 //    CvMemStorage* storage = cvCreateMemStorage(0);
 //    cvNamedWindow("Image", 1);
@@ -161,6 +178,5 @@ int main(int argc, char** argv)
 //    cvShowImage( "Image", frame );
 //    cvWaitKey(0);
 //    cvDestroyWindow("Image");
-    
     return 0;
 } 

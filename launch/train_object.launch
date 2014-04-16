@@ -4,7 +4,7 @@
         <!-- K-mean param -->
         <param name="kmean_max_iter" value="300"/>
         <param name="kmean_epsilon" value="0.000001"/>
-        <param name="kmean_k_cluster" value="350"/>
+        <param name="kmean_k_cluster" value="60"/>
         <param name="kmean_attempts" value="10"/>
         <!-- SVM param -->
         <param name="svm_c" value="2"/>

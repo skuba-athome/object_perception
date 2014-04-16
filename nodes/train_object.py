@@ -16,6 +16,7 @@ object_histogram = {}
 def list_image_in_directory(dir):
     pic_dic = {}
     for object_dir in os.listdir(dir):
+        #object_dir_path = os.path.join(dir, object_dir) + '/train/'
         object_dir_path = os.path.join(dir, object_dir)
         if not os.path.isdir(object_dir_path):
             continue
@@ -143,7 +144,11 @@ if __name__ == '__main__':
     svm_c = int(rospy.get_param('~svm_c', '2'))
     svm_gamma = float(rospy.get_param('~svm_gamma', '0.05'))
 
-    params = dict(kernel_type = cv2.SVM_RBF, svm_type = cv2.SVM_C_SVC, C = svm_c, gamma = svm_gamma)
+    #params = dict(kernel_type = cv2.SVM_RBF, svm_type = cv2.SVM_C_SVC, C = svm_c, gamma = svm_gamma)
+    #params = dict(kernel_type = cv2.SVM_RBF, svm_type = cv2.SVM_C_SVC)
+    params = dict(kernel_type = cv2.SVM_LINEAR, svm_type = cv2.SVM_C_SVC)
+    #params = dict(kernel_type = cv2.SVM_POLY, svm_type = cv2.SVM_C_SVC, degree=2)
+
 
     # create histogram train data
     create_histogram_train_data(knn_model)
