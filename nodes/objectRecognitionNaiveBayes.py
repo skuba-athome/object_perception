@@ -3,10 +3,14 @@ from sklearn import neighbors, datasets
 import roslib
 roslib.load_manifest('object_perception')
 import rospy
+import cv2
 
 from std_msgs.msg import String
 from object_perception.srv import *
 from operator import add
+
+
+surf = cv2.SURF(400)
 
 class objectRecognition:
 
@@ -58,20 +62,31 @@ class objectRecognition:
         return feature_list,label_list
     
     def classifyObjectHandle(self,data):
-        print data
+        #print data,'--------------------'
         category = self.predictObject(data.data)
-        self.recognitionResult.publish(String(self.revertCategory[category]))
         print String(self.revertCategory[category])
+        self.recognitionResult.publish(String(self.revertCategory[category]))
     
     def classifyObjectService(self,req):
         category = self.predictObject(req.filepath)
         return classifyObjectResponse(category)
     
     def predictObject(self,featureFileName):
-        queryFeature,label = self.loadFeature(featureFileName,'-1')
-        if len(queryFeature) == 0:
+        #queryFeature,label = self.loadFeature(featureFileName,'-1')
+        #print 'type(queryFeature) = ',type(queryFeature[0]), 'type(label) = ',type(label[0])
+
+        image = cv2.imread(featureFileName, 0)
+        #queryFeature,label = surf.detectAndCompute(image, None)
+        queryFeature = []
+        #label = []
+        keypoint, features = surf.detectAndCompute(image, None)
+
+        if features == None or len(features) == 0:
             return -1
-    
+
+        for feature in features:
+            queryFeature.append(map(float,feature))
+
         weightSum = [0.0 for i in self.categorySet]
         for aFeature in queryFeature:
             weight = self.predictFeature(aFeature)

@@ -96,3 +96,4 @@ for k, col in zip(unique_labels, colors):
 
 pl.title('Estimated number of clusters: %d' % n_clusters_)
 pl.show()
+

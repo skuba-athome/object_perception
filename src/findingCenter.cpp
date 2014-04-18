@@ -421,10 +421,13 @@ void getObjectPoint(){
 
 
         char picturePath[100];
+        char featurePath[100];
         sprintf(picturePath,"/run/shm/object_perception/picture%d.png",j);
+        sprintf(featurePath,"/run/shm/object_perception/feature%d",j);
 		std::stringstream sf;
 		//sf << "/run/shm/object_perception/feature" << j;
 		sf << "/run/shm/object_perception/picture" << j << ".png";
+		//fileName.push_back(featurePath);
 		fileName.push_back(picturePath);
 		//printf("fileName = %s\n",fileName[j].c_str());
 		//have to change to centroid, now it's the center of object in 2d domain
@@ -489,14 +492,14 @@ void getObjectPoint(){
 
 		objectContainer.isMove = false;
 		for(int k=0;k<j;k++){
-			//classifySrv.request.filepath = fileName[k];
-			verifySrv.request.objectPictureFilePath = fileName[k];
+			classifySrv.request.filepath = fileName[k];
+			//verifySrv.request.objectPictureFilePath = fileName[k];
 			cout << "path : " << fileName[k] << endl;
 
-			//if(classifyClient.call(classifySrv)){
-			if(verifyClient.call(verifySrv)){
-				//cout << "response from server : " << classifySrv.response.objectIndex << endl;
-				cout << "response from server : " << verifySrv.response.objectName << endl;
+			if(classifyClient.call(classifySrv)){
+			//if(verifyClient.call(verifySrv)){
+				cout << "response from server : " << classifySrv.response.objectIndex << endl;
+				//cout << "response from server : " << verifySrv.response.objectName << endl;
 
 				cout << "position of centroid : " << objectCentroidWorld[k][0] << " " << objectCentroidWorld[k][1] << " " <<objectCentroidWorld[k][2] << " " <<endl;
 				object_perception::Object object;
