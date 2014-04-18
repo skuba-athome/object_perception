@@ -98,3 +98,4 @@ if __name__ == '__main__':
         objectRecognition()
     except rospy.ROSInterruptException:
         rospy.logerror('Error ROS')
+
