@@ -10,6 +10,6 @@ CMakeFiles
 *.svn*
 msg_gen
 srv_gen
-src/object_perception/*
+object_recognition/src/object_recognition/*
 .idea
 tmp
