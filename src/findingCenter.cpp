@@ -37,7 +37,7 @@ using namespace std;
 
 //#define DEPTH_LIMIT 0.86
 #define DEPTH_LIMIT 1.25
-#define ACCEPTED_AREA 200
+#define ACCEPTED_AREA 500
 //#define PLANE_HEIGHT -1.5
 #define PLANE_HEIGHT 0.75
 #define PLANE_LEFT -0.35
@@ -45,20 +45,55 @@ using namespace std;
 //IR 580
 //RGB 525
 #define FOCAL_LENGTH 525
-#define CENTER_IMAGE_X 320
-#define CENTER_IMAGE_Y 240
-#define TUNED_H_DISTANCE_TOP_LEFT 10
-#define TUNED_H_DISTANCE_BOTTOM_RIGHT 10
-#define TUNED_V_DISTANCE_TOP_LEFT 5
-#define TUNED_V_DISTANCE_BOTTOM_RIGHT 40
-#define ARM_RAIDUS 1.15
+//#define FOCAL_LENGTH_X 814.033512
+//#define FOCAL_LENGTH_Y 815.46674
+//
+
+
+
+//for webcam resolution 640x480
+//#define CENTER_IMAGE_X 313.73619
+//#define CENTER_IMAGE_Y 254.26251
+
+#define CENTER_IMAGE_X 618.86076
+#define CENTER_IMAGE_Y 354.19705
+
+
+//#define TUNED_H_DISTANCE_TOP_LEFT 10
+//#define TUNED_H_DISTANCE_BOTTOM_RIGHT 10
+//#define TUNED_V_DISTANCE_TOP_LEFT 5
+//#define TUNED_V_DISTANCE_BOTTOM_RIGHT 40
+
+//#define TUNED_H_DISTANCE_TOP_LEFT -30
+//#define TUNED_H_DISTANCE_BOTTOM_RIGHT 35
+//#define TUNED_V_DISTANCE_TOP_LEFT 35
+//#define TUNED_V_DISTANCE_BOTTOM_RIGHT 80
+
+
+
+//#define TUNED_H_DISTANCE_TOP_LEFT 0
+//#define TUNED_H_DISTANCE_BOTTOM_RIGHT 0
+//#define TUNED_V_DISTANCE_TOP_LEFT 0
+//#define TUNED_V_DISTANCE_BOTTOM_RIGHT 0
+//#define ARM_RAIDUS 1.1
+
+
+double FOCAL_LENGTH_X;
+double FOCAL_LENGTH_Y;
+double TUNED_H_DISTANCE_TOP_LEFT;
+double TUNED_H_DISTANCE_BOTTOM_RIGHT;
+double TUNED_V_DISTANCE_TOP_LEFT;
+double TUNED_V_DISTANCE_BOTTOM_RIGHT;
+double ARM_RAIDUS;
+
+
+
 int maxArea=0;
 float pixel_x,pixel_y;
 float pos_x,pos_y,pos_z;
-cv::Mat img;
+cv::Mat img,img_;
 float object_position_world[20][3];
 bool isReach[20];
-vector<std::string> fileName;
 float objectCentroidWorld[20][3];
 bool isObjectManipulable[20];
 
@@ -66,6 +101,7 @@ bool isObjectManipulable[20];
 std::string frameId;
 std::string robot_frame = "base_link";
 std::string pan_frame = "pan_link";
+std::string logitech_frame = "logitech_cam";
 
 std::string category;
 //std::string robot_frame = "/base_link";
@@ -110,19 +146,26 @@ bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* object
 		
 		geometry_msgs::PointStamped kinect_point;
 		geometry_msgs::PointStamped base_point;
+		geometry_msgs::PointStamped logitech_point;
 //		geometry_msgs::Point point;
 //		std_msgs::Header header;
 
-		kinect_point.header.frame_id = "camera_rgb_optical_frame";
-		kinect_point.header.stamp = timeStamp_;
-		kinect_point.point.x = x;
-		kinect_point.point.y = y;
-		kinect_point.point.z = z;
+		//kinect_point.header.frame_id = "camera_rgb_optical_frame";
+		//kinect_point.header.stamp = timeStamp_;
+		//kinect_point.point.x = x;
+		//kinect_point.point.y = y;
+		//kinect_point.point.z = z;
+        
+		logitech_point.header.frame_id = logitech_frame;
+		logitech_point.header.stamp = timeStamp_;
+		logitech_point.point.x = x;
+		logitech_point.point.y = y;
+		logitech_point.point.z = z;
 
 		//cout << "robot_frame = " << robot_frame << ", frameId = " << frameId << endl;
 		//listener->transformPoint(robot_frame,ros::Time::now(),kinect_point,pan_frame, base_point);
-		listener->transformPoint(robot_frame,kinect_point,base_point);
-
+		//listener->transformPoint(robot_frame,kinect_point,base_point);
+		listener->transformPoint(robot_frame,logitech_point,base_point);
 
 		cout << "returned pointStamped from transformPoint function : (" << base_point.point.x << "," << base_point.point.y << "," << base_point.point.z << ")" <<endl;
 
@@ -164,12 +207,22 @@ bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* object
 
 
 void depthCB(const sensor_msgs::PointCloud2& cloud) {
+
+    pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
+    //PointCloudT::Ptr cloud_tmp (new PointCloudT);
+
 	if ((cloud.width * cloud.height) == 0)
 		return; //return if the cloud is not dense!
 	try {
-		frameId = cloud.header.frame_id;
+		//frameId = cloud.header.frame_id;
         timeStamp = cloud.header.stamp;
-		pcl17::fromROSMsg(cloud, *cloud_pcl);
+		//pcl17::fromROSMsg(cloud, *cloud_pcl);
+		pcl17::fromROSMsg(cloud, *cloud_tmp);
+
+	  	listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
+	  	pcl17_ros::transformPointCloud(logitech_frame, *cloud_tmp, *cloud_pcl, *listener);
+
+
 		//ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
 	//	cout << "point cloud get" << endl;
 	} catch (std::runtime_error e) {
@@ -184,10 +237,11 @@ void getObjectPoint(){
 	//pcl17::PCDReader reader;
 	//reader.read ("1389374538.210053381.pcd", *cloud);
 	
-	int reachableCount=0;
+	int reachableCount=0,objectNumber=0;
 	std::stringstream center_ss;
 	cloud = cloud_pcl;
 
+    vector<std::string> fileName;
 	vector<int> compression_params; //vector that stores the compression parameters of the image
 
 	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION); //specify the compression technique
@@ -200,6 +254,8 @@ void getObjectPoint(){
 	   //pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>);
 	   
 	//std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
+    //
+    ROS_INFO("Get PointCloud size : %d",cloud->width*cloud->height);
 	pcl17::PCDWriter writer;
 	writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/first.pcd", *cloud, false); 
 
@@ -318,7 +374,16 @@ void getObjectPoint(){
 	for (std::vector<pcl17::PointIndices>::const_iterator it = cluster_indices.begin(); it != cluster_indices.end(); ++it)
 	{	
 		float x=0,y=0,z=0;
-		float pixel_x_max = 0, pixel_y_max = 0, pixel_x_min = 640, pixel_y_min = 480;
+		float pixel_x_max = 0, pixel_y_max = 0, pixel_x_min = 1280, pixel_y_min = 720;
+        //for webcam resolution 640x480
+		//float pixel_x_max_ = 0, pixel_y_max_ = 0, pixel_x_min_ = 640, pixel_y_min_ = 480;
+        //
+        //float depthX=0,depthY=0,depthZ=0;
+
+        char pixelFileName[100];
+        sprintf(pixelFileName,"/run/shm/object_perception/file_pixel%d",objectNumber);
+        cout << "-----------------------------------"<< pixelFileName << endl;
+        FILE* fp = fopen(pixelFileName,"w");
 
 		pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_cluster (new pcl17::PointCloud<pcl17::PointXYZ>);
 		for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++){
@@ -328,20 +393,49 @@ void getObjectPoint(){
 			y += cloud_filtered->points[*pit].y;
 			z += cloud_filtered->points[*pit].z;
 
-			tmpX = cloud_filtered->points[*pit].x*FOCAL_LENGTH/cloud_filtered->points[*pit].z + CENTER_IMAGE_X;
-			tmpY = cloud_filtered->points[*pit].y*FOCAL_LENGTH/cloud_filtered->points[*pit].z + CENTER_IMAGE_Y;
+			//tmpX = cloud_filtered->points[*pit].x*FOCAL_LENGTH_X/cloud_filtered->points[*pit].z + CENTER_IMAGE_X;
+			//tmpY = cloud_filtered->points[*pit].y*FOCAL_LENGTH_Y/cloud_filtered->points[*pit].z + CENTER_IMAGE_Y;
+
+
+			tmpX = cloud_filtered->points[*pit].x*FOCAL_LENGTH_X/cloud_filtered->points[*pit].z + CENTER_IMAGE_X + (-100);// + (-5);
+			tmpY = cloud_filtered->points[*pit].y*FOCAL_LENGTH_Y/cloud_filtered->points[*pit].z + CENTER_IMAGE_Y;// + 20;
 
 			if(tmpX > pixel_x_max) pixel_x_max = tmpX;
 			if(tmpY > pixel_y_max) pixel_y_max = tmpY;
 			if(tmpX < pixel_x_min) pixel_x_min = tmpX;
 			if(tmpY < pixel_y_min) pixel_y_min = tmpY;
 
+            char pixelValue[100];
+            sprintf(pixelValue,"(%f,%f,%f)  (%f,%f)\n",cloud_filtered->points[*pit].x,cloud_filtered->points[*pit].y,cloud_filtered->points[*pit].z,tmpX,tmpY);
+            fputs (pixelValue,fp);
+
+            //--------------------------------------------------------test--------------------------------------
+//			tmpX = cloud_filtered->points[*pit].x*FOCAL_LENGTH_X/cloud_filtered->points[*pit].z + CENTER_IMAGE_X_;
+//			tmpY = cloud_filtered->points[*pit].y*FOCAL_LENGTH_Y/cloud_filtered->points[*pit].z + CENTER_IMAGE_Y_;
+//
+//			if(tmpX > pixel_x_max_) pixel_x_max_ = tmpX;
+//			if(tmpY > pixel_y_max_) pixel_y_max_ = tmpY;
+//			if(tmpX < pixel_x_min_) pixel_x_min_ = tmpX;
+//			if(tmpY < pixel_y_min_) pixel_y_min_ = tmpY;
+
+
 		}
+
+
+
+        fclose (fp);
 
 		pixel_x_min = pixel_x_min > 0 ? pixel_x_min : 0;
 		pixel_y_min = pixel_y_min > 0 ? pixel_y_min : 0;
-		pixel_x_max = pixel_x_max < 2*CENTER_IMAGE_X ? pixel_x_max : 2*CENTER_IMAGE_X;
-		pixel_y_max = pixel_y_max < 2*CENTER_IMAGE_Y ? pixel_y_max : 2*CENTER_IMAGE_Y;
+		pixel_x_max = pixel_x_max < 1280 ? pixel_x_max : 1280;
+        //for webcam resolution 640x480
+		//pixel_x_max = pixel_x_max < 640 ? pixel_x_max : 640;
+		//pixel_y_max = pixel_y_max < 2*CENTER_IMAGE_Y ? pixel_y_max : 2*CENTER_IMAGE_Y;
+		pixel_y_max = pixel_y_max < 720 ? pixel_y_max : 720;
+
+
+
+        cout << "value of the cropped conner" << '(' << pixel_x_min << ',' << pixel_y_min << ") (" << pixel_x_max << ',' << pixel_y_max << ')' << endl;
 
 		int size = std::distance(it->indices.begin(), it->indices.end());
 		x/=size;
@@ -349,8 +443,8 @@ void getObjectPoint(){
 		z/=size;
 
 
-		if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT)
-			continue;
+//		if(z > DEPTH_LIMIT || x < PLANE_LEFT || x > PLANE_RIGHT)
+//			continue;
 
 		float objectWorldX,objectWorldY,objectWorldZ;
 
@@ -370,42 +464,102 @@ void getObjectPoint(){
 //		else
 			//category = "object/";
 
-		pixel_x = x*FOCAL_LENGTH/z + CENTER_IMAGE_X;
-		pixel_y = y*FOCAL_LENGTH/z + CENTER_IMAGE_Y;
+		//pixel_x = x*FOCAL_LENGTH/z + CENTER_IMAGE_X;
+		//pixel_y = y*FOCAL_LENGTH/z + CENTER_IMAGE_Y;
+
+		pixel_x = x*FOCAL_LENGTH_X/z + CENTER_IMAGE_X;// + (-0.5);
+		pixel_y = y*FOCAL_LENGTH_Y/z + CENTER_IMAGE_Y;// + 20;
 
 		center_ss << pixel_x << " " << pixel_y << " ";
 
 		cv::Mat m = img.clone();
+		//cv::Mat m_ = img_.clone();
 		IplImage* iplImage = new IplImage(m);
+
+		//IplImage* iplImage_ = new IplImage(m_);
 		//IplImage* iplImage = new IplImage(m);
 		//img.copyTo(iplImage);
 		//iplImage = cvCreateImage(cvGetSize(img), IPL_DEPTH_8U, 3); 
 		//iplImage = 
 
 
+        cout << "image height : " << iplImage->height << "image width : " << iplImage->width << endl;
+
+        if(pixel_x_max <= 0 || pixel_x_min >= 1280 || pixel_y_max <= 0 || pixel_y_min >= 720)
+            continue;
+
+        int width_,height_;
+
+        //for webcam resolution 640x480
+        //if(pixel_x_max+TUNED_H_DISTANCE_BOTTOM_RIGHT <= 640 )
+        if(pixel_x_max+TUNED_H_DISTANCE_BOTTOM_RIGHT <= 1280 )
+            //width_ = (bottom_x+tune) - (top_x+tune) 
+            width_ = (pixel_x_max+TUNED_H_DISTANCE_BOTTOM_RIGHT)-(pixel_x_min+TUNED_H_DISTANCE_TOP_LEFT);
+        else
+            width_ = max((double)(1280) -pixel_x_min,(double)0);
+            //width_ = max((double)(640) -pixel_x_min,(double)0);
+        
+        if(pixel_y_max+TUNED_V_DISTANCE_BOTTOM_RIGHT <= 720 )
+        //if(pixel_y_max+TUNED_V_DISTANCE_BOTTOM_RIGHT <= 480 )
+            //height = (bottom_y+tune) - (top_y+tune)
+            height_ = (pixel_y_max+TUNED_V_DISTANCE_BOTTOM_RIGHT)-(pixel_y_min+TUNED_V_DISTANCE_TOP_LEFT);
+        else
+            height_ = max((double)(720) - pixel_y_min,(double)0);
+            //height_ = max((double)(480) - pixel_y_min,(double)0);
+
+        
+
+        //int width_ = pixel_x_max+TUNED_H_DISTANCE_BOTTOM_RIGHT < 480  ? (double)pixel_x_max-pixel_x_min+TUNED_H_DISTANCE_BOTTOM_RIGHT : max((double)(2.0*CENTER_IMAGE_X) -pixel_x_min,(double)0);
+        //int height_ = pixel_y_max+TUNED_V_DISTANCE_BOTTOM_RIGHT < 480 ? (double)pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT : max((double)(480) - (TUNED_V_DISTANCE_BOTTOM_RIGHT+pixel_y_max),(double)0);
+        //int height_ = pixel_y_max+TUNED_V_DISTANCE_BOTTOM_RIGHT < 480 ? (double)pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT : max((double)(480) - pixel_y_min,(double)0);
+        //int height_ = pixel_y_max+TUNED_V_DISTANCE_BOTTOM_RIGHT < 2.0*CENTER_IMAGE_Y ? (float)pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT : max((float)(2.0*CENTER_IMAGE_Y) - (TUNED_V_DISTANCE_BOTTOM_RIGHT+pixel_y_max),(float)0);
+
+        cout << "width : "<< width_<<  "height : " << height_ << endl;
+
+
+        if(width_<=0 || height_ <=0)
+            continue;
+
+
 //use thie one
-		//printf("pixel_x_min : %f, pixel_y_min : %f, pixel_x_max : %f, pixel_y_max : %f\n",pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max);
+		printf("topleft_x : %f, topleft_y : %f, width : %f, height : %f\n",pixel_x_min,pixel_y_min, 
+                                                                          pixel_x_max+TUNED_H_DISTANCE_BOTTOM_RIGHT < (float)(2.0*CENTER_IMAGE_X) ? (float)pixel_x_max-pixel_x_min+TUNED_H_DISTANCE_BOTTOM_RIGHT : (float)(2.0*CENTER_IMAGE_X) - (TUNED_H_DISTANCE_BOTTOM_RIGHT+pixel_x_max),
+                                                                          pixel_y_max+TUNED_V_DISTANCE_BOTTOM_RIGHT < (float)(720) ? (float)pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT : (float)(720) - (TUNED_V_DISTANCE_BOTTOM_RIGHT+pixel_y_max));
+                                                                          //pixel_y_max+TUNED_V_DISTANCE_BOTTOM_RIGHT < (float)(2.0*CENTER_IMAGE_Y) ? (float)pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT : (float)(2.0*CENTER_IMAGE_Y) - (TUNED_V_DISTANCE_BOTTOM_RIGHT+pixel_y_max));
 		//printf("top left : (%f,%f)\n",max(pixel_x_min-TUNED_H_DISTANCE_TOP_LEFT,(float)0),max(pixel_y_min+TUNED_V_DISTANCE_TOP_LEFT,(float)0));
 		//printf("bottom right : (%f,%f)\n",min(pixel_x_max-pixel_x_min+TUNED_H_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_X)),min(pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_Y)));
 		//ROS_INFO("write picture.%d with (%f,%f,%f,%f) iplimage->size() : %d img.size() : %d",j,pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max,iplImage->width*iplImage->height,img.rows*img.cols);
 
-		cvSetImageROI(iplImage,cv::Rect(max(pixel_x_min-TUNED_H_DISTANCE_TOP_LEFT,(float)0),
-										max(pixel_y_min+TUNED_V_DISTANCE_TOP_LEFT,(float)0),
-										min(pixel_x_max-pixel_x_min+TUNED_H_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_X)),
-										min(pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_Y))));
+		cvSetImageROI(iplImage,cv::Rect(max(pixel_x_min+TUNED_H_DISTANCE_TOP_LEFT,(double)0),
+										max(pixel_y_min+TUNED_V_DISTANCE_TOP_LEFT,(double)0),
+                                        width_,
+                                        height_));
+                                        //pixel_x_max+TUNED_H_DISTANCE_BOTTOM_RIGHT < (double)(2.0*CENTER_IMAGE_X) ? pixel_x_max-pixel_x_min+TUNED_H_DISTANCE_BOTTOM_RIGHT : (double)(2.0*CENTER_IMAGE_X) - (TUNED_H_DISTANCE_BOTTOM_RIGHT+pixel_x_max),
+                                        //pixel_y_max+TUNED_V_DISTANCE_BOTTOM_RIGHT < (double)(480) ? pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT : (double)(480) - (TUNED_V_DISTANCE_BOTTOM_RIGHT+pixel_y_max))); 
+                                        //pixel_y_max+TUNED_V_DISTANCE_BOTTOM_RIGHT < (float)(2.0*CENTER_IMAGE_Y) ? pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT : (float)(2.0*CENTER_IMAGE_Y) - (TUNED_V_DISTANCE_BOTTOM_RIGHT+pixel_y_max))); 
 
+//										min(pixel_x_max-pixel_x_min+TUNED_H_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_X)),
+//										min(pixel_y_max-pixel_y_min+TUNED_V_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_Y))));
 
+//
+//		cvSetImageROI(iplImage_,cv::Rect(max(pixel_x_min_-TUNED_H_DISTANCE_TOP_LEFT,(float)0),
+//										max(pixel_y_min_+TUNED_V_DISTANCE_TOP_LEFT,(float)0),
+//										min(pixel_x_max_-pixel_x_min_+TUNED_H_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_X)),
+//										min(pixel_y_max_-pixel_y_min_+TUNED_V_DISTANCE_BOTTOM_RIGHT,(float)(2.0*CENTER_IMAGE_Y))));
+//
 
-		std::stringstream ss_;
+		std::stringstream ss_,ss_2;
 		std::stringstream ss_category_;
 
 //use this one
-		ss_<< "/run/shm/object_perception/picture" << j << ".png";
+		ss_<< "/run/shm/object_perception/picture" << objectNumber << ".png";
+		ss_2<< "/run/shm/object_perception/kinect_picture_" << objectNumber << ".png";
 //use this one
 		bool bSuccess = imwrite(ss_.str(), cv::Mat(iplImage), compression_params); //write the image to file
 
-		ss_category_ << "/run/shm/object_perception/" << category.c_str() << "picture" << j << ".png";
+		ss_category_ << "/run/shm/object_perception/" << category.c_str() << "picture" << objectNumber << ".png";
 		bSuccess = imwrite(ss_category_.str(), cv::Mat(iplImage), compression_params); //write the image to file
+		//bSuccess = imwrite(ss_2.str(), cv::Mat(img_), compression_params); //write the image to file
 
 
 
@@ -422,13 +576,15 @@ void getObjectPoint(){
 
         char picturePath[100];
         char featurePath[100];
-        sprintf(picturePath,"/run/shm/object_perception/picture%d.png",j);
-        sprintf(featurePath,"/run/shm/object_perception/feature%d",j);
+        sprintf(picturePath,"/run/shm/object_perception/picture%d.png",objectNumber);
+        sprintf(featurePath,"/run/shm/object_perception/feature%d",objectNumber);
 		std::stringstream sf;
 		//sf << "/run/shm/object_perception/feature" << j;
 		sf << "/run/shm/object_perception/picture" << j << ".png";
 		//fileName.push_back(featurePath);
+        
 		fileName.push_back(picturePath);
+
 		//printf("fileName = %s\n",fileName[j].c_str());
 		//have to change to centroid, now it's the center of object in 2d domain
 		//objectCentroidWorld[j][0] = pixel_x;
@@ -465,15 +621,17 @@ void getObjectPoint(){
 		cloud_cluster->height = 1;
 		cloud_cluster->is_dense = true;
 
-		//std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
 		std::stringstream ss;
-		ss << "/run/shm/object_perception/cloud_cluster_" << j << ".pcd";
+		ss << "/run/shm/object_perception/cloud_cluster_" << objectNumber << ".pcd";
+		writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
+        objectNumber++;
+		//std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
 
 //		std::stringstream ss_category;
 //		ss_category << "/run/shm/object_perception/" << category.c_str() << "cloud_cluster_" << j << ".pcd";
 
 //------------------------------------cloud_cluster -------------------------
-		writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
+//
 		//writer.write<pcl17::PointXYZ> (ss_category.str (), *cloud_cluster, false); 
 		j++;
 	}
@@ -491,14 +649,14 @@ void getObjectPoint(){
 	else{
 
 		objectContainer.isMove = false;
-		for(int k=0;k<j;k++){
+		for(int k=0;k<objectNumber;k++){
 			classifySrv.request.filepath = fileName[k];
 			//verifySrv.request.objectPictureFilePath = fileName[k];
 			cout << "path : " << fileName[k] << endl;
 
 			if(classifyClient.call(classifySrv)){
 			//if(verifyClient.call(verifySrv)){
-				cout << "response from server : " << classifySrv.response.objectIndex << endl;
+			    cout << "response from server : " << classifySrv.response.objectCategory << endl;
 				//cout << "response from server : " << verifySrv.response.objectName << endl;
 
 				cout << "position of centroid : " << objectCentroidWorld[k][0] << " " << objectCentroidWorld[k][1] << " " <<objectCentroidWorld[k][2] << " " <<endl;
@@ -506,7 +664,7 @@ void getObjectPoint(){
 				object.point.x = objectCentroidWorld[k][0];
 				object.point.y = objectCentroidWorld[k][1];
 				object.point.z = objectCentroidWorld[k][2];
-				//object.category = classifySrv.response.objectIndex;
+				object.category = classifySrv.response.objectCategory;
 				//object.category = verifySrv.response.objectName;
 				object.isManipulable = isObjectManipulable[k];
 				objectContainer.objects.push_back(object);
@@ -514,6 +672,8 @@ void getObjectPoint(){
 			else{
 				cout << "no response from server" << endl;
 			}
+
+            //fileName.clear();
 			/*
 			if(classifyClient.call(classifySrv)){
 				cout << "response from server : " << classifySrv.response.objectIndex << endl;
@@ -600,6 +760,9 @@ void imageColorCb(const sensor_msgs::ImageConstPtr& msg)
 	{
 		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 		img = cv_ptr->image;
+        cv::namedWindow("window", 1);
+		cv::imshow("window",img);
+		cv::waitKey(3);
 		//ROS_INFO("Get image size : %d",img.rows*img.cols);
 	}
 	catch (cv_bridge::Exception& e)
@@ -608,6 +771,7 @@ void imageColorCb(const sensor_msgs::ImageConstPtr& msg)
 		return;
 	}
 }
+
 
 
 int main (int argc, char** argv)
@@ -619,13 +783,35 @@ int main (int argc, char** argv)
 	image_transport::ImageTransport it_(nh);
 	image_transport::Subscriber sub_imageColor;
 
+    //for webcam resolution 640x480
+    //nh.param("FOCAL_LENGTH_X", FOCAL_LENGTH_X, 814.033512);
+    //nh.param("FOCAL_LENGTH_Y", FOCAL_LENGTH_Y, 815.46674);
+
+    //for webcam resolution 1280x720
+    nh.param("FOCAL_LENGTH_X", FOCAL_LENGTH_X, 1416.07692);
+    nh.param("FOCAL_LENGTH_Y", FOCAL_LENGTH_Y, 1420.90281);
+
+
+    nh.param("TUNED_H_DISTANCE_TOP_LEFT", TUNED_H_DISTANCE_TOP_LEFT,0.0);
+    nh.param("TUNED_V_DISTANCE_TOP_LEFT", TUNED_V_DISTANCE_TOP_LEFT,0.0);
+    nh.param("TUNED_H_DISTANCE_BOTTOM_RIGHT", TUNED_H_DISTANCE_BOTTOM_RIGHT,0.0);
+    nh.param("TUNED_V_DISTANCE_BOTTOM_RIGHT", TUNED_V_DISTANCE_BOTTOM_RIGHT,0.0);
+    nh.param("ARM_RAIDUS", ARM_RAIDUS,1.1);
+
+    cout << "FOCAL_LENGTH_X " <<  FOCAL_LENGTH_X << " FOCAL_LENGTH_Y " << FOCAL_LENGTH_Y << endl;
+    cout << "TUNED_H_DISTANCE_TOP_LEFT " <<  TUNED_H_DISTANCE_TOP_LEFT << " TUNED_V_DISTANCE_TOP_LEFT " << TUNED_V_DISTANCE_TOP_LEFT << endl;
+    cout << "TUNED_H_DISTANCE_BOTTOM_RIGHT " <<  TUNED_H_DISTANCE_BOTTOM_RIGHT << " TUNED_V_DISTANCE_BOTTOM_RIGHT" << TUNED_V_DISTANCE_BOTTOM_RIGHT << endl;
+    cout << "ARM_RAIDUS " << ARM_RAIDUS << endl;
+
+
+
 	pubObjectNum = n.advertise<std_msgs::String>("object_number", 1000);
 	center_pub = n.advertise<std_msgs::String>("center_pcl_object", 1000);
 	pub_detectedObject = n.advertise<object_perception::ObjectContainer>("/detected_object", 1000);
-	ros::Subscriber sub = n.subscribe("/camera/depth_registered/points",1,depthCB);
-	//ros::Subscriber sub = n.subscribe("/camera/depth/points",1,depthCB);
+//	ros::Subscriber sub = n.subscribe("/camera/depth_registered/points",1,depthCB);
+	ros::Subscriber sub = n.subscribe("/camera/depth/points",1,depthCB);
 	ros::Subscriber sub_ = n.subscribe("localization",1,localizeCb);
-	sub_imageColor = it_.subscribe("/camera/rgb/image_color", 1, imageColorCb);
+	sub_imageColor = it_.subscribe("/logitech_cam/image_raw", 1, imageColorCb);
 
 	
 	verifyClient = n.serviceClient<object_perception::verifyObject>("verifyObject");

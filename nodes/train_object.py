@@ -146,8 +146,8 @@ if __name__ == '__main__':
 
     #params = dict(kernel_type = cv2.SVM_RBF, svm_type = cv2.SVM_C_SVC, C = svm_c, gamma = svm_gamma)
     #params = dict(kernel_type = cv2.SVM_RBF, svm_type = cv2.SVM_C_SVC)
-    params = dict(kernel_type = cv2.SVM_LINEAR, svm_type = cv2.SVM_C_SVC)
-    #params = dict(kernel_type = cv2.SVM_POLY, svm_type = cv2.SVM_C_SVC, degree=2)
+    #params = dict(kernel_type = cv2.SVM_LINEAR, svm_type = cv2.SVM_C_SVC)
+    params = dict(kernel_type = cv2.SVM_POLY, svm_type = cv2.SVM_C_SVC, degree=2)
 
 
     # create histogram train data

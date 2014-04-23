@@ -3,8 +3,8 @@ import random
 from subprocess import call
 import sys
 
-#startPath = "PicCut/"
-startPath = "/home/skuba/new_data/"
+startPath = "PicCut/"
+#startPath = "/home/skuba/new_data/"
 prefixFolder = "LocalizationTrain/"
 
 if not os.path.exists(prefixFolder):
@@ -28,7 +28,8 @@ for folder in os.listdir(startPath):
             print picture
             filePath = startPath + folder + "/" + picture
             surfPath,extension = os.path.splitext(filePath)
-            Picture[objectIndex-1].append((surfPath+".txt",objectIndex))
+            #Picture[objectIndex-1].append((surfPath+".txt",objectIndex))
+            Picture[objectIndex-1].append((surfPath+".txt",folder))
             #Picture.append((surfPath+".txt",objectIndex))
             print filePath," ",surfPath
             call(["./extractSURF",filePath,surfPath+".txt"])
