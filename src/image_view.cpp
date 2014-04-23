@@ -62,7 +62,8 @@ int main(int argc, char** argv)
 
 	image_transport::ImageTransport it_(nh);
 	image_transport::Subscriber sub_imageColor;
-	sub_imageColor = it_.subscribe("/camera/rgb/image_color", 1, imageColorCb);
+	//sub_imageColor = it_.subscribe("/camera/rgb/image_color", 1, imageColorCb);
+	sub_imageColor = it_.subscribe("/logitech_cam/image_raw", 1, imageColorCb);
 	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION); //specify the compression technique
 	compression_params.push_back(9);//specify the compression quality
 

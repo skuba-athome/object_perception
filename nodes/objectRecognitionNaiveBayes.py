@@ -68,8 +68,9 @@ class objectRecognition:
         self.recognitionResult.publish(String(self.revertCategory[category]))
     
     def classifyObjectService(self,req):
+        print "incoming input :",req.filepath
         category = self.predictObject(req.filepath)
-        return classifyObjectResponse(category)
+        return classifyObjectResponse(str(self.revertCategory[category]))
     
     def predictObject(self,featureFileName):
         #queryFeature,label = self.loadFeature(featureFileName,'-1')
@@ -80,6 +81,8 @@ class objectRecognition:
         queryFeature = []
         #label = []
         keypoint, features = surf.detectAndCompute(image, None)
+
+        print len(keypoint)
 
         if features == None or len(features) == 0:
             return -1
@@ -92,6 +95,11 @@ class objectRecognition:
             weight = self.predictFeature(aFeature)
             weightSum = map(add, weight, weightSum)
             
+        #print min(weightSum)
+
+        sortedWeightSum = sorted(weightSum)
+        print "filename :",featureFileName , "with difference :",str(sortedWeightSum[0]-sortedWeightSum[1])
+
         return int(weightSum.index(min(weightSum)))
     
     def predictFeature(self,feature):

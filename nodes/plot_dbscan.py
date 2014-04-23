@@ -16,7 +16,8 @@ import numpy
 surf = cv2.SURF(400)
 feature_directory = "/run/shm/feature"
 #object_name = "pringles/"
-directory = "/home/skuba/skuba_athome/object_perception/data/"
+#directory = "/home/skuba/skuba_athome/object_perception/data/"
+directory = "/home/skuba/skuba_athome/object_perception/learn/PicCut/"
 centers =[]
 for folder_name in os.listdir(directory):#+object_name):
 #    for file_name in os.listdir(directory+folder_name+'/train/'):
@@ -27,8 +28,8 @@ for folder_name in os.listdir(directory):#+object_name):
 #            image = cv2.imread(directory+folder_name+'/train/'+file_name, 0)
 
     for file_name in os.listdir(directory+folder_name):
-        print directory+folder_name+file_name
         if file_name.endswith(".jpg") or file_name.endswith(".png"):
+            print directory+folder_name+file_name
             #print  directory+folder_name+file_name
             print directory+folder_name+'/'+file_name
             image = cv2.imread(directory+folder_name+'/'+file_name, 0)

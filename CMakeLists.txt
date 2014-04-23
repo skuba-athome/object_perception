@@ -105,6 +105,7 @@ include_directories("/usr/include/openmpi")
 #
 
 
+rosbuild_add_executable(tune_cropped src/tune_cropped.cpp)
 
 rosbuild_add_executable(findingCenter src/findingCenter.cpp)
 rosbuild_add_boost_directories()
