@@ -1,12 +1,12 @@
 #!/usr/bin/python
 from sklearn import neighbors, datasets
 import roslib
-roslib.load_manifest('object_perception')
+roslib.load_manifest('object_recognition')
 import rospy
 import cv2
 
 from std_msgs.msg import String
-from object_perception.srv import *
+from object_recognition.srv import *
 from operator import add
 
 
@@ -19,7 +19,7 @@ class objectRecognition:
         rospy.Subscriber("featureFilePath",String,self.classifyObjectHandle)
         self.recognitionResult = rospy.Publisher('recognitionResult',String) 
         
-        learningListFile = "/home/skuba/skuba_athome/object_perception/learn/LocalizationTrain/15.train"
+        learningListFile = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/LocalizationTrain/15.train"
         feature,self.labels = self.loadTrainData(learningListFile)
         K_neighbors = int(rospy.get_param('~k_neighbors', 35))
         self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
@@ -69,8 +69,8 @@ class objectRecognition:
     
     def classifyObjectService(self,req):
         print "incoming input :",req.filepath
-        category = self.predictObject(req.filepath)
-        return classifyObjectResponse(str(self.revertCategory[category]))
+        category,confident = self.predictObject(req.filepath)
+        return classifyObjectResponse(str(self.revertCategory[category]),confident)
     
     def predictObject(self,featureFileName):
         #queryFeature,label = self.loadFeature(featureFileName,'-1')
@@ -100,7 +100,7 @@ class objectRecognition:
         sortedWeightSum = sorted(weightSum)
         print "filename :",featureFileName , "with difference :",str(sortedWeightSum[0]-sortedWeightSum[1])
 
-        return int(weightSum.index(min(weightSum)))
+        return int(weightSum.index(min(weightSum))), (sortedWeightSum[0]-sortedWeightSum[1])
     
     def predictFeature(self,feature):
         classSet = []

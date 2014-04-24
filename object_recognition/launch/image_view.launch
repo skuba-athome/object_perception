@@ -5,6 +5,6 @@
 		<param name="depth_registration" value="true" />
 	</node>
 	
-	<node pkg="object_perception" type="image_view" name="image_view" output="screen"/>
+	<node pkg="object_recognition" type="image_view" name="image_view" output="screen"/>
 
 </launch>

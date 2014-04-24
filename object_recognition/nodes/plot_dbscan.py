@@ -17,7 +17,7 @@ surf = cv2.SURF(400)
 feature_directory = "/run/shm/feature"
 #object_name = "pringles/"
 #directory = "/home/skuba/skuba_athome/object_perception/data/"
-directory = "/home/skuba/skuba_athome/object_perception/learn/PicCut/"
+directory = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/PicCut/"
 centers =[]
 for folder_name in os.listdir(directory):#+object_name):
 #    for file_name in os.listdir(directory+folder_name+'/train/'):
