@@ -1,3 +1,4 @@
 string filepath
 ---
 string objectCategory
+float64 confident

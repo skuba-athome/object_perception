@@ -4,7 +4,7 @@
 #include <vector>
 #include <math.h>
 #include "ros/ros.h"
-#include "object_perception/verifyObject.h"
+#include "object_recognition/verifyObject.h"
 #include "opencv2/core/core.hpp"
 #include "opencv2/nonfree/nonfree.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -86,8 +86,8 @@ int verifyResult(float *predictResult)
     }
 }
 
-bool verifyObjectService(object_perception::verifyObject::Request &req,
-                         object_perception::verifyObject::Response &res)
+bool verifyObjectService(object_recognition::verifyObject::Request &req,
+                         object_recognition::verifyObject::Response &res)
 {
     Mat image = imread(req.objectPictureFilePath, CV_LOAD_IMAGE_GRAYSCALE);
     if(image.empty())

@@ -5,6 +5,6 @@
 		<param name="depth_registration" value="true" />
 	</node>
 	
-	<node pkg="object_perception" type="click_object" name="click_object" output="screen"/>
+	<node pkg="object_recognition" type="click_object" name="click_object" output="screen"/>
 
 </launch>

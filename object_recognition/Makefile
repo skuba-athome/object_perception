@@ -36,10 +36,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/skuba/skuba_athome/object_perception
+CMAKE_SOURCE_DIR = /home/skuba/skuba_athome/object_perception/object_recognition
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/skuba/skuba_athome/object_perception
+CMAKE_BINARY_DIR = /home/skuba/skuba_athome/object_perception/object_recognition
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -66,9 +66,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/skuba/skuba_athome/object_perception/CMakeFiles /home/skuba/skuba_athome/object_perception/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/skuba/skuba_athome/object_perception/object_recognition/CMakeFiles /home/skuba/skuba_athome/object_perception/object_recognition/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/skuba/skuba_athome/object_perception/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/skuba/skuba_athome/object_perception/object_recognition/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -185,6 +185,19 @@ clean-test-results: cmake_check_build_system
 clean-test-results/fast:
 	$(MAKE) -f CMakeFiles/clean-test-results.dir/build.make CMakeFiles/clean-test-results.dir/build
 .PHONY : clean-test-results/fast
+
+#=============================================================================
+# Target rules for targets named click_object
+
+# Build rule for target.
+click_object: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 click_object
+.PHONY : click_object
+
+# fast build rule for target.
+click_object/fast:
+	$(MAKE) -f CMakeFiles/click_object.dir/build.make CMakeFiles/click_object.dir/build
+.PHONY : click_object/fast
 
 #=============================================================================
 # Target rules for targets named drawKeypoints
@@ -421,19 +434,6 @@ tests/fast:
 .PHONY : tests/fast
 
 #=============================================================================
-# Target rules for targets named tune_cropped
-
-# Build rule for target.
-tune_cropped: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 tune_cropped
-.PHONY : tune_cropped
-
-# fast build rule for target.
-tune_cropped/fast:
-	$(MAKE) -f CMakeFiles/tune_cropped.dir/build.make CMakeFiles/tune_cropped.dir/build
-.PHONY : tune_cropped/fast
-
-#=============================================================================
 # Target rules for targets named verify_object_service
 
 # Build rule for target.
@@ -445,6 +445,21 @@ verify_object_service: cmake_check_build_system
 verify_object_service/fast:
 	$(MAKE) -f CMakeFiles/verify_object_service.dir/build.make CMakeFiles/verify_object_service.dir/build
 .PHONY : verify_object_service/fast
+
+# target to build an object file
+src/click_object.o:
+	$(MAKE) -f CMakeFiles/click_object.dir/build.make CMakeFiles/click_object.dir/src/click_object.o
+.PHONY : src/click_object.o
+
+# target to preprocess a source file
+src/click_object.i:
+	$(MAKE) -f CMakeFiles/click_object.dir/build.make CMakeFiles/click_object.dir/src/click_object.i
+.PHONY : src/click_object.i
+
+# target to generate assembly for a file
+src/click_object.s:
+	$(MAKE) -f CMakeFiles/click_object.dir/build.make CMakeFiles/click_object.dir/src/click_object.s
+.PHONY : src/click_object.s
 
 # target to build an object file
 src/drawKeypoints.o:
@@ -537,21 +552,6 @@ src/image_view.s:
 .PHONY : src/image_view.s
 
 # target to build an object file
-src/tune_cropped.o:
-	$(MAKE) -f CMakeFiles/tune_cropped.dir/build.make CMakeFiles/tune_cropped.dir/src/tune_cropped.o
-.PHONY : src/tune_cropped.o
-
-# target to preprocess a source file
-src/tune_cropped.i:
-	$(MAKE) -f CMakeFiles/tune_cropped.dir/build.make CMakeFiles/tune_cropped.dir/src/tune_cropped.i
-.PHONY : src/tune_cropped.i
-
-# target to generate assembly for a file
-src/tune_cropped.s:
-	$(MAKE) -f CMakeFiles/tune_cropped.dir/build.make CMakeFiles/tune_cropped.dir/src/tune_cropped.s
-.PHONY : src/tune_cropped.s
-
-# target to build an object file
 src/verify_object.o:
 	$(MAKE) -f CMakeFiles/verify_object_service.dir/build.make CMakeFiles/verify_object_service.dir/src/verify_object.o
 .PHONY : src/verify_object.o
@@ -579,6 +579,7 @@ help:
 	@echo "... ROSBUILD_gensrv_lisp"
 	@echo "... ROSBUILD_gensrv_py"
 	@echo "... clean-test-results"
+	@echo "... click_object"
 	@echo "... drawKeypoints"
 	@echo "... drawKeypointsAll"
 	@echo "... drawKeypointsArch"
@@ -599,8 +600,10 @@ help:
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tests"
-	@echo "... tune_cropped"
 	@echo "... verify_object_service"
+	@echo "... src/click_object.o"
+	@echo "... src/click_object.i"
+	@echo "... src/click_object.s"
 	@echo "... src/drawKeypoints.o"
 	@echo "... src/drawKeypoints.i"
 	@echo "... src/drawKeypoints.s"
@@ -619,9 +622,6 @@ help:
 	@echo "... src/image_view.o"
 	@echo "... src/image_view.i"
 	@echo "... src/image_view.s"
-	@echo "... src/tune_cropped.o"
-	@echo "... src/tune_cropped.i"
-	@echo "... src/tune_cropped.s"
 	@echo "... src/verify_object.o"
 	@echo "... src/verify_object.i"
 	@echo "... src/verify_object.s"

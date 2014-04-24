@@ -6,8 +6,8 @@ import os
 import numpy
 import time
 
-roslib.load_manifest('object_perception')
-from object_perception.srv import *
+roslib.load_manifest('object_recognition')
+from object_recognition.srv import *
 from std_msgs.msg import String
 
 object_dic = []
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     #rospy.wait_for_service('verifyObject')
 
 #    verify_object = rospy.ServiceProxy('verifyObject', verifyObject)
-#    #object_root_dir = rospy.get_param('~object_directory', roslib.packages.get_pkg_dir('object_perception') + '/data')
+#    #object_root_dir = rospy.get_param('~object_directory', roslib.packages.get_pkg_dir('object_recognition') + '/data')
 #    object_root_dir = rospy.get_param('~object_directory',"/home/skuba/new_data/")
 #    print object_root_dir
 #    object_dic = list_image_in_directory(object_root_dir)
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     for feature in features_files:
         pub.publish(feature)
         print feature
-        time.sleep(2)
+        #time.sleep(2)
     rospy.spin()
 
 #    print object_root_dir

@@ -6,7 +6,7 @@ import cv2
 import os
 import numpy
 
-roslib.load_manifest('object_perception')
+roslib.load_manifest('object_recognition')
 
 surf = cv2.SURF(400)
 feature_directory = "/run/shm/feature"
@@ -112,7 +112,7 @@ def write_svm_config(object_name,svm_model):
 if __name__ == '__main__':
     global kmean_k_cluster
     rospy.init_node('train_object')
-    object_root_dir = rospy.get_param('~object_directory', roslib.packages.get_pkg_dir('object_perception') + '/learn')
+    object_root_dir = rospy.get_param('~object_directory', roslib.packages.get_pkg_dir('object_recognition') + '/learn')
     object_dic = list_image_in_directory(object_root_dir)
 
     print sum([len(object_dic[object_name]) for object_name in object_dic]),"pictures found."

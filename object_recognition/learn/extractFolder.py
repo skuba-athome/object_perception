@@ -3,9 +3,9 @@ import random
 from subprocess import call
 import sys
 
-startPath = "PicCut/"
+startPath = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/PicCut/"
 #startPath = "/home/skuba/new_data/"
-prefixFolder = "LocalizationTrain/"
+prefixFolder = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/LocalizationTrain/"
 
 if not os.path.exists(prefixFolder):
     os.makedirs(prefixFolder)
@@ -32,32 +32,32 @@ for folder in os.listdir(startPath):
             Picture[objectIndex-1].append((surfPath+".txt",folder))
             #Picture.append((surfPath+".txt",objectIndex))
             print filePath," ",surfPath
-            call(["./extractSURF",filePath,surfPath+".txt"])
             #call(["./extractSURF",filePath,surfPath+".txt"])
-
-trainList = Picture[:-50]
-testingList = Picture[-50:]
-trainList = []
-testingList = []
-for i in range(len(Picture)):
-    random.shuffle(Picture[i])
-    trainList += Picture[i][:-nnn]
-    testingList += Picture[i][-nnn:]
-
-print len(trainList),len(testingList)
-
-# create file train
-
-fileTrain = open(prefixFolder + index + ".train","w")
-for aObject in trainList:
-    fileTrain.write(str(aObject[1])+" "+aObject[0]+"\n")
-fileTrain.close()
-
-# create file testing
-
-fileTrain = open(prefixFolder + index +".test","w")
-for aObject in testingList:
-    fileTrain.write(str(aObject[1])+" "+aObject[0]+"\n")
-fileTrain.close()
-
-#call(["./writeObjectOrder.py"])
+            #call(["./extractSURF",filePath,surfPath+".txt"])
+#
+#trainList = Picture[:-50]
+#testingList = Picture[-50:]
+#trainList = []
+#testingList = []
+#for i in range(len(Picture)):
+#    random.shuffle(Picture[i])
+#    trainList += Picture[i][:-nnn]
+#    testingList += Picture[i][-nnn:]
+#
+#print len(trainList),len(testingList)
+#
+## create file train
+#
+#fileTrain = open(prefixFolder + index + ".train","w")
+#for aObject in trainList:
+#    fileTrain.write(str(aObject[1])+" "+aObject[0]+"\n")
+#fileTrain.close()
+#
+## create file testing
+#
+#fileTrain = open(prefixFolder + index +".test","w")
+#for aObject in testingList:
+#    fileTrain.write(str(aObject[1])+" "+aObject[0]+"\n")
+#fileTrain.close()
+#
+##call(["./writeObjectOrder.py"])

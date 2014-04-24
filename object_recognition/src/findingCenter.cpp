@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <object_perception/classifyObject.h>
-#include <object_perception/verifyObject.h>
+#include <object_recognition/classifyObject.h>
+#include <object_recognition/verifyObject.h>
 #include <manipulator/isManipulable.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Header.h>
@@ -30,8 +30,8 @@
 #include <algorithm>
 #include <tf/transform_listener.h>
 
-#include <object_perception/Object.h>
-#include <object_perception/ObjectContainer.h>
+#include <object_recognition/Object.h>
+#include <object_recognition/ObjectContainer.h>
 
 using namespace std;
 
@@ -113,10 +113,10 @@ std::string category;
 
 //verification service 
 ros::ServiceClient classifyClient;
-object_perception::classifyObject classifySrv;
+object_recognition::classifyObject classifySrv;
 
 ros::ServiceClient verifyClient;
-object_perception::verifyObject verifySrv;
+object_recognition::verifyObject verifySrv;
 
 //is reachable service 
 ros::ServiceClient isManipulableClient;
@@ -231,6 +231,7 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 }
 
 void getObjectPoint(){
+
     timeStamp_ = timeStamp;
     pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>)    ,cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
 	//Read in the cloud data
@@ -568,7 +569,7 @@ void getObjectPoint(){
 
 		char comm[1000];
 		//sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /home/skuba/skuba_athome/object_perception/picture%d.jpg /home/skuba/skuba_athome/object_perception/feature%d",j,j);
-		sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /run/shm/object_perception/picture%d.png /run/shm/object_perception/feature%d",j,j);
+		sprintf(comm,"/home/skuba/skuba_athome/object_perception/object_recognition/bin/extractSURF /run/shm/object_perception/picture%d.png /run/shm/object_perception/feature%d",j,j);
 		system(comm);
 
 		//------------------------------------------------------
@@ -639,7 +640,7 @@ void getObjectPoint(){
 	cout << "isReachable : " << reachableCount << endl;
 
 	//object_perception::Object objects[j];
-	object_perception::ObjectContainer objectContainer;
+	object_recognition::ObjectContainer objectContainer;
 
 	//if((float)reachableCount/j < 0.8){
 	if(false){
@@ -656,15 +657,17 @@ void getObjectPoint(){
 
 			if(classifyClient.call(classifySrv)){
 			//if(verifyClient.call(verifySrv)){
-			    cout << "response from server : " << classifySrv.response.objectCategory << endl;
+			    //cout << "response from server : " << classifySrv.response.objectCategory << endl;
+                cout << "response from server : category = " << classifySrv.response.objectCategory << " confidient = " << classifySrv.response.confident  << endl;
 				//cout << "response from server : " << verifySrv.response.objectName << endl;
 
 				cout << "position of centroid : " << objectCentroidWorld[k][0] << " " << objectCentroidWorld[k][1] << " " <<objectCentroidWorld[k][2] << " " <<endl;
-				object_perception::Object object;
+				object_recognition::Object object;
 				object.point.x = objectCentroidWorld[k][0];
 				object.point.y = objectCentroidWorld[k][1];
 				object.point.z = objectCentroidWorld[k][2];
 				object.category = classifySrv.response.objectCategory;
+				object.confident = classifySrv.response.confident;
 				//object.category = verifySrv.response.objectName;
 				object.isManipulable = isObjectManipulable[k];
 				objectContainer.objects.push_back(object);
@@ -679,7 +682,7 @@ void getObjectPoint(){
 				cout << "response from server : " << classifySrv.response.objectIndex << endl;
 
 				cout << objectCentroidWorld[k][0] << " " << objectCentroidWorld[k][1] << " " <<objectCentroidWorld[k][2] << " " <<endl;
-				object_perception::Object object;
+				object_recognition::Object object;
 				object.point.x = objectCentroidWorld[k][0];
 				object.point.y = objectCentroidWorld[k][1];
 				object.point.z = objectCentroidWorld[k][2];
@@ -807,18 +810,18 @@ int main (int argc, char** argv)
 
 	pubObjectNum = n.advertise<std_msgs::String>("object_number", 1000);
 	center_pub = n.advertise<std_msgs::String>("center_pcl_object", 1000);
-	pub_detectedObject = n.advertise<object_perception::ObjectContainer>("/detected_object", 1000);
+	pub_detectedObject = n.advertise<object_recognition::ObjectContainer>("/detected_object", 1000);
 //	ros::Subscriber sub = n.subscribe("/camera/depth_registered/points",1,depthCB);
 	ros::Subscriber sub = n.subscribe("/camera/depth/points",1,depthCB);
 	ros::Subscriber sub_ = n.subscribe("localization",1,localizeCb);
 	sub_imageColor = it_.subscribe("/logitech_cam/image_raw", 1, imageColorCb);
 
 	
-	verifyClient = n.serviceClient<object_perception::verifyObject>("verifyObject");
-	//object_perception::verifyObject verifySrv;
+	verifyClient = n.serviceClient<object_recognition::verifyObject>("verifyObject");
+	//object_recognition::verifyObject verifySrv;
 
-	classifyClient = n.serviceClient<object_perception::classifyObject>("classifyObject");
-	//object_perception::classifyObject classifySrv;
+	classifyClient = n.serviceClient<object_recognition::classifyObject>("classifyObject");
+	//object_recognition::classifyObject classifySrv;
 
 	isManipulableClient = n.serviceClient<manipulator::isManipulable>("isManipulable");
 	manipulator::isManipulable isManipulatableSrv;

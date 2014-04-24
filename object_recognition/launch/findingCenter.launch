@@ -1,16 +1,8 @@
 <launch>
 	
-	<node pkg="object_perception" type="findingCenter" name="findingCenter" output="screen">
+	<node pkg="object_recognition" type="findingCenter" name="findingCenter" output="screen">
         <param name="FOCAL_LENGTH_X" value="1416.07692"/>
         <param name="FOCAL_LENGTH_Y" value="1420.90281"/>
-
-<!--
-        <param name="TUNED_H_DISTANCE_TOP_LEFT" value="-35.0"/>
-        <param name="TUNED_V_DISTANCE_TOP_LEFT" value="20.0"/>
-
-        <param name="TUNED_H_DISTANCE_BOTTOM_RIGHT" value="25.0"/>
-        <param name="TUNED_V_DISTANCE_BOTTOM_RIGHT" value="70.0"/>
--->
 
 <!-- webcam resolution 640x480
         <param name="TUNED_H_DISTANCE_TOP_LEFT" value="-80"/>

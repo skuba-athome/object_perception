@@ -1,4 +1,4 @@
-# Install script for directory: /home/skuba/skuba_athome/object_perception
+# Install script for directory: /home/skuba/skuba_athome/object_perception/object_recognition
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,7 +38,7 @@ ELSE(CMAKE_INSTALL_COMPONENT)
   SET(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 ENDIF(CMAKE_INSTALL_COMPONENT)
 
-FILE(WRITE "/home/skuba/skuba_athome/object_perception/${CMAKE_INSTALL_MANIFEST}" "")
+FILE(WRITE "/home/skuba/skuba_athome/object_perception/object_recognition/${CMAKE_INSTALL_MANIFEST}" "")
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
-  FILE(APPEND "/home/skuba/skuba_athome/object_perception/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+  FILE(APPEND "/home/skuba/skuba_athome/object_perception/object_recognition/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 ENDFOREACH(file)
