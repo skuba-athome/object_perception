@@ -5,6 +5,7 @@ import rospy
 import cv2
 import os
 import numpy
+import math
 
 roslib.load_manifest('object_recognition')
 
@@ -12,6 +13,10 @@ surf = cv2.SURF(400)
 feature_directory = "/run/shm/feature"
 object_feature = {}
 object_histogram = {}
+
+def diff(feature_1,feature_2):
+    distance = sum(map(lambda x,y : (x-y)**2 ,feature_1,feature_2))
+    return math.sqrt(distance)
 
 def list_image_in_directory(dir):
     pic_dic = {}
@@ -112,13 +117,14 @@ def write_svm_config(object_name,svm_model):
 if __name__ == '__main__':
     global kmean_k_cluster
     rospy.init_node('train_object')
-    object_root_dir = rospy.get_param('~object_directory', roslib.packages.get_pkg_dir('object_recognition') + '/learn')
+    object_root_dir = rospy.get_param('~object_directory', roslib.packages.get_pkg_dir('object_recognition') + '/learn/PicCut')
     object_dic = list_image_in_directory(object_root_dir)
 
     print sum([len(object_dic[object_name]) for object_name in object_dic]),"pictures found."
     # extract SURF feature
     for object_name in object_dic:
-        extract_feature_from_images(object_dic[object_name], object_name)
+        if object_name == "pringles":
+            extract_feature_from_images(object_dic[object_name], object_name)
 
     # perform K-means
     kmean_max_iter = int(rospy.get_param('~kmean_max_iter', '300'))
@@ -127,44 +133,74 @@ if __name__ == '__main__':
     kmean_attempts = int(rospy.get_param('~kmean_attempts', '20'))
 
     print "Start K-means"
+    print "K = %d"%(kmean_k_cluster)
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, kmean_max_iter, kmean_epsilon)
     train_data = create_kmean_train_data()
     print "Features count : ", len(train_data)
     compactness, labels, centers = cv2.kmeans(train_data, kmean_k_cluster, criteria, kmean_attempts, cv2.KMEANS_RANDOM_CENTERS)
+    compactness_per_cluster = {}
+    labels = map(lambda x : int(x[0]),labels)
 
+    print 'len(labels)',len(labels)
+    for i in labels:
+        compactness_per_cluster[i] = []
+        compactness_per_cluster[i].append(0)
+        compactness_per_cluster[i].append(9999999)
+    maximum_distance = 0
+    for i in range(len(labels)):
+        distance = diff(train_data[i],centers[labels[i]])
+        if distance > maximum_distance:
+            maximum_distance = distance
+        if distance > compactness_per_cluster[labels[i]][0]:
+            compactness_per_cluster[labels[i]][0] = distance
+        if distance < compactness_per_cluster[labels[i]][1]:
+            compactness_per_cluster[labels[i]][1] = distance
+
+    number_of_cluster = [0 for i in range(max(labels)+1)]
+    for tmp in labels:
+        number_of_cluster[tmp]+=1
+
+    print 'maximum number in cluster :',max(number_of_cluster)
+
+    print 'maximum_distance',maximum_distance
+    #print 'compactness_per_cluster[cluster_index]',type(compactness_per_cluster[0])
+#    for cluster_index in compactness_per_cluster:
+#        #print compactness_per_cluster[cluster_index]
+#        print 'label :',cluster_index,'compactness : ',compactness_per_cluster[cluster_index]
     print "Compactness : ",compactness
-    write_kmeans_config(centers)
-
-    # create KNN
-    knn_model = cv2.KNearest()
-    labels = numpy.float32([index+1 for index in range(kmean_k_cluster)])
-    knn_model.train(centers, labels)
-
-    # perform SVM
-    svm_c = int(rospy.get_param('~svm_c', '2'))
-    svm_gamma = float(rospy.get_param('~svm_gamma', '0.05'))
-
-    #params = dict(kernel_type = cv2.SVM_RBF, svm_type = cv2.SVM_C_SVC, C = svm_c, gamma = svm_gamma)
-    #params = dict(kernel_type = cv2.SVM_RBF, svm_type = cv2.SVM_C_SVC)
-    #params = dict(kernel_type = cv2.SVM_LINEAR, svm_type = cv2.SVM_C_SVC)
-    params = dict(kernel_type = cv2.SVM_POLY, svm_type = cv2.SVM_C_SVC, degree=2)
-
-
-    # create histogram train data
-    create_histogram_train_data(knn_model)
-    for object_name in object_histogram:
-        train_data, labels, histogram_info = get_svm_train_data(object_name)
-
-        # build SVM model
-        svm_model = cv2.SVM()
-        svm_model.train(train_data, labels, params = params)
-
-        #test model
-        predict_labels = svm_model.predict_all(train_data)
-        print "----------------------------------------------"
-        print object_name, "fault : "
-        for histogram_index in range(len(train_data)):
-            if predict_labels[histogram_index]*labels[histogram_index] < 0.0:
-                print histogram_info[histogram_index]
-
-        write_svm_config(object_name, svm_model)
+#
+#    write_kmeans_config(centers)
+#
+#    # create KNN
+#    knn_model = cv2.KNearest()
+#    labels = numpy.float32([index+1 for index in range(kmean_k_cluster)])
+#    knn_model.train(centers, labels)
+#
+#    # perform SVM
+#    svm_c = int(rospy.get_param('~svm_c', '2'))
+#    svm_gamma = float(rospy.get_param('~svm_gamma', '0.05'))
+#
+#    #params = dict(kernel_type = cv2.SVM_RBF, svm_type = cv2.SVM_C_SVC, C = svm_c, gamma = svm_gamma)
+#    #params = dict(kernel_type = cv2.SVM_RBF, svm_type = cv2.SVM_C_SVC)
+#    #params = dict(kernel_type = cv2.SVM_LINEAR, svm_type = cv2.SVM_C_SVC)
+#    params = dict(kernel_type = cv2.SVM_POLY, svm_type = cv2.SVM_C_SVC, degree=2)
+#
+#
+#    # create histogram train data
+#    create_histogram_train_data(knn_model)
+#    for object_name in object_histogram:
+#        train_data, labels, histogram_info = get_svm_train_data(object_name)
+#
+#        # build SVM model
+#        svm_model = cv2.SVM()
+#        svm_model.train(train_data, labels, params = params)
+#
+#        #test model
+#        predict_labels = svm_model.predict_all(train_data)
+#        print "----------------------------------------------"
+#        print object_name, "fault : "
+#        for histogram_index in range(len(train_data)):
+#            if predict_labels[histogram_index]*labels[histogram_index] < 0.0:
+#                print histogram_info[histogram_index]
+#
+#        write_svm_config(object_name, svm_model)
