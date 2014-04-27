@@ -1,0 +1,16 @@
+<launch>
+    <!--node pkg="object_recognition" type="verify_object_service" name="verify_object_service" output="screen"-->
+     <!--   <param name="cluster_file" value="/home/skuba/.ros/cluster.config"/> -->
+    <!--/node-->
+
+    <node pkg="object_recognition" type="verify_object_service" name="verify_object_service" output="screen">
+     <param name="cluster_file" value="/home/skuba/.ros/cluster.config"/>
+     <param name="svm_model_dir" value="/home/skuba/.ros/svm_configs/"/>
+    </node>
+<!--
+    <node pkg="object_recognition" type="test_verify_object.py" name="test_verify_object_service" output="screen">
+      <param name="object_directory" value="/home/skuba/new_data/"/>
+    </node>
+-->
+</launch>
+
