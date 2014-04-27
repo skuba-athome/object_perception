@@ -25,36 +25,27 @@ def list_image_in_directory(dir):
     return pic_dic
 
 if __name__ == "__main__":
-    rospy.wait_for_service('verifyObject')
+    rospy.wait_for_service('/object_recognition/verify_object')
 
-    verify_object = rospy.ServiceProxy('verifyObject', verifyObject)
+    #verify_object = rospy.ServiceProxy('/object_recognition/verify_object', verifyObject)
+    #verify_object = rospy.ServiceProxy('/object_recognition/verify_object',classify_object_service)
+    verify_object = rospy.ServiceProxy('/object_recognition/verify_object',classifyObject)
+
+    #rospy.Service('/object_recognition/verify_object', classifyObject, self.classify_object_service)
+
+
+
+    #verify_object = rospy.ServiceProxy('verifyObject', verifyObject)
     #object_root_dir = rospy.get_param('~object_directory', roslib.packages.get_pkg_dir('object_recognition') + '/data')
-    object_root_dir = rospy.get_param('~object_directory',"/home/skuba/new_data/")
-    print object_root_dir
+    object_root_dir = rospy.get_param('~object_directory',"/home/skuba/test_data/")
+#    print object_root_dir
     object_dic = list_image_in_directory(object_root_dir)
+    print object_dic
 
-    f = open('/home/skuba/.ros/result','w')
+    #f = open('/home/skuba/.ros/result','w')
     print object_root_dir
     for directory_path in object_dic:
-        #f.write(directory_path+'\n') 
-        accuracy = 0
-        if len(object_dic[directory_path]) == 0:
-            continue
         for file_name in object_dic[directory_path]:
+            print file_name
             response = verify_object(file_name)
-            if response.objectName in file_name:
-                accuracy+=1
-        print float(accuracy)/len(object_dic[directory_path])
-        f.write(directory_path + '| correct '+ str(accuracy) +'| all ' + str(len(object_dic[directory_path])) + '| accuracy' + str(float(accuracy)/len(object_dic[directory_path])) +'\n') 
-    f.close() 
-
-    #print sum([len(object_dic[object_name]) for object_name in object_dic]),"pictures found."
-    # extract SURF feature
-#    for object_name in object_dic:
-#        extract_feature_from_images(object_dic[object_name], object_name) 
-
-
-    #print dir()
-    #response = verify_object("/run/shm/test.jpg")
-#    response = verify_object("/run/shm/object_perception/picture0.png")
-
+            print response

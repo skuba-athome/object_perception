@@ -13,3 +13,5 @@ srv_gen
 object_recognition/src/object_recognition/*
 .idea
 tmp
+object_recognition/config/feature/*
+object_recognition/learn/file_location.txt

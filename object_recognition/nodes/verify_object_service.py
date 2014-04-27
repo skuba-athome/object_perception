@@ -28,7 +28,7 @@ class object_recognition:
         self.clf.fit(feature, self.labels) 
 
         object_threshold_file = rospy.get_param('~threshold_file', 'config/threshold.txt')
-        object_threshold_file = "/home/skuba/skuba_athome/object_perception/object_recognition/config/result_thresold.txt"
+        object_threshold_file = "/home/skuba/skuba_athome/object_perception/object_recognition/config/result_threshold.txt"
         self.object_threshold = self.read_object_threshold(object_threshold_file)
         #print self.object_threshold
         
@@ -48,18 +48,18 @@ class object_recognition:
     def load_train_data(self, feature_directory):
         feature_list = []
         label_list = []
-        category_set = []
+        self.category_set = []
         for feature_file in os.listdir(feature_directory):
             if feature_file.endswith(".txt"):
-                category = os.path.basename(feature_file)
-                category_set.append(category)
-                category_index = category_set.index(category)
+                category = os.path.splitext(os.path.basename(feature_file))[0]
+                self.category_set.append(category)
+                category_index = self.category_set.index(category)
                 feature, label = self.load_feature(os.path.join(feature_directory,feature_file), category_index)
                 
                 feature_list += feature
                 label_list += label
                 
-        category_set.append('unknown')
+        self.category_set.append('unknown')
         return feature_list,label_list
 
     def load_feature(self, filename, category):
@@ -82,11 +82,11 @@ class object_recognition:
     def classify_object_service(self, req):
         print "incoming input :", req.filepath
         category, confident = self.predict_object(req.filepath)
-        return classifyObjectResponse(self.category_set[category],confident)
 
-    #    if self.object_threshold[str(self.revertCategory[category])] < confident:
-    #        return classifyObjectResponse(str(self.revertCategory[category]),confident)
-    #    return classifyObjectResponse('unknown',confident)
+        #return classifyObjectResponse(str(self.category_set[category]),confident)
+        if self.object_threshold[str(self.category_set[category])] > confident:
+            return classifyObjectResponse(str(self.category_set[category]),confident)
+        return classifyObjectResponse('unknown',confident)
     
     def predict_object(self, image_filename):
         image = cv2.imread(image_filename, 0)
