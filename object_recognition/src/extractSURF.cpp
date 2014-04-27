@@ -40,7 +40,8 @@ int main(int argc, char** argv)
     Mat descriptors1;
     extractor.compute(img1, keypoints1, descriptors1);
 
-    FILE *ptr = fopen(argv[2],"w");
+    //FILE *ptr = fopen(argv[2],"w");
+    FILE *ptr = fopen(argv[2],"a");
     for(int i=0;i<descriptors1.rows;++i)
     {
         //fprintf(ptr,"%d,%d,",(int)keypoints1[i].pt.x,(int)keypoints1[i].pt.y);

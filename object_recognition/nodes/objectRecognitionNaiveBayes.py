@@ -26,10 +26,25 @@ class objectRecognition:
         self.clf.fit(feature, self.labels) 
         
         rospy.Service('classifyObject',classifyObject,self.classifyObjectService)
+
+        self.object_threshold_file = "/home/skuba/skuba_athome/object_perception/object_recognition/config/result_threshold.txt"
+        self.object_threshold = {}
+        self.object_threshold = self.read_object_threshold(self.object_threshold_file)
+        print self.object_threshold
+
         
         rospy.loginfo('Verification Start')
         rospy.spin()
 		
+
+    def read_object_threshold(self,file_name):
+        filePtr = open(file_name,"r")
+        threshold_list = {}
+        for line in filePtr:
+            object_name, threshold = line.split()
+            threshold_list[object_name] = float(threshold)
+        return threshold_list
+
     def loadTrainData(self,filename):
         self.categorySet = {}
         self.revertCategory = []
@@ -71,6 +86,9 @@ class objectRecognition:
         print "incoming input :",req.filepath
         category,confident = self.predictObject(req.filepath)
         return classifyObjectResponse(str(self.revertCategory[category]),confident)
+#        if self.object_threshold[str(self.revertCategory[category])] < confident:
+#            return classifyObjectResponse(str(self.revertCategory[category]),confident)
+#        return classifyObjectResponse("unknown",confident)
     
     def predictObject(self,featureFileName):
         #queryFeature,label = self.loadFeature(featureFileName,'-1')
@@ -99,7 +117,6 @@ class objectRecognition:
 
         sortedWeightSum = sorted(weightSum)
         print "filename :",featureFileName , "with difference :",str(sortedWeightSum[0]-sortedWeightSum[1])
-
         return int(weightSum.index(min(weightSum))), (sortedWeightSum[0]-sortedWeightSum[1])
     
     def predictFeature(self,feature):

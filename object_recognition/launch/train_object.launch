@@ -1,10 +1,11 @@
 <launch>
     <node pkg="object_recognition" type="train_object.py" name="train_object" output="screen">
-        <param name="object_directory" value="$(find object_recognition)/learn/PicCut/"/>
+       <!-- <param name="object_directory" value="$(find object_recognition)/learn/PicCut/"/> -->
+        <param name="object_directory" value="/home/skuba/webcam_data_640x480/cropped/"/>
         <!-- K-mean param -->
         <param name="kmean_max_iter" value="300"/>
         <param name="kmean_epsilon" value="0.000001"/>
-        <param name="kmean_k_cluster" value="200"/>
+        <param name="kmean_k_cluster" value="300"/>
         <param name="kmean_attempts" value="10"/>
         <!-- SVM param -->
         <param name="svm_c" value="2"/>

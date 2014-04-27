@@ -434,6 +434,19 @@ tests/fast:
 .PHONY : tests/fast
 
 #=============================================================================
+# Target rules for targets named tune_cropped
+
+# Build rule for target.
+tune_cropped: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 tune_cropped
+.PHONY : tune_cropped
+
+# fast build rule for target.
+tune_cropped/fast:
+	$(MAKE) -f CMakeFiles/tune_cropped.dir/build.make CMakeFiles/tune_cropped.dir/build
+.PHONY : tune_cropped/fast
+
+#=============================================================================
 # Target rules for targets named verify_object_service
 
 # Build rule for target.
@@ -552,6 +565,21 @@ src/image_view.s:
 .PHONY : src/image_view.s
 
 # target to build an object file
+src/tune_cropped.o:
+	$(MAKE) -f CMakeFiles/tune_cropped.dir/build.make CMakeFiles/tune_cropped.dir/src/tune_cropped.o
+.PHONY : src/tune_cropped.o
+
+# target to preprocess a source file
+src/tune_cropped.i:
+	$(MAKE) -f CMakeFiles/tune_cropped.dir/build.make CMakeFiles/tune_cropped.dir/src/tune_cropped.i
+.PHONY : src/tune_cropped.i
+
+# target to generate assembly for a file
+src/tune_cropped.s:
+	$(MAKE) -f CMakeFiles/tune_cropped.dir/build.make CMakeFiles/tune_cropped.dir/src/tune_cropped.s
+.PHONY : src/tune_cropped.s
+
+# target to build an object file
 src/verify_object.o:
 	$(MAKE) -f CMakeFiles/verify_object_service.dir/build.make CMakeFiles/verify_object_service.dir/src/verify_object.o
 .PHONY : src/verify_object.o
@@ -600,6 +628,7 @@ help:
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tests"
+	@echo "... tune_cropped"
 	@echo "... verify_object_service"
 	@echo "... src/click_object.o"
 	@echo "... src/click_object.i"
@@ -622,6 +651,9 @@ help:
 	@echo "... src/image_view.o"
 	@echo "... src/image_view.i"
 	@echo "... src/image_view.s"
+	@echo "... src/tune_cropped.o"
+	@echo "... src/tune_cropped.i"
+	@echo "... src/tune_cropped.s"
 	@echo "... src/verify_object.o"
 	@echo "... src/verify_object.i"
 	@echo "... src/verify_object.s"
