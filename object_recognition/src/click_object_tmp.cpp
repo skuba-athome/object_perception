@@ -28,6 +28,11 @@
 #include <pcl/point_types.h>
 
 
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+
+
 #include <pcl/ModelCoefficients.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
@@ -46,36 +51,26 @@
 
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/visualization/cloud_viewer.h>
-
-#include <tf/transform_listener.h>
-#include <pcl_ros/transforms.h>
-#include <pcl/ros/conversions.h>
-
 //---------
 using namespace std;
 using namespace cv;
 
-//std::string rgb_frame = "/camera_rgb_frame";
-std::string rgb_frame = "/base_link";
-tf::TransformListener* listener;
+Mat img;
 ros::Publisher vector_pub; // = n2.advertise<geometry_msgs::Vector3>("object_point", 1000);
 ros::Publisher vector_pub_pointcloud;
 IplImage *inFrame  = cvCreateImage(cvSize(640, 480), 8, 3);
 static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl (new pcl::PointCloud<pcl::PointXYZRGB>);
 
 void depthCb(const sensor_msgs::PointCloud2& cloud) {
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_tmp (new pcl::PointCloud<pcl::PointXYZRGB>);
   if ((cloud.width * cloud.height) == 0)
     return; //return if the cloud is not dense!
   try {
-    pcl::fromROSMsg(cloud, *cloud_tmp);
-    listener->waitForTransform(rgb_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
-    pcl_ros::transformPointCloud(rgb_frame, *cloud_tmp, *cloud_pcl, *listener);
-
+    pcl::fromROSMsg(cloud, *cloud_pcl);
   } catch (std::runtime_error e) {
     ROS_ERROR_STREAM("Error message: " << e.what());
   }
 }
+
 
 
 // mouse callback
@@ -85,6 +80,7 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 	{
 		ROS_INFO("click_at : x:%d y:%d",x,y);
 		geometry_msgs::Vector3 vector;
+        cout << "cloud : "<< cloud_pcl->height << ", " << cloud_pcl->width << endl;
 		vector.x = cloud_pcl->points[y*640+x].x;
 		vector.y = cloud_pcl->points[y*640+x].y;
 		vector.z = cloud_pcl->points[y*640+x].z;
@@ -97,11 +93,37 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 			pcl::toROSMsg(*cloud_pcl,cloud_tf_out);
 			vector_pub_pointcloud.publish(cloud_tf_out);
 			vector_pub.publish(vector);
-			printf("send : x:%.5f y:%.5f z:%.5f\n",vector.x,vector.y,vector.z);						
+			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
 		}
 
 	}
 }
+
+
+void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
+{
+	cv_bridge::CvImagePtr cv_ptr;
+	try
+	{
+		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+		img = cv_ptr->image;
+		//ROS_INFO("Get image size : %d",img.rows*img.cols);
+	
+		//show the image
+		//while(true){
+		namedWindow("My Window", 1);
+		setMouseCallback("My Window", on_mouse, NULL);
+		imshow("My Window", img);
+		waitKey(3);
+	}
+	catch (cv_bridge::Exception& e)
+	{
+		ROS_ERROR("cv_bridge exception: %s", e.what());
+		return;
+	}
+}
+
+/*
 void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 {
         int inKey = 0;
@@ -120,24 +142,29 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 		exit(0);
 	}
 }
+*/
 
 int main(int argc , char *argv[])
 {
 	ros::init(argc,argv,"click_objects");
 	ros::NodeHandle n;
 	ros::NodeHandle nh("~");
+
+
+	image_transport::ImageTransport it_(nh);
+
+	image_transport::Subscriber sub_imageColor;
+	sub_imageColor = it_.subscribe("/camera/rgb/image_color", 1, kinectCallBack);
 	
-	ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,kinectCallBack);
-	//ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);
-	ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
+	//ros::Subscriber sub = n.subscribe("/camera/rgb/image_color",1,kinectCallBack);
+	ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);
+	//ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
 	
-	//vector_pub = n.advertise<geometry_msgs::Vector3>("object_point", 1000);
-	vector_pub = n.advertise<geometry_msgs::Vector3>("manipulator/object_point_split", 1000);
+	vector_pub = n.advertise<geometry_msgs::Vector3>("object_point", 1000);
 	vector_pub_pointcloud = n.advertise<sensor_msgs::PointCloud2>("object_pointcloud", 1000);
 
-    listener = new tf::TransformListener();
 	printf("start click_objects\n");
-	cvNamedWindow("input", 1 );
+	//cvNamedWindow("input", 1 );
 	cvSetMouseCallback("input", on_mouse);
 	ros::spin();
 
