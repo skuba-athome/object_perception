@@ -264,6 +264,12 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 
 
 void getObjectPoint(){
+
+    classifySrv.request.filepath = "/home/skuba/webcam_data_640x480/cropped/peter_pan/frame0020.png";
+    if(classifyClient.call(classifySrv))
+        cout << "response from server : category = " << classifySrv.response.objectCategory << " confidient = " << classifySrv.response.confident  << endl;
+    else
+        cout << "no response from server" << endl;
     return;
     timeStamp_ = timeStamp;
     pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>)    ,cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
@@ -831,7 +837,10 @@ int main (int argc, char** argv)
 	verifyClient = n.serviceClient<object_recognition::verifyObject>("verifyObject");
 	//object_recognition::verifyObject verifySrv;
 
-	classifyClient = n.serviceClient<object_recognition::classifyObject>("classifyObject");
+	//classifyClient = n.serviceClient<object_recognition::classifyObject>("classifyObject");
+	classifyClient = n.serviceClient<object_recognition::classifyObject>("/object_recognition/verify_object");
+
+    //verify_object = rospy.ServiceProxy('/object_recognition/verify_object',classifyObject)
 	//object_recognition::classifyObject classifySrv;
 
 	isManipulableClient = n.serviceClient<manipulator::isManipulable>("isManipulable");

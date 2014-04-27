@@ -1,4 +1,10 @@
 <launch>
+
+	<include file="$(find object_recognition)/launch/verify_object_service.launch">
+        <param name="feature_directory" value="$(find object_recognition)/config/feature"/>
+        <param name="k_neighbors" value="50"/>
+        <param name="threshold_file" value="$(find object_recognition)/config/result_threshold.txt"/>
+    </include>
 	
 	<node pkg="object_recognition" type="findingCenter" name="findingCenter" output="screen">
 
@@ -32,9 +38,6 @@
 -->
 
 <!-- webcam resolution 1280x720 -->
-
-
-
 <!--
 
         <param name="CENTER_IMAGE_X" value="640"/>
@@ -54,9 +57,6 @@
 -->
 
 
-        <param name="ARM_RAIDUS" value="0.95"/>
+    <param name="ARM_RAIDUS" value="0.95"/>
     </node>
-
-	<node pkg="object_recognition" type="objectRecognitionNaiveBayes.py" name="objectRecognitionNaiveBayes" output="screen"/>
-
 </launch>

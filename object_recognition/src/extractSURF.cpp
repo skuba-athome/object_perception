@@ -18,8 +18,8 @@ static void help()
 
 int main(int argc, char** argv)
 {
-    printf("argc : %d\n",argc);
-    help();
+    //printf("argc : %d\n",argc);
+//    help();
 
 	printf("%s %s\n",argv[1],argv[2]);
 
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     detector.detect(img1, keypoints1);
 
     // computing descriptors
-    SurfDescriptorExtractor extractor(4,4,true);
+    SurfDescriptorExtractor extractor;
     Mat descriptors1;
     extractor.compute(img1, keypoints1, descriptors1);
 
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
         //fprintf(ptr,"%d,%d,",(int)keypoints1[i].pt.x,(int)keypoints1[i].pt.y);
         for(int j=0;j<descriptors1.cols;++j)
         {
-            if(j != 0) fprintf(ptr,",");
+            if(j != 0) fprintf(ptr," ");
 	    	fprintf(ptr,"%.17lf",descriptors1.at<float>(i,j));
 	}
         fprintf(ptr,"\n");
