@@ -4,6 +4,7 @@ import roslib
 roslib.load_manifest('object_recognition')
 import rospy
 import cv2
+import os
 
 from std_msgs.msg import String
 from object_recognition.srv import *
@@ -19,7 +20,8 @@ class objectRecognition:
         rospy.Subscriber("featureFilePath",String,self.classifyObjectHandle)
         self.recognitionResult = rospy.Publisher('recognitionResult',String) 
         
-        learningListFile = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/LocalizationTrain/15.train"
+        #learningListFile = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/LocalizationTrain/15.train"
+        learningListFile = "/home/skuba/webcam_data_640x480/cropped/"
         feature,self.labels = self.loadTrainData(learningListFile)
         K_neighbors = int(rospy.get_param('~k_neighbors', 35))
         self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
@@ -45,25 +47,42 @@ class objectRecognition:
             threshold_list[object_name] = float(threshold)
         return threshold_list
 
-    def loadTrainData(self,filename):
+    def loadTrainData(self,dir_name):
         self.categorySet = {}
         self.revertCategory = []
         feature_list = []
         label_list = []
-        print filename
-        filePtr = open(filename,"r")
-        for line in filePtr:
-            print line
-            #category,filePath = line.strip().split(",")
-            category,filePath = line.strip().split(" ")
-            print filePath
+
+        for object_dir in os.listdir(dir_name):
+            file_name = dir_name + object_dir + "/features.txt"
+            category = object_dir
+
             if not category in self.categorySet:
                 self.categorySet[category] = len(self.categorySet)
                 self.revertCategory.append(category)
-            feature,label = self.loadFeature(filePath,self.categorySet[category])
+
+            feature,label = self.loadFeature(file_name,self.categorySet[category])
             feature_list += feature
             label_list += label
+        print len(label_list),len(feature_list)
         return feature_list,label_list
+
+
+
+        #print filename
+        #filePtr = open(filename,"r")
+        #for line in filePtr:
+        #    print line
+        #    #category,filePath = line.strip().split(",")
+        #    category,filePath = line.strip().split(" ")
+        #    print filePath
+        #    if not category in self.categorySet:
+        #        self.categorySet[category] = len(self.categorySet)
+        #        self.revertCategory.append(category)
+        #    feature,label = self.loadFeature(filePath,self.categorySet[category])
+        #    feature_list += feature
+        #    label_list += label
+        #return feature_list,label_list
 
     def loadFeature(self,filename,category):
         feature_list = []

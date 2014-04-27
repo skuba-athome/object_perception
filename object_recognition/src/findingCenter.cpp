@@ -4,6 +4,7 @@
 #include <object_recognition/verifyObject.h>
 #include <manipulator/isManipulable.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Float64.h>
 #include <std_msgs/Header.h>
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/Point.h>
@@ -33,13 +34,14 @@
 #include <object_recognition/Object.h>
 #include <object_recognition/ObjectContainer.h>
 
+#include <unistd.h>
 using namespace std;
 
 //#define DEPTH_LIMIT 0.86
 #define DEPTH_LIMIT 0.9
 #define ACCEPTED_AREA 300
 //#define PLANE_HEIGHT -1.5
-#define PLANE_HEIGHT 0.7
+//#define PLANE_HEIGHT 0.7
 #define PLANE_LEFT 0.35
 #define PLANE_RIGHT -0.35
 //IR 580
@@ -99,6 +101,8 @@ float object_position_world[20][3];
 bool isReach[20];
 float objectCentroidWorld[20][3];
 bool isObjectManipulable[20];
+float PLANE_HEIGHT = 0.7;
+bool waiting_cloud_flags = false;
 
 
 std::string frameId;
@@ -224,7 +228,6 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 		pcl17::fromROSMsg(cloud, *cloud_tmp);
         int n = 0;
 
-
         for (pcl17::PointCloud<pcl17::PointXYZ>::iterator it = cloud_tmp->begin(); it != cloud_tmp->end(); ++it){
             float x = it->x;
             float y = it->y;
@@ -244,7 +247,7 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 
 //        cloud_tmp2->width = 1;
 //        cloud_tmp2->height = n;
-        //cout << "width : " << cloud_tmp2->width << " height : " << n << endl;
+        cout << "width : " << cloud_tmp2->width << " height : " << n << endl;
         //cout << "frame_id " << cloud.header.frame_id << endl;
 	  	listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
 	  	//listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(2.0));
@@ -259,8 +262,9 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 	}
 }
 
-void getObjectPoint(){
 
+void getObjectPoint(){
+    return;
     timeStamp_ = timeStamp;
     pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>)    ,cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
 	//Read in the cloud data
@@ -749,12 +753,6 @@ void getObjectPoint(){
 
 }
 
-
-void localizeCb(const std_msgs::String::ConstPtr& msg){
-	getObjectPoint();
-}
-
-
 void imageColorCb(const sensor_msgs::ImageConstPtr& msg)
 {
 	cv_bridge::CvImagePtr cv_ptr;
@@ -774,6 +772,12 @@ void imageColorCb(const sensor_msgs::ImageConstPtr& msg)
 	}
 }
 
+
+void prepareCloud(const std_msgs::Float64 planeHeight){
+    PLANE_HEIGHT = planeHeight.data;
+    usleep(1500);
+    getObjectPoint();
+}
 
 
 int main (int argc, char** argv)
@@ -820,7 +824,7 @@ int main (int argc, char** argv)
 //	ros::Subscriber sub = n.subscribe("/camera/depth_registered/points",1,depthCB);
 	//ros::Subscriber sub = n.subscribe("/camera/depth/points",1,depthCB);
 	ros::Subscriber sub = n.subscribe("/cloud_tf",1,depthCB);
-	ros::Subscriber sub_ = n.subscribe("localization",1,localizeCb);
+	ros::Subscriber sub_ = n.subscribe("/search_object",1, prepareCloud);
 	sub_imageColor = it_.subscribe("/logitech_cam/image_raw", 1, imageColorCb);
 
 	
