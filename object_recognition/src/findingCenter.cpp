@@ -38,7 +38,7 @@
 using namespace std;
 
 //#define DEPTH_LIMIT 0.86
-#define DEPTH_LIMIT 0.9
+#define DEPTH_LIMIT 1.0
 #define ACCEPTED_AREA 300
 //#define PLANE_HEIGHT -1.5
 //#define PLANE_HEIGHT 0.7
@@ -305,7 +305,7 @@ void getObjectPoint(){
 
 	pcl17::VoxelGrid<pcl17::PointXYZ> vg;
 	pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_filtered (new pcl17::PointCloud<pcl17::PointXYZ>);
-	vg.setInputCloud (cloud_tmp);
+	vg.setInputCloud (cloud);
 	//adjust?
 	//vg.setLeafSize (0.001f, 0.001f, 0.001f);
 	vg.setLeafSize (0.002f, 0.002f, 0.002f);
@@ -321,8 +321,8 @@ void getObjectPoint(){
 //	std::cout << "PointCloud after(cloud_filtered = cloud) filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; 
 
 
-
-	writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/cloud_filtered.pcd", *cloud_filtered, false); 
+    if(cloud_filtered->size() != 0 )
+        writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/cloud_filtered.pcd", *cloud_filtered, false); 
 
 	pcl17::SACSegmentation<pcl17::PointXYZ> seg;
 	pcl17::PointIndices::Ptr inliers (new pcl17::PointIndices);
@@ -380,6 +380,11 @@ void getObjectPoint(){
 
 	// Creating the KdTree object for the search method of the extraction
 
+    if(cloud_filtered->size() == 0){
+        object_recognition::ObjectContainer objectContainer;
+        pub_detectedObject.publish(objectContainer);
+        return;
+    }
 	pcl17::search::KdTree<pcl17::PointXYZ>::Ptr tree (new pcl17::search::KdTree<pcl17::PointXYZ>);
 	tree->setInputCloud (cloud_filtered);
 
@@ -669,7 +674,8 @@ void getObjectPoint(){
 
 		std::stringstream ss;
 		ss << "/run/shm/object_perception/cloud_cluster_" << objectNumber << ".pcd";
-		writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
+        if(cloud_cluster->size() != 0 )
+            writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
         objectNumber++;
 		//std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
 
@@ -706,6 +712,7 @@ void getObjectPoint(){
 				//cout << "response from server : " << verifySrv.response.objectName << endl;
 
 				cout << "position of centroid : " << objectCentroidWorld[k][0] << " " << objectCentroidWorld[k][1] << " " <<objectCentroidWorld[k][2] << " " <<endl;
+                
 				object_recognition::Object object;
 				object.point.x = objectCentroidWorld[k][0];
 				object.point.y = objectCentroidWorld[k][1];
@@ -747,7 +754,9 @@ void getObjectPoint(){
 
 
 //--------------------------------------------------centerOfObject-------------------------
-	writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/centerOfObject.pcd", *enlarged_cloud, false); 
+
+    if(enlarged_cloud->size() != 0 )
+        writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/centerOfObject.pcd", *enlarged_cloud, false); 
 
 	if(maxArea == 0){
 		ROS_ERROR("No object in this range.");
