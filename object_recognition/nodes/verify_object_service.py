@@ -43,6 +43,7 @@ class object_recognition:
         for line in file_ptr:
             object_name, threshold = line.split()
             threshold_list[object_name] = float(threshold)
+        threshold_list['unknown'] = 1.0
         return threshold_list
 
     def load_train_data(self, feature_directory):
@@ -83,9 +84,11 @@ class object_recognition:
         print "incoming input :", req.filepath
         category, confident = self.predict_object(req.filepath)
 
+        
         #return classifyObjectResponse(str(self.category_set[category]),confident)
         if self.object_threshold[str(self.category_set[category])] > confident:
             return classifyObjectResponse(str(self.category_set[category]),confident)
+        print 'predicted result(wrong) as',str(self.category_set[category]),'with confident',confident
         return classifyObjectResponse('unknown',confident)
     
     def predict_object(self, image_filename):
@@ -93,7 +96,7 @@ class object_recognition:
         keypoint, features = surf.detectAndCompute(image, None)
 
         if features == None or len(keypoint) == 0:
-            return -1
+            return -1, 0.0
 
         query_feature = [map(float,feature) for feature in features]
 
