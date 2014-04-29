@@ -96,7 +96,8 @@ void filterContour();
 double distance(int a,int b,int c,int d);
 void update_current_contour();
 void setwindowSetting();
-
+float depth = 0;
+bool findDepth = false;
 void setwindowSettings(){
 cvNamedWindow("Color");
 cvCreateTrackbar("LowerH", "Color", &lowerH, 180, NULL);
@@ -117,20 +118,22 @@ void depthCb(const sensor_msgs::PointCloud2& cloud) {
   }
 }
 void sendPosition(int x , int y){
+                //ROS_INFO("Concentrete at : x:%d y:%d",x,y);
   		if ((cloud_pcl->width * cloud_pcl->height) == 0)
     			return; //return if the cloud is not dense!
-                // ROS_INFO("Concentrete at : x:%d y:%d",x,y);
 		geometry_msgs::Vector3 vector;
 		vector.x = cloud_pcl->points[y*640+x].x;
 		vector.y = cloud_pcl->points[y*640+x].y;
 		vector.z = cloud_pcl->points[y*640+x].z;
-		if( vector.x == vector.x 
+                depth = vector.x;
+                if(findDepth==false)
+                if( vector.x == vector.x 
 			&& vector.y == vector.y
 			&& vector.z == vector.z
-		)
-		{
-			vector_pub.publish(vector);//Publish vector
-			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
+                  )
+                {
+			//vector_pub.publish(vector);//Publish vector
+			printf("send : pixel_x:%d pixel_y:%d x:%.2f y:%.2f z:%.2f\n",x,y,vector.x,vector.y,vector.z);						
 		}
 }
 
@@ -186,13 +189,25 @@ void get_contour_center(int* x,int* y){
 	if(new_contour->my_contours.size() == 0) return;
 	int sum_countour_x=0,sum_countour_y=0,index;
 	index = new_contour->max_index;
-
+        int _x=0,_y=0;
+        findDepth = true;
+        depth=0;
 	for(int i=0;i<new_contour->my_contours.at(index).size();i++){
-		sum_countour_x += new_contour->my_contours.at(index).at(i).x;
-		sum_countour_y += new_contour->my_contours.at(index).at(i).y;
-	}
+		//sum_countour_x += new_contour->my_contours.at(index).at(i).x;
+		//sum_countour_y += new_contour->my_contours.at(index).at(i).y;
+	        _x=new_contour->my_contours.at(index).at(i).x;
+                _y=new_contour->my_contours.at(index).at(i).y;
+                sendPosition(_x,_y);
+                sum_countour_x += _x;
+                sum_countour_y += _y;
+        }
 	*x = int(sum_countour_x/new_contour->my_contours.at(index).size());
 	*y = int(sum_countour_y/new_contour->my_contours.at(index).size());
+         depth = depth/new_contour->my_contours.at(index).size();
+         int _size=new_contour->my_contours.at(index).size();
+         cout<< depth <<endl;
+         cout << "x:"<<*x<<"y:"<<*y<<"Depth:"<< depth<<"Size:"<<_size <<endl;
+         depth=0;
 }
 double distance(int a,int b,int c,int d){
 	return sqrt((a-c)*(a-c) + (b-d)*(b-d));
@@ -215,7 +230,8 @@ void draw(int maxIndex,vector<vector<Point> > contours,vector<Vec4i> hierarchy){
 	}
 	if(regionExist){
 		cv::circle(m, cv::Point(center_contour_x, center_contour_y), ACCEPTED_DISTANCE, CV_RGB(100,100,0));
-		sendPosition(center_contour_x,center_contour_y);
+		findDepth = false;
+                sendPosition(center_contour_x,center_contour_y);
 	}
 	cv::circle(m, cv::Point(center_x, center_y), 10, CV_RGB(255,0,0));// draw red circle at center
 	cvNamedWindow("after draw contours");
@@ -280,10 +296,10 @@ void imageCallback(const sensor_msgs::Image::ConstPtr& img_in)
 int main (int argc, char** argv)
 {
 //read from file
-	lowerH=107;
-	lowerS=187;
-	lowerV=78;
-	upperH=131;
+	lowerH=90;
+	lowerS=115;
+	lowerV=150;
+	upperH=180;
 	upperS=256;
 	upperV=256;
 	setwindowSettings();
@@ -292,7 +308,8 @@ int main (int argc, char** argv)
 	ros::init(argc, argv, "color_detector");
 	ros::NodeHandle n;
 	cv::namedWindow(WINDOW, CV_WINDOW_AUTOSIZE);
-	ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);//Subscribe depth from kinect
+	//ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);//Subscribe depth from kinect
+	ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);//Subscribe depth from kinect
 	ros::Subscriber	image_sub = n.subscribe("/camera/rgb/image_color", 1, imageCallback);//Subscribe image from kinect
 	vector_pub = n.advertise<geometry_msgs::Vector3>("color_detector", 1000);
 	cv::destroyWindow(WINDOW);
