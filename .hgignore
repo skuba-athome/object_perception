@@ -1,0 +1,17 @@
+syntax: glob
+
+*.pyc
+*~
+build
+bin
+*.tmp
+CMakeCache.txt
+CMakeFiles
+*.svn*
+msg_gen
+srv_gen
+object_recognition/src/object_recognition/*
+.idea
+tmp
+object_recognition/config/feature/*
+object_recognition/learn/file_location.txt
