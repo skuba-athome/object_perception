@@ -32,7 +32,7 @@
         <param name="TUNED_V_DISTANCE_TOP_LEFT" value="-15"/>
 
         <param name="TUNED_H_DISTANCE_BOTTOM_RIGHT" value="0"/>
-        <param name="TUNED_V_DISTANCE_BOTTOM_RIGHT" value="15"/>
+        <param name="TUNED_V_DISTANCE_BOTTOM_RIGHT" value="25"/>
 
 
 -->

@@ -56,9 +56,12 @@ using namespace std;
 using namespace cv;
 
 //std::string rgb_frame = "/camera_rgb_frame";
-std::string rgb_frame = "/base_link";
+ros::Time timeStamp;
+std::string rgb_frame = "/camera_rgb_optical_frame";
+std::string robot_frame = "/base_link";
 tf::TransformListener* listener;
 ros::Publisher vector_pub; // = n2.advertise<geometry_msgs::Vector3>("object_point", 1000);
+ros::Publisher vector_pub_pour; 
 ros::Publisher vector_pub_pointcloud;
 IplImage *inFrame  = cvCreateImage(cvSize(640, 480), 8, 3);
 static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl (new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -69,6 +72,8 @@ void depthCb(const sensor_msgs::PointCloud2& cloud) {
     return; //return if the cloud is not dense!
   try {
     pcl::fromROSMsg(cloud, *cloud_tmp);
+    cloud_tmp->header = cloud.header;
+    timeStamp = cloud.header.stamp;
     listener->waitForTransform(rgb_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
     pcl_ros::transformPointCloud(rgb_frame, *cloud_tmp, *cloud_pcl, *listener);
 
@@ -93,15 +98,65 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 			&& vector.z == vector.z
 		)
 		{
-			sensor_msgs::PointCloud2 cloud_tf_out;
-			pcl::toROSMsg(*cloud_pcl,cloud_tf_out);
-			vector_pub_pointcloud.publish(cloud_tf_out);
-			vector_pub.publish(vector);
-			printf("send : x:%.5f y:%.5f z:%.5f\n",vector.x,vector.y,vector.z);						
+
+            geometry_msgs::PointStamped kinect_point;
+            geometry_msgs::PointStamped base_point;
+
+            kinect_point.header.frame_id = rgb_frame;
+            kinect_point.header.stamp = timeStamp;
+            kinect_point.point.x = vector.x;
+            kinect_point.point.y = vector.y;
+            kinect_point.point.z = vector.z;
+            listener->transformPoint(robot_frame,kinect_point,base_point);
+            vector.x = base_point.point.x;
+            vector.y = base_point.point.y;
+            vector.z = base_point.point.z;
+
+//            sensor_msgs::PointCloud2 cloud_tf_out;
+//            pcl::toROSMsg(*cloud_pcl,cloud_tf_out);
+            //vector_pub_pointcloud.publish(cloud_tf_out);
+            vector_pub.publish(vector);
+            printf("send : x:%.5f y:%.5f z:%.5f\n",vector.x,vector.y,vector.z);						
+		}
+
+	}
+	if(event == CV_EVENT_RBUTTONUP) 
+	{
+        ROS_INFO("R_click");
+		ROS_INFO("click_at : x:%d y:%d",x,y);
+		geometry_msgs::Vector3 vector;
+		vector.x = cloud_pcl->points[y*640+x].x;
+		vector.y = cloud_pcl->points[y*640+x].y;
+		vector.z = cloud_pcl->points[y*640+x].z;
+		if( vector.x == vector.x 
+			&& vector.y == vector.y
+			&& vector.z == vector.z
+		)
+		{
+
+            geometry_msgs::PointStamped kinect_point;
+            geometry_msgs::PointStamped base_point;
+
+            kinect_point.header.frame_id = rgb_frame;
+            kinect_point.header.stamp = timeStamp;
+            kinect_point.point.x = vector.x;
+            kinect_point.point.y = vector.y;
+            kinect_point.point.z = vector.z;
+            listener->transformPoint(robot_frame,kinect_point,base_point);
+            vector.x = base_point.point.x;
+            vector.y = base_point.point.y;
+            vector.z = base_point.point.z;
+
+//            sensor_msgs::PointCloud2 cloud_tf_out;
+//            pcl::toROSMsg(*cloud_pcl,cloud_tf_out);
+            //vector_pub_pointcloud.publish(cloud_tf_out);
+            vector_pub_pour.publish(vector);
+            printf("send : x:%.5f y:%.5f z:%.5f\n",vector.x,vector.y,vector.z);						
 		}
 
 	}
 }
+
 void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 {
         int inKey = 0;
@@ -132,7 +187,9 @@ int main(int argc , char *argv[])
 	ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
 	
 	//vector_pub = n.advertise<geometry_msgs::Vector3>("object_point", 1000);
-	vector_pub = n.advertise<geometry_msgs::Vector3>("manipulator/object_point_split", 1000);
+	//vector_pub = n.advertise<geometry_msgs::Vector3>("manipulator/object_point_split", 1000);
+	vector_pub = n.advertise<geometry_msgs::Vector3>("manipulator/grasp", 1000);
+	vector_pub_pour = n.advertise<geometry_msgs::Vector3>("manipulator/pour", 1000);
 	vector_pub_pointcloud = n.advertise<sensor_msgs::PointCloud2>("object_pointcloud", 1000);
 
     listener = new tf::TransformListener();

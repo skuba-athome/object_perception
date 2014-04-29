@@ -136,9 +136,6 @@ ros::Publisher pub,pubObjectNum,center_pub,pub_detectedObject;
 static pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_pcl (new pcl17::PointCloud<pcl17::PointXYZ>);
 
 bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* objectWorldY,float* objectWorldZ){
-    x=0;
-    y=0;
-    z=0;
 	cout << "-------------------in isObjectReachable method-------------------------" << endl;
 	cout << "centroid of object in kinect :  (x,y,z) = " << x << " " << y << " " << z << endl;
 	float xWorld,yWorld,zWorld;
@@ -247,13 +244,14 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 
 //        cloud_tmp2->width = 1;
 //        cloud_tmp2->height = n;
-        cout << "width : " << cloud_tmp2->width << " height : " << n << endl;
+        //cout << "width : " << cloud_tmp2->width << " height : " << n << endl;
         //cout << "frame_id " << cloud.header.frame_id << endl;
 	  	listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
 	  	//listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(2.0));
         //cout << "before transformPointCloud" << endl;
 	  	pcl17_ros::transformPointCloud(logitech_frame, *cloud_tmp2, *cloud_pcl, *listener);
 
+        //cout << "cloud_pcl->header.frame_id" << cloud_pcl->header.frame_id << endl;
 
 		//ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
 	//	cout << "point cloud get" << endl;
@@ -265,12 +263,6 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 
 void getObjectPoint(){
 
-    classifySrv.request.filepath = "/home/skuba/webcam_data_640x480/cropped/peter_pan/frame0020.png";
-    if(classifyClient.call(classifySrv))
-        cout << "response from server : category = " << classifySrv.response.objectCategory << " confidient = " << classifySrv.response.confident  << endl;
-    else
-        cout << "no response from server" << endl;
-    return;
     timeStamp_ = timeStamp;
     pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>)    ,cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
 	//Read in the cloud data
@@ -415,6 +407,7 @@ void getObjectPoint(){
 	for (std::vector<pcl17::PointIndices>::const_iterator it = cluster_indices.begin(); it != cluster_indices.end(); ++it)
 	{	
 		float x=0,y=0,z=0;
+		//float sumX=0,sumY=0,sumZ=0;
 		//float pixel_x_max = 0, pixel_y_max = 0, pixel_x_min = 1280, pixel_y_min = 720;
 		float pixel_x_max = 0, pixel_y_max = 0, pixel_x_min = CENTER_IMAGE_X*2, pixel_y_min = CENTER_IMAGE_Y*2;
 
@@ -491,13 +484,13 @@ void getObjectPoint(){
 		if( (isObjectManipulable[j] = isObjectReachable(x,y,z,&objectWorldX,&objectWorldY,&objectWorldZ) ))
 			reachableCount++;
 
-        objectCentroidWorld[j][0] = x;
-        objectCentroidWorld[j][1] = y;
-        objectCentroidWorld[j][2] = z;
+//        objectCentroidWorld[j][0] = x;
+//        objectCentroidWorld[j][1] = y;
+//        objectCentroidWorld[j][2] = z;
 
-        //objectCentroidWorld[j][0] = objectWorldX;
-        //objectCentroidWorld[j][1] = objectWorldY;
-        //objectCentroidWorld[j][2] = objectWorldZ;
+//        objectCentroidWorld[j][0] = objectWorldX;
+//        objectCentroidWorld[j][1] = objectWorldY;
+//        objectCentroidWorld[j][2] = objectWorldZ;
 
 
 		pixel_x = x*FOCAL_LENGTH_X/z + CALIBRATED_CENTER_IMAGE_X;// + (-0.5);
@@ -564,6 +557,10 @@ void getObjectPoint(){
         if(width_<=0 || height_ <=0)
             continue;
 
+
+        objectCentroidWorld[j][0] = objectWorldX;
+        objectCentroidWorld[j][1] = objectWorldY;
+        objectCentroidWorld[j][2] = objectWorldZ;
 
 //use thie one
 		//printf("topleft_x : %f, topleft_y : %f, width : %f, height : %f\n",pixel_x_min,pixel_y_min, 
@@ -781,7 +778,7 @@ void imageColorCb(const sensor_msgs::ImageConstPtr& msg)
 
 void prepareCloud(const std_msgs::Float64 planeHeight){
     PLANE_HEIGHT = planeHeight.data;
-    usleep(1500);
+    usleep(500);
     getObjectPoint();
 }
 
