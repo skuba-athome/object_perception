@@ -107,6 +107,7 @@ cvCreateTrackbar("LowerV", "Color", &lowerV, 256, NULL);
 }
 void transformer(int x, int y)
 {
+    printf("%d %d\n",x,y);
 	if ((cloud_pcl->width * cloud_pcl->height) == 0)
     			return;
 		geometry_msgs::Vector3 vector;
@@ -211,7 +212,7 @@ void get_contour_center(int* x,int* y){
         global_x = 0;
         global_y = 0;
         global_z = 0;
-		cout<<sum_contour_x<<" "<< sum_contour_y<<" "<<sum_contour_z<<endl;
+		//cout<<sum_contour_x<<" "<< sum_contour_y<<" "<<sum_contour_z<<endl;
 }
 double distance(int a,int b,int c,int d){
 	return sqrt((a-c)*(a-c) + (b-d)*(b-d));
@@ -310,8 +311,8 @@ int main (int argc, char** argv)
 	ros::init(argc, argv, "color_detector");
 	ros::NodeHandle n;
 	cv::namedWindow(WINDOW, CV_WINDOW_AUTOSIZE);
-	//ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);
-	ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
+	ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);
+	//ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
 	ros::Subscriber	image_sub = n.subscribe("/camera/rgb/image_color", 1, imageCallback);
 	vector_pub = n.advertise<geometry_msgs::Vector3>("color_detector", 1000);
 	cv::destroyWindow(WINDOW);

@@ -83,13 +83,11 @@ class object_recognition:
     def classify_object_service(self, req):
         print "incoming input :", req.filepath
         category, confident = self.predict_object(req.filepath)
-
-        
-        #return classifyObjectResponse(str(self.category_set[category]),confident)
-        if self.object_threshold[str(self.category_set[category])] > confident:
-            return classifyObjectResponse(str(self.category_set[category]),confident)
-        print 'predicted result(wrong) as',str(self.category_set[category]),'with confident',confident
-        return classifyObjectResponse('unknown',confident)
+        return classifyObjectResponse(str(self.category_set[category]),confident)
+#        if self.object_threshold[str(self.category_set[category])] > confident:
+#            return classifyObjectResponse(str(self.category_set[category]),confident)
+#        print 'predicted result(wrong) as',str(self.category_set[category]),'with confident',confident
+#        return classifyObjectResponse('unknown',confident)
     
     def predict_object(self, image_filename):
         image = cv2.imread(image_filename, 0)
