@@ -15,3 +15,4 @@ object_recognition/src/object_recognition/*
 tmp
 object_recognition/config/feature/*
 object_recognition/learn/file_location.txt
+object_recognition/learn/

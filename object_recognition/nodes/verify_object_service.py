@@ -41,7 +41,7 @@ class object_recognition:
         file_ptr = open(file_name,"r")
         threshold_list = {}
         for line in file_ptr:
-            object_name, threshold = line.split()
+            object_name, threshold = line.split(':')
             threshold_list[object_name] = float(threshold)
         threshold_list['unknown'] = 1.0
         return threshold_list
