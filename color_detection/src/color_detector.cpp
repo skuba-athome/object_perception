@@ -81,7 +81,7 @@ int lowerV=0;
 int upperH=180;
 int upperS=256;
 int upperV=256;
-int demo =0;
+int divider =0;
 char vertical_last_cmd[5]="s",vertical_cmd[5]="s";
 static const char WINDOW[] = "Image";
 ros::Publisher vector_pub;
@@ -107,7 +107,7 @@ cvCreateTrackbar("LowerV", "Color", &lowerV, 256, NULL);
 }
 void transformer(int x, int y)
 {
-    printf("%d %d\n",x,y);
+ //   printf("%d %d\n",x,y);
 	if ((cloud_pcl->width * cloud_pcl->height) == 0)
     			return;
 		geometry_msgs::Vector3 vector;
@@ -122,7 +122,11 @@ void transformer(int x, int y)
                 global_x += vector.x;
                 global_y += vector.y;
                 global_z += vector.z;
-		}
+	                    //printf("x:%f y:%f z:%f\n",vector.x,vector.y,vector.z);
+                }
+                else 
+                    divider++;
+
 }
 void depthCb(const sensor_msgs::PointCloud2& cloud) {
   if ((cloud.width * cloud.height) == 0)
@@ -138,7 +142,8 @@ void sendPosition(float x , float y ,float z){
 			vector.x = x;
 			vector.y = y;
 			vector.z = z;
-			vector_pub.publish(vector);
+	        if(vector.x == vector.x && vector.y == vector.y && vector.z == vector.z)
+            vector_pub.publish(vector);
 			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
 		
 }
@@ -197,18 +202,21 @@ void get_contour_center(int* x,int* y){
 	float sum_contour_z=0,sum_contour_y=0,sum_contour_x=0;
 	index = new_contour->max_index;
 	sizes = new_contour->my_contours.at(index).size();
+    divider = 0;
 	for(int i=0;i<sizes;i++){
 		transformer(new_contour->my_contours.at(index).at(i).x , new_contour->my_contours.at(index).at(i).y);
         }
-        sum_contour_x = global_x/sizes;
-        sum_contour_y = global_y/sizes;
-        sum_contour_z = global_z/sizes;
+        //printf("%d\n",divider);
+        sum_contour_x = global_x/(sizes-divider);//Protect nan
+        sum_contour_y = global_y/(sizes-divider);
+        sum_contour_z = global_z/(sizes-divider);
         if(sum_contour_x != 0 && sum_contour_y != 0 && sum_contour_z != 0)
         {
             send_x = sum_contour_x;
             send_y = sum_contour_y;
             send_z = sum_contour_z;
         }
+        divider = 0;
         global_x = 0;
         global_y = 0;
         global_z = 0;
@@ -240,8 +248,8 @@ void draw(int maxIndex,vector<vector<Point> > contours,vector<Vec4i> hierarchy){
 	cv::circle(m, cv::Point(center_x, center_y), 10, CV_RGB(255,0,0));
 	cvNamedWindow("after draw contours");
 	cvShowImage("after draw contours",imgTresh);
-	cvNamedWindow("source");
-	cvShowImage("source",img);
+	//cvNamedWindow("source");
+	//cvShowImage("source",img);
 }
 bool findColor(){
 	Mat frame = image;
@@ -294,14 +302,14 @@ void imageCallback(const sensor_msgs::Image::ConstPtr& img_in)
         		return;
     		}
 	trigger = findColor();
- 	cv::imshow(WINDOW, image);
+ 	//cv::imshow(WINDOW, image);
 	cv::waitKey(3);
 }
 int main (int argc, char** argv)
 {
-	lowerH=90;
-	lowerS=115;
-	lowerV=150;
+	lowerH=86;
+	lowerS=193;
+	lowerV=112;
 	upperH=180;
 	upperS=256;
 	upperV=256;
