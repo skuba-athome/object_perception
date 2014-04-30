@@ -29,7 +29,6 @@
 #include <pcl/features/vfh.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d_omp.h>
-//#include <pcl/visualization/cloud_viewer.h>
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include<ros/ros.h>
@@ -82,10 +81,10 @@ int lowerV=0;
 int upperH=180;
 int upperS=256;
 int upperV=256;
-int demo =0;
+int divider =0;
 char vertical_last_cmd[5]="s",vertical_cmd[5]="s";
 static const char WINDOW[] = "Image";
-ros::Publisher vector_pub; // = n2.advertise<geometry_msgs::Vector3>("object_point", 1000);
+ros::Publisher vector_pub;
 ros::Publisher vector_pub_pointcloud;
 static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl (new pcl::PointCloud<pcl::PointXYZRGB>);
 bool findColor();
@@ -96,8 +95,7 @@ void filterContour();
 double distance(int a,int b,int c,int d);
 void update_current_contour();
 void setwindowSetting();
-float depth = 0;
-bool findDepth = false;
+float global_x = 0,global_y =0,global_z = 0,send_x=0,send_y=0,send_z=0;
 void setwindowSettings(){
 cvNamedWindow("Color");
 cvCreateTrackbar("LowerH", "Color", &lowerH, 180, NULL);
@@ -107,34 +105,47 @@ cvCreateTrackbar("LowerS", "Color", &lowerS, 256, NULL);
 cvCreateTrackbar("LowerV", "Color", &lowerV, 256, NULL);
         cvCreateTrackbar("UpperV", "Color", &upperV, 256, NULL);
 }
+void transformer(int x, int y)
+{
+ //   printf("%d %d\n",x,y);
+	if ((cloud_pcl->width * cloud_pcl->height) == 0)
+    			return;
+		geometry_msgs::Vector3 vector;
+		vector.x = cloud_pcl->points[y*640+x].x;
+		vector.y = cloud_pcl->points[y*640+x].y;
+		vector.z = cloud_pcl->points[y*640+x].z;
+                if( vector.x == vector.x 
+			&& vector.y == vector.y
+			&& vector.z == vector.z
+                  )
+                {
+                global_x += vector.x;
+                global_y += vector.y;
+                global_z += vector.z;
+	                    //printf("x:%f y:%f z:%f\n",vector.x,vector.y,vector.z);
+                }
+                else 
+                    divider++;
 
+}
 void depthCb(const sensor_msgs::PointCloud2& cloud) {
   if ((cloud.width * cloud.height) == 0)
-      return; //return if the cloud is not dense!
+      return;
   try {
     pcl::fromROSMsg(cloud, *cloud_pcl);
   } catch (std::runtime_error e) {
     ROS_ERROR_STREAM("Error message: " << e.what());
   }
 }
-void sendPosition(int x , int y){
-                //ROS_INFO("Concentrete at : x:%d y:%d",x,y);
-  		if ((cloud_pcl->width * cloud_pcl->height) == 0)
-    			return; //return if the cloud is not dense!
-		geometry_msgs::Vector3 vector;
-		vector.x = cloud_pcl->points[y*640+x].x;
-		vector.y = cloud_pcl->points[y*640+x].y;
-		vector.z = cloud_pcl->points[y*640+x].z;
-                depth = vector.x;
-                if(findDepth==false)
-                if( vector.x == vector.x 
-			&& vector.y == vector.y
-			&& vector.z == vector.z
-                  )
-                {
-			//vector_pub.publish(vector);//Publish vector
-			printf("send : pixel_x:%d pixel_y:%d x:%.2f y:%.2f z:%.2f\n",x,y,vector.x,vector.y,vector.z);						
-		}
+void sendPosition(float x , float y ,float z){
+			geometry_msgs::Vector3 vector;
+			vector.x = x;
+			vector.y = y;
+			vector.z = z;
+	        if(vector.x == vector.x && vector.y == vector.y && vector.z == vector.z)
+            vector_pub.publish(vector);
+			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
+		
 }
 
 void filterContour(){
@@ -187,27 +198,29 @@ void filterContour(){
 }
 void get_contour_center(int* x,int* y){
 	if(new_contour->my_contours.size() == 0) return;
-	int sum_countour_x=0,sum_countour_y=0,index;
+	int index,sizes = 0;
+	float sum_contour_z=0,sum_contour_y=0,sum_contour_x=0;
 	index = new_contour->max_index;
-        int _x=0,_y=0;
-        findDepth = true;
-        depth=0;
-	for(int i=0;i<new_contour->my_contours.at(index).size();i++){
-		//sum_countour_x += new_contour->my_contours.at(index).at(i).x;
-		//sum_countour_y += new_contour->my_contours.at(index).at(i).y;
-	        _x=new_contour->my_contours.at(index).at(i).x;
-                _y=new_contour->my_contours.at(index).at(i).y;
-                sendPosition(_x,_y);
-                sum_countour_x += _x;
-                sum_countour_y += _y;
+	sizes = new_contour->my_contours.at(index).size();
+    divider = 0;
+	for(int i=0;i<sizes;i++){
+		transformer(new_contour->my_contours.at(index).at(i).x , new_contour->my_contours.at(index).at(i).y);
         }
-	*x = int(sum_countour_x/new_contour->my_contours.at(index).size());
-	*y = int(sum_countour_y/new_contour->my_contours.at(index).size());
-         depth = depth/new_contour->my_contours.at(index).size();
-         int _size=new_contour->my_contours.at(index).size();
-         cout<< depth <<endl;
-         cout << "x:"<<*x<<"y:"<<*y<<"Depth:"<< depth<<"Size:"<<_size <<endl;
-         depth=0;
+        //printf("%d\n",divider);
+        sum_contour_x = global_x/(sizes-divider);//Protect nan
+        sum_contour_y = global_y/(sizes-divider);
+        sum_contour_z = global_z/(sizes-divider);
+        if(sum_contour_x != 0 && sum_contour_y != 0 && sum_contour_z != 0)
+        {
+            send_x = sum_contour_x;
+            send_y = sum_contour_y;
+            send_z = sum_contour_z;
+        }
+        divider = 0;
+        global_x = 0;
+        global_y = 0;
+        global_z = 0;
+		//cout<<sum_contour_x<<" "<< sum_contour_y<<" "<<sum_contour_z<<endl;
 }
 double distance(int a,int b,int c,int d){
 	return sqrt((a-c)*(a-c) + (b-d)*(b-d));
@@ -230,14 +243,13 @@ void draw(int maxIndex,vector<vector<Point> > contours,vector<Vec4i> hierarchy){
 	}
 	if(regionExist){
 		cv::circle(m, cv::Point(center_contour_x, center_contour_y), ACCEPTED_DISTANCE, CV_RGB(100,100,0));
-		findDepth = false;
-                sendPosition(center_contour_x,center_contour_y);
+               sendPosition(send_x,send_y,send_z);
 	}
-	cv::circle(m, cv::Point(center_x, center_y), 10, CV_RGB(255,0,0));// draw red circle at center
+	cv::circle(m, cv::Point(center_x, center_y), 10, CV_RGB(255,0,0));
 	cvNamedWindow("after draw contours");
 	cvShowImage("after draw contours",imgTresh);
-	cvNamedWindow("source");
-	cvShowImage("source",img);
+	//cvNamedWindow("source");
+	//cvShowImage("source",img);
 }
 bool findColor(){
 	Mat frame = image;
@@ -255,7 +267,7 @@ bool findColor(){
 		isStart = true;
 	}
 	cvSmooth(imgTresh,imgTresh,CV_GAUSSIAN,3,3);
-	cvInRangeS(imgHsv,cvScalar(lowerH,lowerS,lowerV), cvScalar(upperH,upperS,upperV) , imgTresh);  //Read from files Color oldversion[ cvScalar(90,100,60), cvScalar(135,256,256) ]
+	cvInRangeS(imgHsv,cvScalar(lowerH,lowerS,lowerV), cvScalar(upperH,upperS,upperV) , imgTresh);
 	cvDilate(imgTresh,imgTresh,NULL,3);
 	cvErode(imgTresh,imgTresh);
 	cvCanny( imgTresh, imgTresh, 100, 200, 3 );
@@ -290,15 +302,14 @@ void imageCallback(const sensor_msgs::Image::ConstPtr& img_in)
         		return;
     		}
 	trigger = findColor();
- 	cv::imshow(WINDOW, image);
+ 	//cv::imshow(WINDOW, image);
 	cv::waitKey(3);
 }
 int main (int argc, char** argv)
 {
-//read from file
-	lowerH=90;
-	lowerS=115;
-	lowerV=150;
+	lowerH=86;
+	lowerS=193;
+	lowerV=112;
 	upperH=180;
 	upperS=256;
 	upperV=256;
@@ -308,9 +319,9 @@ int main (int argc, char** argv)
 	ros::init(argc, argv, "color_detector");
 	ros::NodeHandle n;
 	cv::namedWindow(WINDOW, CV_WINDOW_AUTOSIZE);
-	//ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);//Subscribe depth from kinect
-	ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);//Subscribe depth from kinect
-	ros::Subscriber	image_sub = n.subscribe("/camera/rgb/image_color", 1, imageCallback);//Subscribe image from kinect
+	ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);
+	//ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
+	ros::Subscriber	image_sub = n.subscribe("/camera/rgb/image_color", 1, imageCallback);
 	vector_pub = n.advertise<geometry_msgs::Vector3>("color_detector", 1000);
 	cv::destroyWindow(WINDOW);
 	ros::spin(); 
