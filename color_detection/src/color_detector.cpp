@@ -307,9 +307,9 @@ void imageCallback(const sensor_msgs::Image::ConstPtr& img_in)
 }
 int main (int argc, char** argv)
 {
-	lowerH=86;
-	lowerS=193;
-	lowerV=112;
+	lowerH=80;
+	lowerS=75;
+	lowerV=120;
 	upperH=180;
 	upperS=256;
 	upperV=256;
@@ -322,7 +322,7 @@ int main (int argc, char** argv)
 	ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);
 	//ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
 	ros::Subscriber	image_sub = n.subscribe("/camera/rgb/image_color", 1, imageCallback);
-	vector_pub = n.advertise<geometry_msgs::Vector3>("color_detector", 1000);
+	vector_pub = n.advertise<geometry_msgs::Vector3>("color_detect", 1000);
 	cv::destroyWindow(WINDOW);
 	ros::spin(); 
   return 0;
