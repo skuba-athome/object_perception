@@ -41,7 +41,7 @@ class object_recognition:
         file_ptr = open(file_name,"r")
         threshold_list = {}
         for line in file_ptr:
-            object_name, threshold = line.split()
+            object_name, threshold = line.split(':')
             threshold_list[object_name] = float(threshold)
         threshold_list['unknown'] = 1.0
         return threshold_list
@@ -83,11 +83,11 @@ class object_recognition:
     def classify_object_service(self, req):
         print "incoming input :", req.filepath
         category, confident = self.predict_object(req.filepath)
-        return classifyObjectResponse(str(self.category_set[category]),confident)
-#        if self.object_threshold[str(self.category_set[category])] > confident:
-#            return classifyObjectResponse(str(self.category_set[category]),confident)
-#        print 'predicted result(wrong) as',str(self.category_set[category]),'with confident',confident
-#        return classifyObjectResponse('unknown',confident)
+        #return classifyObjectResponse(str(self.category_set[category]),confident)
+        if self.object_threshold[str(self.category_set[category])] > confident:
+            return classifyObjectResponse(str(self.category_set[category]),confident)
+        print 'predicted result(wrong) as',str(self.category_set[category]),'with confident',confident
+        return classifyObjectResponse('unknown',confident)
     
     def predict_object(self, image_filename):
         image = cv2.imread(image_filename, 0)

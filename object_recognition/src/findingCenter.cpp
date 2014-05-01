@@ -101,8 +101,10 @@ float object_position_world[20][3];
 bool isReach[20];
 float objectCentroidWorld[20][3];
 bool isObjectManipulable[20];
-float PLANE_HEIGHT = 0.7;
+float PLANE_HEIGHT = 0.75;
 bool waiting_cloud_flags = false;
+bool ready_flag = false;
+void getObjectPoint();
 
 
 std::string frameId;
@@ -216,48 +218,52 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
     pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_tmp2 (new pcl17::PointCloud<pcl17::PointXYZ>);
     //PointCloudT::Ptr cloud_tmp (new PointCloudT);
 
-	if ((cloud.width * cloud.height) == 0)
-		return; //return if the cloud is not dense!
-	try {
-		//frameId = cloud.header.frame_id;
-        timeStamp = cloud.header.stamp;
-		//pcl17::fromROSMsg(cloud, *cloud_pcl);
-		pcl17::fromROSMsg(cloud, *cloud_tmp);
-        int n = 0;
+    if(ready_flag == true){
+        ready_flag = false;
+        if ((cloud.width * cloud.height) == 0)
+            return; //return if the cloud is not dense!
+        try {
+            //frameId = cloud.header.frame_id;
+            timeStamp = cloud.header.stamp;
+            //pcl17::fromROSMsg(cloud, *cloud_pcl);
+            pcl17::fromROSMsg(cloud, *cloud_tmp);
+            int n = 0;
 
-        for (pcl17::PointCloud<pcl17::PointXYZ>::iterator it = cloud_tmp->begin(); it != cloud_tmp->end(); ++it){
-            float x = it->x;
-            float y = it->y;
-            float z = it->z;
-            //cout << "(" << x << "," << y << "," << z << ")" << endl;
-            //if( x < DEPTH_LIMIT && y < PLANE_LEFT && y > PLANE_RIGHT && z > PLANE_HEIGHT){
-            if( x < DEPTH_LIMIT && y < PLANE_LEFT && y > PLANE_RIGHT && z > PLANE_HEIGHT){
-                cloud_tmp2->push_back(pcl17::PointXYZ(it->x,it->y,it->z));
-                n++;
-            }
+            for (pcl17::PointCloud<pcl17::PointXYZ>::iterator it = cloud_tmp->begin(); it != cloud_tmp->end(); ++it){
+                float x = it->x;
+                float y = it->y;
+                float z = it->z;
+                //cout << "(" << x << "," << y << "," << z << ")" << endl;
+                //if( x < DEPTH_LIMIT && y < PLANE_LEFT && y > PLANE_RIGHT && z > PLANE_HEIGHT){
+                if( x < DEPTH_LIMIT && y < PLANE_LEFT && y > PLANE_RIGHT && z > PLANE_HEIGHT){
+                    cloud_tmp2->push_back(pcl17::PointXYZ(it->x,it->y,it->z));
+                    n++;
+                }
                 //if( sqrt(x*x+y*y+z*z) < ARM_RAIDUS){
                 //    cloud_tmp2->push_back(pcl17::PointXYZ(it->x,it->y,it->z));
                 //}
+            }
+            cloud_tmp2->header = cloud_tmp->header;
+            cout << "first cloud size : " <<cloud_tmp->width*cloud_tmp->height << "modified cloud size : " << n << endl;
+
+            //        cloud_tmp2->width = 1;
+            //        cloud_tmp2->height = n;
+            //cout << "width : " << cloud_tmp2->width << " height : " << n << endl;
+            //cout << "frame_id " << cloud.header.frame_id << endl;
+            listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
+            //listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(2.0));
+            //cout << "before transformPointCloud" << endl;
+            pcl17_ros::transformPointCloud(logitech_frame, *cloud_tmp2, *cloud_pcl, *listener);
+
+            getObjectPoint();
+            //cout << "cloud_pcl->header.frame_id" << cloud_pcl->header.frame_id << endl;
+
+            //ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
+            //	cout << "point cloud get" << endl;
+            } catch (std::runtime_error e) {
+                ROS_ERROR_STREAM("Error message: " << e.what());
+            }
         }
-        cloud_tmp2->header = cloud_tmp->header;
-        //cout << "first cloud size : " <<cloud_tmp->width*cloud_tmp->height << "modified cloud size : " << n << endl;
-
-//        cloud_tmp2->width = 1;
-//        cloud_tmp2->height = n;
-        //cout << "width : " << cloud_tmp2->width << " height : " << n << endl;
-        //cout << "frame_id " << cloud.header.frame_id << endl;
-	  	listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
-	  	//listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(2.0));
-        //cout << "before transformPointCloud" << endl;
-	  	pcl17_ros::transformPointCloud(logitech_frame, *cloud_tmp2, *cloud_pcl, *listener);
-
-        //cout << "cloud_pcl->header.frame_id" << cloud_pcl->header.frame_id << endl;
-
-		//ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
-	//	cout << "point cloud get" << endl;
-	} catch (std::runtime_error e) {
-		ROS_ERROR_STREAM("Error message: " << e.what());
-	}
 }
 
 
@@ -787,8 +793,7 @@ void imageColorCb(const sensor_msgs::ImageConstPtr& msg)
 
 void prepareCloud(const std_msgs::Float64 planeHeight){
     PLANE_HEIGHT = planeHeight.data;
-    usleep(500);
-    getObjectPoint();
+    ready_flag = true;
 }
 
 
