@@ -187,8 +187,8 @@ int main(int argc , char *argv[])
 	ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
 	
 	//vector_pub = n.advertise<geometry_msgs::Vector3>("object_point", 1000);
-	//vector_pub = n.advertise<geometry_msgs::Vector3>("manipulator/object_point_split", 1000);
-	vector_pub = n.advertise<geometry_msgs::Vector3>("manipulator/grasp", 1000);
+	vector_pub = n.advertise<geometry_msgs::Vector3>("manipulator/object_point_split", 1000);
+	//vector_pub = n.advertise<geometry_msgs::Vector3>("manipulator/grasp", 1000);
 	vector_pub_pour = n.advertise<geometry_msgs::Vector3>("manipulator/pour", 1000);
 	vector_pub_pointcloud = n.advertise<sensor_msgs::PointCloud2>("object_pointcloud", 1000);
 
