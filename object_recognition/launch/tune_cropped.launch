@@ -1,0 +1,20 @@
+<launch>
+	
+	<node pkg="object_recognition" type="tune_cropped" name="tune_cropped" output="screen">
+<!-- for webcam resolution 640x480 -->
+        <param name="X_TUNE" value="0"/>
+        <param name="Y_TUNE" value="0"/>
+        <param name="FOCAL_LENGTH_X" value="814.033512"/>
+        <param name="FOCAL_LENGTH_Y" value="815.46674"/>
+
+<!-- for webcam resolution 1280x720 -->
+<!--
+        <param name="X_TUNE" value="0"/>
+        <param name="Y_TUNE" value="-300"/>
+        <param name="FOCAL_LENGTH_X" value="1412.85425"/>
+        <param name="FOCAL_LENGTH_Y" value="1413.27344"/>
+
+-->
+    </node>
+
+</launch>
