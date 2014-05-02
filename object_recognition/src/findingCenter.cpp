@@ -833,6 +833,10 @@ int main (int argc, char** argv)
     cout << "TUNED_H_DISTANCE_BOTTOM_RIGHT " <<  TUNED_H_DISTANCE_BOTTOM_RIGHT << " TUNED_V_DISTANCE_BOTTOM_RIGHT" << TUNED_V_DISTANCE_BOTTOM_RIGHT << endl;
     cout << "ARM_RAIDUS " << ARM_RAIDUS << endl;
 
+    //char mkdirCommand[1000];
+    //sprintf(comm,"/home/skuba/skuba_athome/object_perception/bin/extractSURF /home/skuba/skuba_athome/object_perception/picture%d.jpg /home/skuba/skuba_athome/object_perception/feature%d",j,j);
+    //sprintf(mkdirCommand,"/home/skuba/skuba_athome/object_perception/object_recognition/bin/extractSURF /run/shm/object_perception/picture%d.png /run/shm/object_perception/feature%d",j,j);
+    system("mkdir /run/shm/object_perception");
 
 
 	pubObjectNum = n.advertise<std_msgs::String>("object_number", 1000);

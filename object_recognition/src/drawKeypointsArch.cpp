@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 	cout << argc << endl;
 	for(int i=0;i<argc;i++)
 		cout << "i : " << i << " " << argv[i] << endl;
-    for(int k=0;k<=38;k++){
+    for(int k=0;k<=41;k++){
 
         char fileName[100],output[100];
 
@@ -32,8 +32,9 @@ int main(int argc, char** argv)
 				sprintf(fileName,"/run/shm/object_perception/picture%d.png",k);
 			}
 		else
-			sprintf(fileName,"/home/skuba/skuba_athome/object_perception/data/%s/frame%04d.png",argv[1],k);
-        sprintf(output,"/home/skuba/skuba_athome/object_perception/tmp/frame%04d_feature.png",k);
+			sprintf(fileName,"/home/skuba/webcam_data_640x480/cropped/%s/frame%04d.png",argv[1],k);
+			//sprintf(fileName,"/home/skuba/skuba_athome/object_perception/data/%s/frame%04d.png",argv[1],k);
+        sprintf(output,"/home/skuba/skuba_athome/object_perception/object_recognition//tmp/frame%04d_feature.png",k);
 
 		//cout << fileName << endl;
 
@@ -114,6 +115,7 @@ int main(int argc, char** argv)
         cvDestroyWindow("Image");
     }
 
+	printf("sum number of descriptor: %d\n",sum);
 	printf("avg number of descriptor: %f\n",sum/38.0);
 //
 //    CvMemStorage* storage = cvCreateMemStorage(0);
