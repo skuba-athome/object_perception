@@ -1,3 +1,10 @@
+#include <iostream>
+#include <boost/algorithm/string.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <string>
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
@@ -55,6 +62,7 @@
 namespace enc = sensor_msgs::image_encodings;
 using namespace std;
 using namespace cv;
+using namespace boost;
 enum State { START,TRACKING,NORMAL,FIND_REGION};
 Mat image;
 bool isStart= false,regionExist=false;
@@ -144,7 +152,7 @@ void sendPosition(float x , float y ,float z){
 			vector.z = z;
 	        if(vector.x == vector.x && vector.y == vector.y && vector.z == vector.z)
             vector_pub.publish(vector);
-			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
+			//printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
 		
 }
 
@@ -248,8 +256,8 @@ void draw(int maxIndex,vector<vector<Point> > contours,vector<Vec4i> hierarchy){
 	cv::circle(m, cv::Point(center_x, center_y), 10, CV_RGB(255,0,0));
 	cvNamedWindow("after draw contours");
 	cvShowImage("after draw contours",imgTresh);
-	//cvNamedWindow("source");
-	//cvShowImage("source",img);
+	cvNamedWindow("source");
+	cvShowImage("source",img);
 }
 bool findColor(){
 	Mat frame = image;
@@ -307,12 +315,32 @@ void imageCallback(const sensor_msgs::Image::ConstPtr& img_in)
 }
 int main (int argc, char** argv)
 {
-	lowerH=80;
-	lowerS=75;
-	lowerV=120;
-	upperH=180;
-	upperS=256;
-	upperV=256;
+	int i = 0;
+        int config[6];
+        for(int x = 0 ;x<6;x++)
+        config[x] = 0;
+
+	string line;
+	vector <string> fields;  	
+	ifstream myfile ("/home/skuba/skuba_athome/object_perception/color_detection/bin/color_config.txt");
+  	
+	if (myfile.is_open())
+  	{
+    		while ( getline (myfile,line) )
+    		{
+			split( fields, line, is_any_of( ":" ) );
+			config[i] = atoi(fields[1].c_str());
+    			i++;
+		}
+    		myfile.close();
+  	}
+  	else cout << "Unable to open file"; 
+	lowerH=config[0];
+	lowerS=config[1];
+	lowerV=config[2];
+	upperH=config[3];
+	upperS=config[4];
+	upperV=config[5];
 	setwindowSettings();
 	current_contour = new my_contour();
 	new_contour = new my_contour();
