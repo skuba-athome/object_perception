@@ -10,8 +10,8 @@ startPath = "/home/skuba/webcam_data_640x480/cropped/"
 prefixFolder = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/LocalizationTrain/"
 featurePath = "/home/skuba/skuba_athome/object_perception/object_recognition/config/feature/"
 
-if not os.path.exists(prefixFolder):
-    os.makedirs(prefixFolder)
+#if not os.path.exists(prefixFolder):
+#    os.makedirs(prefixFolder)
 
 # Extract SURF keypoints
 Picture = []
