@@ -1,22 +1,17 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
-#include <iostream>
-#include <string>
 #include <vector>
-#include <fstream>
 #include <string>
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp" 
-#include <iostream> 
 #include <stdio.h>
 #include <stdlib.h>
 #include <cv.h>
 #include <cv_bridge/cv_bridge.h> 
 #include <math.h>
-#include <string>
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl/ros/conversions.h>
 #include <pcl/point_cloud.h>
@@ -36,23 +31,8 @@
 #include <pcl/features/vfh.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d_omp.h>
-#include <ros/ros.h>
-#include <sensor_msgs/PointCloud2.h>
-#include<ros/ros.h>
-#include<sensor_msgs/Image.h>
-#include<std_msgs/String.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <geometry_msgs/Vector3.h>
-#include <cv.h>
-#include <highgui.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <iostream>
-#include <vector>
-#include <string>
 #include <fstream>
 #define distance_ratio 100
 #define ACCEPTED_DISTANCE 50
