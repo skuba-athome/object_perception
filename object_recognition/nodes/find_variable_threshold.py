@@ -3,6 +3,8 @@ import roslib
 import rospy
 import cv2
 import os
+import sys
+from subprocess import call
 import numpy
 import time
 import math
@@ -19,12 +21,110 @@ from operator import add
 object_dic = []
 surf = cv2.SURF(400)
 
+class extract_folder:
+    def __init__(self):
+        self.startPath = "/home/skuba/webcam_data_640x480/cropped/"
+        #startPath = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/PicCut/"
+        #prefixFolder = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/LocalizationTrain/"
+        self.prefixFolder = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/LocalizationTrain/"
+        self.featurePath = "/home/skuba/skuba_athome/object_perception/object_recognition/config/feature/"
+
+    def extract_to_config(self):
+        if not os.path.exists(self.featurePath):
+            os.makedirs(self.featurePath)
+
+        objectIndex = 0
+        for folder in os.listdir(self.startPath):
+
+            #print folder
+            #Picture.append([])
+            objectIndex += 1
+            surfPath = self.featurePath + folder + ".txt"
+            if os.path.exists(surfPath):
+                os.remove(surfPath)
+
+            #print surfPath
+            for picture in os.listdir(self.startPath + folder + "/"):
+                if picture.endswith(".jpg") or picture.endswith(".png"):
+                    #print picture
+                    filePath = self.startPath + folder + "/" + picture
+
+#//                if os.path.exists(filePath):
+#//                    os.remove(filePath)
+                    print 'in extract_to_config method'
+                    call(["/home/skuba/skuba_athome/object_perception/object_recognition/bin/extractSURF",filePath,surfPath])
+
+
+    def extract_to_each_picture(self):
+        startPath = "/home/skuba/webcam_data_640x480/cropped/"
+        prefixFolder = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/LocalizationTrain/"
+
+        if not os.path.exists(prefixFolder):
+            os.makedirs(prefixFolder)
+        index = 15
+        nnn = 1
+
+        # Extract SURF keypoints
+        Picture = []
+
+        objectIndex = 0
+        print os.listdir(startPath)
+        for folder in os.listdir(startPath):
+            Picture.append([])
+            objectIndex += 1
+            print folder
+            for picture in os.listdir(startPath + folder + "/"):
+                if picture.endswith(".txt"):
+                    os.remove(startPath + folder + "/" + picture)
+
+            for picture in os.listdir(startPath + folder + "/"):
+                if picture.endswith(".jpg") or picture.endswith(".png"):
+                    filePath = startPath + folder + "/" + picture
+                    surfPath,extension = os.path.splitext(filePath)
+                    print '----',filePath,'----\n'
+                    #print os.path.splitext(filePath)
+                    #Picture[objectIndex-1].append((surfPath+".txt",objectIndex))
+                    Picture[objectIndex-1].append((surfPath+".txt",folder))
+                    print 'in extract_to_each_picture method'
+                    call(["/home/skuba/skuba_athome/object_perception/object_recognition/bin/extractSURF",filePath,surfPath+".txt"])
+
+        #trainList = Picture[::]
+##        trainList = Picture[:-50]
+##        testingList = Picture[-50:]
+        trainList = []
+        testingList = []
+        for i in range(len(Picture)):
+            random.shuffle(Picture[i])
+            trainList += Picture[i][::]
+            #trainList += Picture[i][:-nnn]
+            #testingList += Picture[i][-nnn:]
+#
+#        print len(trainList),len(testingList)
+#
+#
+#
+#        # create file train
+#
+        fileTrain = open(prefixFolder + str(index) + ".train","w")
+        for aObject in trainList:
+            fileTrain.write(str(aObject[1])+" "+str(aObject[0])+"\n")
+            print (str(aObject[1])+" "+str(aObject[0])+"\n")
+        fileTrain.close()
+
+        # create file testing
+#
+#        fileTrain = open(prefixFolder + str(index) +".test","w")
+#        for aObject in testingList:
+#            fileTrain.write(str(aObject[1])+" "+str(aObject[0])+"\n")
+#        fileTrain.close()
 
 class find_variable_threshold:
     def __init__(self):
+        print 'in find_variable_threshold init0'
         self.classify_object = rospy.ServiceProxy('classifyObject', classifyObject)
         self.object_recognition = objectRecognition()
-        self.k_fold = rospy.get_param('~k_fold', 200)
+        print 'in find_variable_threshold init1'
+        self.k_fold = rospy.get_param('~k_fold', 10)
         self.object_root_dir = rospy.get_param('~object_directory',"/home/skuba/webcam_data_640x480/cropped/")
         self.train_file = []
         self.test_file = {}
@@ -35,7 +135,7 @@ class find_variable_threshold:
             self.result[file_name]["correct"] = []
             self.result[file_name]["wrong"] = []
         self.iteration = 1
-        self.percentile = 0.9
+        self.percentile = 0.95
         self.object_threshold = {}
         #time.sleep(3)
         self.recreate_location = '/home/skuba/skuba_athome/object_perception/object_recognition/learn/file_location.txt'
@@ -72,7 +172,7 @@ class find_variable_threshold:
                     #self.object_threshold[object_name] = correct_max
                     print self.object_threshold[object_name] 
                     f.write(object_name + '(correct) : '+ str(correct_max) +'\n'+ str(reduce(lambda x,y : "%s\n%s"%(str(x),str(y)) ,correct_tmp)) +'\n') 
-                    threshold_writer.write(str(object_name) + " " + str(self.object_threshold[object_name]) + '\n')
+                    threshold_writer.write(str(object_name) + ":" + str(self.object_threshold[object_name]) + '\n')
                 else:
                     f.write(object_name + '(correct) : '+ str(0) +'\n'+'no sequence\n') 
 
@@ -174,9 +274,10 @@ class objectRecognition:
     def __init__(self):
         rospy.Subscriber("featureFilePath",String,self.classifyObjectHandle)
         self.recognitionResult = rospy.Publisher('recognitionResult',String) 
-        
+        print 'in objectRecognition init'
         learningListFile = "/home/skuba/skuba_athome/object_perception/object_recognition/learn/LocalizationTrain/15.train"
         feature,self.labels = self.loadTrainData(learningListFile)
+        print 'in objectRecognition init2'
         self.K_neighbors = int(rospy.get_param('~k_neighbors', 35))
         self.clf = neighbors.KNeighborsClassifier(self.K_neighbors, weights='distance')
         self.clf.fit(feature, self.labels) 
@@ -210,10 +311,10 @@ class objectRecognition:
             #print line
             #category,filePath = line.strip().split(",")
             category,filePath = line.strip().split(" ")
-            #print filePath
             if not category in self.categorySet:
                 self.categorySet[category] = len(self.categorySet)
                 self.revertCategory.append(category)
+            #print '--',filePath,self.categorySet[category]
             feature,label = self.loadFeature(filePath,self.categorySet[category])
             feature_list += feature
             label_list += label
@@ -224,7 +325,7 @@ class objectRecognition:
         label_list = []
         filePtr = open(filename,"r")
         for line in filePtr:
-            attribute = line.strip().split(",")
+            attribute = line.strip().split(" ")
             feature_list.append(map(float,attribute))
             label_list.append(int(category))
         filePtr.close()
@@ -294,6 +395,10 @@ class objectRecognition:
 if __name__ == "__main__":
     try:
         rospy.init_node('find_variable_threshold')
+        ef = extract_folder()
+        ef.extract_to_config()
+        ef.extract_to_each_picture()
+        print 'after extraction finished'
         fvt = find_variable_threshold()
         fvt.run()
         rospy.spin()
