@@ -37,15 +37,20 @@ if __name__ == "__main__":
 
     #verify_object = rospy.ServiceProxy('verifyObject', verifyObject)
     #object_root_dir = rospy.get_param('~object_directory', roslib.packages.get_pkg_dir('object_recognition') + '/data')
-    object_root_dir = rospy.get_param('~object_directory',"/home/skuba/test_data/")
+    object_root_dir = rospy.get_param('~object_directory',"/home/skuba/webcam_data_640x480/cropped/")
 #    print object_root_dir
     object_dic = list_image_in_directory(object_root_dir)
-    print object_dic
+    #print object_dic
 
     #f = open('/home/skuba/.ros/result','w')
-    print object_root_dir
+    #print object_root_dir
     for directory_path in object_dic:
         for file_name in object_dic[directory_path]:
-            print file_name
+            #print file_name
             response = verify_object(file_name)
-            print response
+            #print response
+            if response.objectCategory in file_name:
+                print 'predict ',file_name,'correct'
+            else:
+                print 'predict ',file_name,'wrong as',response.objectCategory
+

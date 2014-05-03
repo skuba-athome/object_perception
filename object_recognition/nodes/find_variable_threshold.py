@@ -107,8 +107,8 @@ class extract_folder:
 #
         fileTrain = open(prefixFolder + str(index) + ".train","w")
         for aObject in trainList:
-            fileTrain.write(str(aObject[1])+" "+str(aObject[0])+"\n")
-            print (str(aObject[1])+" "+str(aObject[0])+"\n")
+            fileTrain.write(str(aObject[1])+","+str(aObject[0])+"\n")
+            print (str(aObject[1])+","+str(aObject[0])+"\n")
         fileTrain.close()
 
         # create file testing
@@ -129,6 +129,7 @@ class find_variable_threshold:
         self.train_file = []
         self.test_file = {}
         self.object_dic = self.list_image_in_directory(self.object_root_dir)
+        #print self.object_dic
         self.result = {}
         for file_name in self.object_dic:
             self.result[file_name] = {}
@@ -159,6 +160,7 @@ class find_variable_threshold:
     def run(self):
         #self.k_fold_validation()
         self.k_attempt_validation()
+        print 'after k_attempt_validation'
         f = open("/home/skuba/.ros/find_variable_threshold.txt",'w')
         threshold_writer = open("/home/skuba/skuba_athome/object_perception/object_recognition/config/result_threshold.txt",'w')
         for object_name in self.object_dic:
@@ -243,7 +245,8 @@ class find_variable_threshold:
                 #test_file[object_name] = self.object_dic[object_name][i*number_per_round:(i+1)*number_per_round]
                 #train_tmp = (self.object_dic[object_name][:i*2] + self.object_dic[object_name][(i+1)*number_per_round:])
                 #train_file_prefixed = map(lambda x : "%s %s"%(object_name,x),train_tmp)
-                train_file += map(lambda x : "%s %stxt"%(object_name,x[:-3]),train_tmp)
+                train_file += map(lambda x : "%s,%stxt"%(object_name,x[:-3]),train_tmp)
+            print train_file
             self.train_model(train_file)
             self.validate(test_file)
 
@@ -310,7 +313,7 @@ class objectRecognition:
         for line in filePtr:
             #print line
             #category,filePath = line.strip().split(",")
-            category,filePath = line.strip().split(" ")
+            category,filePath = line.strip().split(",")
             if not category in self.categorySet:
                 self.categorySet[category] = len(self.categorySet)
                 self.revertCategory.append(category)
@@ -395,10 +398,10 @@ class objectRecognition:
 if __name__ == "__main__":
     try:
         rospy.init_node('find_variable_threshold')
-        ef = extract_folder()
-        ef.extract_to_config()
-        ef.extract_to_each_picture()
-        print 'after extraction finished'
+        #ef = extract_folder()
+        #ef.extract_to_config()
+        #ef.extract_to_each_picture()
+        #print 'after extraction finished'
         fvt = find_variable_threshold()
         fvt.run()
         rospy.spin()
