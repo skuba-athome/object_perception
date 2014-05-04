@@ -398,10 +398,10 @@ class objectRecognition:
 if __name__ == "__main__":
     try:
         rospy.init_node('find_variable_threshold')
-        #ef = extract_folder()
-        #ef.extract_to_config()
-        #ef.extract_to_each_picture()
-        #print 'after extraction finished'
+        ef = extract_folder()
+        ef.extract_to_config()
+        ef.extract_to_each_picture()
+        print 'after extraction finished'
         fvt = find_variable_threshold()
         fvt.run()
         rospy.spin()
