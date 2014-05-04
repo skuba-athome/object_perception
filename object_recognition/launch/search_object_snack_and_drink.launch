@@ -1,10 +1,10 @@
 <launch>
 
-	<include file="$(find object_recognition)/launch/verify_object_service.launch">
+    <node pkg="object_recognition" type="verify_object_service.py" name="verify_object_service" output="screen">
         <param name="feature_directory" value="$(find object_recognition)/config/feature_snack_and_drink"/>
         <param name="k_neighbors" value="50"/>
         <param name="threshold_file" value="$(find object_recognition)/config/result_threshold_snack_and_drink.txt"/>
-    </include>
+    </node>
 	
 	<node pkg="object_recognition" type="findingCenter" name="findingCenter" output="screen">
 

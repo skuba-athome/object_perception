@@ -110,7 +110,7 @@ void transformer(int x, int y)
                 global_x += vector.x;
                 global_y += vector.y;
                 global_z += vector.z;
-	                    //printf("x:%f y:%f z:%f\n",vector.x,vector.y,vector.z);
+	                //printf("x:%f y:%f z:%f\n",vector.x,vector.y,vector.z);
                 }
                 else 
                     divider++;
@@ -132,7 +132,7 @@ void sendPosition(float x , float y ,float z){
 			vector.z = z;
 	        if(vector.x == vector.x && vector.y == vector.y && vector.z == vector.z)
             vector_pub.publish(vector);
-			//printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
+			printf("send : x:%.2f y:%.2f z:%.2f\n",vector.x,vector.y,vector.z);						
 		
 }
 
