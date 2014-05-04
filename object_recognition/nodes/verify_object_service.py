@@ -23,14 +23,17 @@ class object_recognition:
         feature_directory = rospy.get_param('~feature_directory', '/config/feature')
         K_neighbors = int(rospy.get_param('~k_neighbors', 35))
 
+
+        print feature_directory
         feature, self.labels = self.load_train_data(feature_directory)
         self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
         self.clf.fit(feature, self.labels) 
 
         object_threshold_file = rospy.get_param('~threshold_file', 'config/threshold.txt')
-        object_threshold_file = "/home/skuba/skuba_athome/object_perception/object_recognition/config/result_threshold.txt"
+        #object_threshold_file = "/home/skuba/skuba_athome/object_perception/object_recognition/config/result_threshold.txt"
         self.object_threshold = self.read_object_threshold(object_threshold_file)
-        #print self.object_threshold
+        print object_threshold_file
+        print self.object_threshold
         
         rospy.Service('/object_recognition/verify_object', classifyObject, self.classify_object_service)
         
