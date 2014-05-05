@@ -279,6 +279,13 @@ void getObjectPoint(){
 	std::stringstream center_ss;
 	cloud = cloud_pcl;
 
+    if (cloud->width*cloud->height == 0)
+    {
+        object_recognition::ObjectContainer objectContainer;
+        pub_detectedObject.publish(objectContainer);
+        return ;
+    }
+
     vector<std::string> fileName;
 	vector<int> compression_params; //vector that stores the compression parameters of the image
 
