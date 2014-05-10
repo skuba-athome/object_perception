@@ -14,5 +14,7 @@ object_recognition/src/object_recognition/*
 .idea
 tmp
 object_recognition/config/feature/*
+object_recognition/config/*
 object_recognition/learn/file_location.txt
 object_recognition/learn/
+*.orig
