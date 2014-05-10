@@ -37,8 +37,8 @@
 #include <unistd.h>
 using namespace std;
 
-//#define DEPTH_LIMIT 0.86
-#define DEPTH_LIMIT 1.0
+#define DEPTH_LIMIT 0.86
+//#define DEPTH_LIMIT 1.0
 #define ACCEPTED_AREA 300
 //#define PLANE_HEIGHT -1.5
 //#define PLANE_HEIGHT 0.7

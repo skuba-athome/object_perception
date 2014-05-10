@@ -20,10 +20,10 @@
         <param name="FOCAL_LENGTH_Y" value="815.46674"/>
 
 
-        <param name="TUNED_H_DISTANCE_TOP_LEFT" value="-25"/>
+        <param name="TUNED_H_DISTANCE_TOP_LEFT" value="-45"/>
         <param name="TUNED_V_DISTANCE_TOP_LEFT" value="45"/>
 
-        <param name="TUNED_H_DISTANCE_BOTTOM_RIGHT" value="0"/>
+        <param name="TUNED_H_DISTANCE_BOTTOM_RIGHT" value="-20"/>
         <param name="TUNED_V_DISTANCE_BOTTOM_RIGHT" value="80"/>
 
 <!-- tmp webcam resolution 640x480
