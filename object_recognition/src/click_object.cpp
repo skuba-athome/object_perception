@@ -23,9 +23,11 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 // PCL specific includes
-#include <pcl/ros/conversions.h>
+//#include <pcl/ros/conversions.h>
+#include <pcl/conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+#include <pcl/PCLPointCloud2.h>
 
 
 #include <pcl/ModelCoefficients.h>
@@ -49,7 +51,8 @@
 
 #include <tf/transform_listener.h>
 #include <pcl_ros/transforms.h>
-#include <pcl/ros/conversions.h>
+
+#include <pcl_conversions/pcl_conversions.h>
 
 //---------
 using namespace std;
@@ -68,11 +71,18 @@ static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl (new pcl::PointCloud<pcl
 
 void depthCb(const sensor_msgs::PointCloud2& cloud) {
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_tmp (new pcl::PointCloud<pcl::PointXYZRGB>);
+  pcl::PCLPointCloud2 PCLPointCloud_tmp;
   if ((cloud.width * cloud.height) == 0)
     return; //return if the cloud is not dense!
   try {
-    pcl::fromROSMsg(cloud, *cloud_tmp);
-    cloud_tmp->header = cloud.header;
+    pcl_conversions::toPCL(cloud, PCLPointCloud_tmp);
+
+    //pcl::fromROSMsg(cloud, *cloud_tmp);
+
+    pcl::fromPCLPointCloud2(PCLPointCloud_tmp, *cloud_tmp);
+
+    //cloud_tmp->header = cloud.header;
+
     timeStamp = cloud.header.stamp;
     listener->waitForTransform(rgb_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
     pcl_ros::transformPointCloud(rgb_frame, *cloud_tmp, *cloud_pcl, *listener);
@@ -176,6 +186,7 @@ void kinectCallBack(const sensor_msgs::ImageConstPtr& msg)
 	}
 }
 
+
 int main(int argc , char *argv[])
 {
 	ros::init(argc,argv,"click_objects");
@@ -197,5 +208,4 @@ int main(int argc , char *argv[])
 	cvNamedWindow("input", 1 );
 	cvSetMouseCallback("input", on_mouse);
 	ros::spin();
-
 }
