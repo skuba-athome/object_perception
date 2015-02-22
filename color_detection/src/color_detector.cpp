@@ -13,7 +13,7 @@
 #include <cv_bridge/cv_bridge.h> 
 #include <math.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <pcl/ros/conversions.h>
+#include <pcl/conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/ModelCoefficients.h>
@@ -34,6 +34,12 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <geometry_msgs/Vector3.h>
 #include <fstream>
+
+#include <pcl/PCLPointCloud2.h>
+#include <pcl_conversions/pcl_conversions.h>
+
+
+
 #define distance_ratio 100
 #define ACCEPTED_DISTANCE 50
 #define AGGREGRATED_FRAME 3
@@ -120,10 +126,38 @@ void depthCb(const sensor_msgs::PointCloud2& cloud) {
   if ((cloud.width * cloud.height) == 0)
       return;
   try {
-    pcl::fromROSMsg(cloud, *cloud_pcl);
+      pcl::PCLPointCloud2 PCLPointCloud_tmp;
+      pcl_conversions::toPCL(cloud, PCLPointCloud_tmp);
+      pcl::fromPCLPointCloud2(PCLPointCloud_tmp, *cloud_pcl);
   } catch (std::runtime_error e) {
     ROS_ERROR_STREAM("Error message: " << e.what());
   }
+
+
+/*
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_tmp (new pcl::PointCloud<pcl::PointXYZRGB>);
+  pcl::PCLPointCloud2 PCLPointCloud_tmp;
+  if ((cloud.width * cloud.height) == 0)
+    return; //return if the cloud is not dense!
+  try {
+    pcl_conversions::toPCL(cloud, PCLPointCloud_tmp);
+
+    //pcl::fromROSMsg(cloud, *cloud_tmp);
+
+    pcl::fromPCLPointCloud2(PCLPointCloud_tmp, *cloud_tmp);
+
+    //cloud_tmp->header = cloud.header;
+
+    timeStamp = cloud.header.stamp;
+    listener->waitForTransform(rgb_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
+    pcl_ros::transformPointCloud(rgb_frame, *cloud_tmp, *cloud_pcl, *listener);
+
+  } catch (std::runtime_error e) {
+    ROS_ERROR_STREAM("Error message: " << e.what());
+  }
+  */
+
+
 }
 void sendPosition(float x , float y ,float z){
 			geometry_msgs::Vector3 vector;
@@ -302,7 +336,7 @@ int main (int argc, char** argv)
 
 	string line;
 	vector <string> fields;  	
-	ifstream myfile ("/home/skuba/skuba_athome/object_perception/color_detection/bin/color_config.txt");
+	ifstream myfile ("/home/win/skuba_athome_hydro/object_perception/src/color_detection/color_config.txt");
   	
 	if (myfile.is_open())
   	{
@@ -327,8 +361,8 @@ int main (int argc, char** argv)
 	ros::init(argc, argv, "color_detector");
 	ros::NodeHandle n;
 	cv::namedWindow(WINDOW, CV_WINDOW_AUTOSIZE);
-	ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);
-	//ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
+	//ros::Subscriber subDepth = n.subscribe("/cloud_tf",1,depthCb);
+	ros::Subscriber subDepth = n.subscribe("/camera/depth_registered/points",1,depthCb);
 	ros::Subscriber	image_sub = n.subscribe("/camera/rgb/image_color", 1, imageCallback);
 	vector_pub = n.advertise<geometry_msgs::Vector3>("color_detect", 1000);
 	cv::destroyWindow(WINDOW);

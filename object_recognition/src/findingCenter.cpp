@@ -2,25 +2,26 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <object_recognition/classifyObject.h>
 #include <object_recognition/verifyObject.h>
+#include <tf/transform_listener.h>
 #include <manipulator/isManipulable.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Header.h>
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/Point.h>
-#include <pcl17_ros/transforms.h>
-#include <pcl17/ros/conversions.h>
-#include <pcl17/ModelCoefficients.h>
-#include <pcl17/point_types.h>
-#include <pcl17/io/pcd_io.h>
-#include <pcl17/filters/extract_indices.h> 
-#include <pcl17/filters/voxel_grid.h>
-#include <pcl17/features/normal_3d.h>
-#include <pcl17/kdtree/kdtree.h>
-#include <pcl17/sample_consensus/method_types.h>
-#include <pcl17/sample_consensus/model_types.h>
-#include <pcl17/segmentation/sac_segmentation.h>
-#include <pcl17/segmentation/extract_clusters.h>
+//#include <pcl_transforms.h>
+#include <pcl/ros/conversions.h>
+#include <pcl/ModelCoefficients.h>
+#include <pcl/point_types.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/filters/extract_indices.h> 
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/kdtree/kdtree.h>
+#include <pcl/sample_consensus/method_types.h>
+#include <pcl/sample_consensus/model_types.h>
+#include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/segmentation/extract_clusters.h>
 #include <sstream>
 #include "opencv2/highgui/highgui.hpp"
 #include <image_transport/image_transport.h>
@@ -29,12 +30,13 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <algorithm>
-#include <tf/transform_listener.h>
 
 #include <object_recognition/Object.h>
 #include <object_recognition/ObjectContainer.h>
-
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl_ros/transforms.h>
 #include <unistd.h>
+
 using namespace std;
 
 #define DEPTH_LIMIT 0.86
@@ -135,7 +137,7 @@ tf::TransformListener* listener;
 ros::Time timeStamp,timeStamp_;
 
 ros::Publisher pub,pubObjectNum,center_pub,pub_detectedObject;
-static pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_pcl (new pcl17::PointCloud<pcl17::PointXYZ>);
+static pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pcl (new pcl::PointCloud<pcl::PointXYZ>);
 
 bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* objectWorldY,float* objectWorldZ){
 	cout << "-------------------in isObjectReachable method-------------------------" << endl;
@@ -144,8 +146,8 @@ bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* object
 	//char* robot_frame = "";
 
 	//try{
-		//pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_obj (new pcl17::PointCloud<pcl17::PointXYZ>);
-		pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_obj (new pcl17::PointCloud<pcl17::PointXYZ>);
+		//pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>), cloud_obj (new pcl::PointCloud<pcl::PointXYZ>);
+		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>), cloud_obj (new pcl::PointCloud<pcl::PointXYZ>);
 
 //		PointCloudT::Ptr cloud (new PointCloudT);
 //		pcl::fromROSMsg(*cloud_in,*cloud);
@@ -179,21 +181,6 @@ bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* object
 		*objectWorldY = base_point.point.y;
 		*objectWorldZ = base_point.point.z;
 
-//		listener->waitForTransform(robot_frame, frameId, ros::Time::now(), ros::Duration(1.0));
-		//pcl17_ros::transformPointCloud("base_link", *cloud, *cloud_obj, *listener);
-
-//		xWorld = cloud_obj->begin()->x;
-//		yWorld = cloud_obj->begin()->y;
-//		zWorld = cloud_obj->begin()->z;
-		//xWorld = 1.3;
-		//yWorld = 0.3;
-		//zWorld = 0.3;
-//	}
-//	catch(tf::TransformException& ex){
-//		//ROS_ERROR("Received an exception trying to transform a point from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
-//		ROS_ERROR("Received an exception trying to transform a point.");// from %s to %s: %s", cloud_in->header.frame_id.c_str(),pan_frame.c_str(),ex.what());
-//	}
-//
 	isManipulatableSrv.request.x = base_point.point.x;
 	isManipulatableSrv.request.y = base_point.point.y;
 	isManipulatableSrv.request.z = base_point.point.z;
@@ -207,40 +194,50 @@ bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* object
 	}
 	else
 		ROS_ERROR("Failed to call isManipulable service");
-
 	return false;
 }
 
 
 void depthCB(const sensor_msgs::PointCloud2& cloud) {
 
-    pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
-    pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_tmp2 (new pcl17::PointCloud<pcl17::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_tmp (new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_tmp2 (new pcl::PointCloud<pcl::PointXYZ>);
     //PointCloudT::Ptr cloud_tmp (new PointCloudT);
+    pcl::PCLPointCloud2 PCLPointCloud_tmp;
 
     if(ready_flag == true){
         ready_flag = false;
         if ((cloud.width * cloud.height) == 0)
+
+
+            //pcl::fromROSMsg(cloud, *cloud_tmp);
+
             return; //return if the cloud is not dense!
         try {
+            pcl_conversions::toPCL(cloud, PCLPointCloud_tmp);
+            pcl::fromPCLPointCloud2(PCLPointCloud_tmp, *cloud_tmp);
             //frameId = cloud.header.frame_id;
             timeStamp = cloud.header.stamp;
-            //pcl17::fromROSMsg(cloud, *cloud_pcl);
-            pcl17::fromROSMsg(cloud, *cloud_tmp);
+            //pcl::fromROSMsg(cloud, *cloud_pcl);
+            //pcl::fromROSMsg(cloud, *cloud_tmp);
+
+
+
+
             int n = 0;
 
-            for (pcl17::PointCloud<pcl17::PointXYZ>::iterator it = cloud_tmp->begin(); it != cloud_tmp->end(); ++it){
+            for (pcl::PointCloud<pcl::PointXYZ>::iterator it = cloud_tmp->begin(); it != cloud_tmp->end(); ++it){
                 float x = it->x;
                 float y = it->y;
                 float z = it->z;
                 //cout << "(" << x << "," << y << "," << z << ")" << endl;
                 //if( x < DEPTH_LIMIT && y < PLANE_LEFT && y > PLANE_RIGHT && z > PLANE_HEIGHT){
                 if( x < DEPTH_LIMIT && y < PLANE_LEFT && y > PLANE_RIGHT && z > PLANE_HEIGHT){
-                    cloud_tmp2->push_back(pcl17::PointXYZ(it->x,it->y,it->z));
+                    cloud_tmp2->push_back(pcl::PointXYZ(it->x,it->y,it->z));
                     n++;
                 }
                 //if( sqrt(x*x+y*y+z*z) < ARM_RAIDUS){
-                //    cloud_tmp2->push_back(pcl17::PointXYZ(it->x,it->y,it->z));
+                //    cloud_tmp2->push_back(pcl::PointXYZ(it->x,it->y,it->z));
                 //}
             }
             cloud_tmp2->header = cloud_tmp->header;
@@ -253,7 +250,7 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
             listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
             //listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(2.0));
             //cout << "before transformPointCloud" << endl;
-            pcl17_ros::transformPointCloud(logitech_frame, *cloud_tmp2, *cloud_pcl, *listener);
+            pcl_ros::transformPointCloud(logitech_frame, *cloud_tmp2, *cloud_pcl, *listener);
 
             getObjectPoint();
             //cout << "cloud_pcl->header.frame_id" << cloud_pcl->header.frame_id << endl;
@@ -270,9 +267,9 @@ void depthCB(const sensor_msgs::PointCloud2& cloud) {
 void getObjectPoint(){
 
     timeStamp_ = timeStamp;
-    pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>)    ,cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>), cloud_f (new pcl::PointCloud<pcl::PointXYZ>)    ,cloud_tmp (new pcl::PointCloud<pcl::PointXYZ>);
 	//Read in the cloud data
-	//pcl17::PCDReader reader;
+	//pcl::PCDReader reader;
 	//reader.read ("1389374538.210053381.pcd", *cloud);
 	
 	int reachableCount=0,objectNumber=0;
@@ -296,28 +293,28 @@ void getObjectPoint(){
 	//bool bSuccess_ = imwrite("first.jpg", img, compression_params); //write the image to file
 	bool bSuccess_ = imwrite("/run/shm/object_perception/first.png", img, compression_params); //write the image to file
 	
-	   //pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_f (new pcl17::PointCloud<pcl17::PointXYZ>);
+	   //pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>), cloud_f (new pcl::PointCloud<pcl::PointXYZ>);
 	   
 	//std::cout << "PointCloud before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
     //
     ROS_INFO("Get PointCloud size : %d",cloud->width*cloud->height);
-	pcl17::PCDWriter writer;
-	writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/first.pcd", *cloud, false); 
+	pcl::PCDWriter writer;
+	writer.write<pcl::PointXYZ> ("/run/shm/object_perception/first.pcd", *cloud, false); 
 
 
-	for (pcl17::PointCloud<pcl17::PointXYZ>::iterator it = cloud->begin(); it != cloud->end(); ++it){
+	for (pcl::PointCloud<pcl::PointXYZ>::iterator it = cloud->begin(); it != cloud->end(); ++it){
 		float x = it->x;
 		float y = it->y;
 		float z = it->z;
 		if( sqrt(x*x+y*y+z*z) < ARM_RAIDUS)
-			cloud_tmp->push_back(pcl17::PointXYZ(it->x,it->y,it->z));
+			cloud_tmp->push_back(pcl::PointXYZ(it->x,it->y,it->z));
 	}
 	
 
 	// Create the filtering object: downsample the dataset using a leaf size of 1cm
 
-	pcl17::VoxelGrid<pcl17::PointXYZ> vg;
-	pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_filtered (new pcl17::PointCloud<pcl17::PointXYZ>);
+	pcl::VoxelGrid<pcl::PointXYZ> vg;
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 	vg.setInputCloud (cloud);
 	//adjust?
 	//vg.setLeafSize (0.001f, 0.001f, 0.001f);
@@ -335,15 +332,15 @@ void getObjectPoint(){
 
 
     if(cloud_filtered->size() != 0 )
-        writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/cloud_filtered.pcd", *cloud_filtered, false); 
+        writer.write<pcl::PointXYZ> ("/run/shm/object_perception/cloud_filtered.pcd", *cloud_filtered, false); 
 
-	pcl17::SACSegmentation<pcl17::PointXYZ> seg;
-	pcl17::PointIndices::Ptr inliers (new pcl17::PointIndices);
-	pcl17::ModelCoefficients::Ptr coefficients (new pcl17::ModelCoefficients);
-	pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_plane (new pcl17::PointCloud<pcl17::PointXYZ> ());
+	pcl::SACSegmentation<pcl::PointXYZ> seg;
+	pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
+	pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZ> ());
 	seg.setOptimizeCoefficients (true);
-	seg.setModelType (pcl17::SACMODEL_PLANE);
-	seg.setMethodType (pcl17::SAC_RANSAC);
+	seg.setModelType (pcl::SACMODEL_PLANE);
+	seg.setMethodType (pcl::SAC_RANSAC);
 	seg.setMaxIterations (100);
 	seg.setDistanceThreshold (0.02);
 
@@ -369,7 +366,7 @@ void getObjectPoint(){
 		}
 
 		// Extract the planar inliers from the input cloud
-		pcl17::ExtractIndices<pcl17::PointXYZ> extract;
+		pcl::ExtractIndices<pcl::PointXYZ> extract;
 		extract.setInputCloud (cloud_filtered);
 		extract.setIndices (inliers);
 		extract.setNegative (false);
@@ -386,7 +383,7 @@ void getObjectPoint(){
 
 		std::stringstream plane_name;
 		plane_name << "/run/shm/object_perception/segmenged_plane" << j << ".pcd";
-		writer.write<pcl17::PointXYZ> (plane_name.str (), *cloud_plane, false); 
+		writer.write<pcl::PointXYZ> (plane_name.str (), *cloud_plane, false); 
 		j++;
         //break;
 	}
@@ -398,11 +395,11 @@ void getObjectPoint(){
         pub_detectedObject.publish(objectContainer);
         return;
     }
-	pcl17::search::KdTree<pcl17::PointXYZ>::Ptr tree (new pcl17::search::KdTree<pcl17::PointXYZ>);
+	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
 	tree->setInputCloud (cloud_filtered);
 
-	std::vector<pcl17::PointIndices> cluster_indices;
-	pcl17::EuclideanClusterExtraction<pcl17::PointXYZ> ec;
+	std::vector<pcl::PointIndices> cluster_indices;
+	pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
 	//ec.setClusterTolerance (0.02); // 2cm
 	ec.setClusterTolerance (0.02); // 2cm
 	//ec.setMinClusterSize (ACCEPTED_AREA);
@@ -414,7 +411,7 @@ void getObjectPoint(){
 	ec.setInputCloud (cloud_filtered);
 	ec.extract (cluster_indices);
 
-	pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_center (new pcl17::PointCloud<pcl17::PointXYZ>);
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_center (new pcl::PointCloud<pcl::PointXYZ>);
 
 	int objectNum=0;
 	j = 0;
@@ -422,7 +419,7 @@ void getObjectPoint(){
 
 	cout << "cluster_indeces.size() = " << cluster_indices.size() << endl;
 
-	for (std::vector<pcl17::PointIndices>::const_iterator it = cluster_indices.begin(); it != cluster_indices.end(); ++it)
+	for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin(); it != cluster_indices.end(); ++it)
 	{	
 		float x=0,y=0,z=0;
 		//float sumX=0,sumY=0,sumZ=0;
@@ -434,7 +431,7 @@ void getObjectPoint(){
         cout << "-----------------------------------"<< pixelFileName << endl;
         FILE* fp = fopen(pixelFileName,"w");
 
-		pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_cluster (new pcl17::PointCloud<pcl17::PointXYZ>);
+		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
 		for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++){
 			float tmpX,tmpY;
 			cloud_cluster->points.push_back (cloud_filtered->points[*pit]); 
@@ -499,7 +496,7 @@ void getObjectPoint(){
 
 		float objectWorldX,objectWorldY,objectWorldZ;
 
-		if( (isObjectManipulable[j] = isObjectReachable(x,y,z,&objectWorldX,&objectWorldY,&objectWorldZ) ))
+		//if( (isObjectManipulable[j] = isObjectReachable(x,y,z,&objectWorldX,&objectWorldY,&objectWorldZ) ))
 			reachableCount++;
 
 //        objectCentroidWorld[j][0] = x;
@@ -670,15 +667,15 @@ void getObjectPoint(){
 		ROS_INFO("(object's point in RGB (%f,%f)\n",pixel_x,pixel_y);
 		ROS_INFO("TOPLEFT : (%f,%f) TOP_RIGHT : (%f,%f)\n",pixel_x_min,pixel_y_min,pixel_x_max,pixel_y_max);
 
-		//pcl17::PointCloud<pcl17::PointXYZ> point;
+		//pcl::PointCloud<pcl::PointXYZ> point;
 
-		//pcl17::PointXYZ point;
+		//pcl::PointXYZ point;
 		//point.x = x;  point.y = y;  point.z = z;
 		//cloud_center->push_back(point);
 		
-		cloud_center->push_back(pcl17::PointXYZ(x,y,z));
+		cloud_center->push_back(pcl::PointXYZ(x,y,z));
 
-		//cloud_center->push_back(new pcl17::PointXYZ(x,y,z));
+		//cloud_center->push_back(new pcl::PointXYZ(x,y,z));
 		ROS_INFO("center of clustering no.%d : (%f,%f,%f) \n",j,x,y,z);
 
 		cloud_cluster->width = cloud_cluster->points.size ();
@@ -688,7 +685,7 @@ void getObjectPoint(){
 		std::stringstream ss;
 		ss << "/run/shm/object_perception/cloud_cluster_" << objectNumber << ".pcd";
         if(cloud_cluster->size() != 0 )
-            writer.write<pcl17::PointXYZ> (ss.str (), *cloud_cluster, false); 
+            writer.write<pcl::PointXYZ> (ss.str (), *cloud_cluster, false); 
         objectNumber++;
 		//std::cout << "PointCloud representing the Cluster: " << cloud_cluster->points.size () << " data points." << std::endl;
 
@@ -697,7 +694,7 @@ void getObjectPoint(){
 
 //------------------------------------cloud_cluster -------------------------
 //
-		//writer.write<pcl17::PointXYZ> (ss_category.str (), *cloud_cluster, false); 
+		//writer.write<pcl::PointXYZ> (ss_category.str (), *cloud_cluster, false); 
 		j++;
 	}
 
@@ -753,13 +750,13 @@ void getObjectPoint(){
 	msg_.data = tmpSs.str();
 	pubObjectNum.publish(msg_);
 //
-	pcl17::PointCloud<pcl17::PointXYZ>::Ptr enlarged_cloud (new pcl17::PointCloud<pcl17::PointXYZ>);
+	pcl::PointCloud<pcl::PointXYZ>::Ptr enlarged_cloud (new pcl::PointCloud<pcl::PointXYZ>);
 	//create center of object cloud
 	for(size_t t = 0; t < cloud_center->size(); t++){
 		for(float i=-0.007;i<=0.007;i+=0.001){
 			for(float j=-0.007;j<=0.007;j+=0.001){
 				for(float k=-0.007;k<=0.007;k+=0.001){
-					enlarged_cloud->push_back(pcl17::PointXYZ(cloud_center->points[t].x+i,cloud_center->points[t].y+j,cloud_center->points[t].z+k));
+					enlarged_cloud->push_back(pcl::PointXYZ(cloud_center->points[t].x+i,cloud_center->points[t].y+j,cloud_center->points[t].z+k));
 				}
 			}
 		}
@@ -769,7 +766,7 @@ void getObjectPoint(){
 //--------------------------------------------------centerOfObject-------------------------
 
     if(enlarged_cloud->size() != 0 )
-        writer.write<pcl17::PointXYZ> ("/run/shm/object_perception/centerOfObject.pcd", *enlarged_cloud, false); 
+        writer.write<pcl::PointXYZ> ("/run/shm/object_perception/centerOfObject.pcd", *enlarged_cloud, false); 
 
 	if(maxArea == 0){
 		ROS_ERROR("No object in this range.");

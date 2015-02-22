@@ -23,33 +23,34 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 // PCL specific includes
-#include <pcl17/ros/conversions.h>
-#include <pcl17_ros/transforms.h>
-#include <pcl17/point_types.h>
+#include <pcl/ros/conversions.h>
+#include <pcl_ros/transforms.h>
+#include <pcl/point_types.h>
 
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 
 #include <tf/transform_listener.h>
+#include <pcl_conversions/pcl_conversions.h>
 
-//#include <pcl17/ModelCoefficients.h>
-//#include <pcl17/io/pcd_io.h>
-//#include <pcl17/filters/extract_indices.h>
-//#include <pcl17/filters/voxel_grid.h>
-//#include <pcl17/features/normal_3d.h>
-//#include <pcl17/kdtree/kdtree.h>
-//#include <pcl17/sample_consensus/method_types.h>
-//#include <pcl17/sample_consensus/model_types.h>
-//#include <pcl17/segmentation/sac_segmentation.h>
-//#include <pcl17/segmentation/extract_clusters.h>
-//#include <pcl17/filters/passthrough.h>
-//#include <pcl17/features/vfh.h>
+//#include <pcl/ModelCoefficients.h>
+//#include <pcl/io/pcd_io.h>
+//#include <pcl/filters/extract_indices.h>
+//#include <pcl/filters/voxel_grid.h>
+//#include <pcl/features/normal_3d.h>
+//#include <pcl/kdtree/kdtree.h>
+//#include <pcl/sample_consensus/method_types.h>
+//#include <pcl/sample_consensus/model_types.h>
+//#include <pcl/segmentation/sac_segmentation.h>
+//#include <pcl/segmentation/extract_clusters.h>
+//#include <pcl/filters/passthrough.h>
+//#include <pcl/features/vfh.h>
 
-//#include <pcl17/kdtree/kdtree_flann.h>
+//#include <pcl/kdtree/kdtree_flann.h>
 //
-//#include <pcl17/features/normal_3d_omp.h>
-//#include <pcl17/visualization/cloud_viewer.h>
+//#include <pcl/features/normal_3d_omp.h>
+//#include <pcl/visualization/cloud_viewer.h>
 
 //for webcam resolution 640x480
 #define CENTER_IMAGE_X 313.73619
@@ -85,15 +86,15 @@ ros::Publisher vector_pub; // = n2.advertise<geometry_msgs::Vector3>("object_poi
 ros::Publisher vector_pub_pointcloud;
 IplImage *inFrame  = cvCreateImage(cvSize(1280, 720), 8, 3);
 //IplImage *inFrame  = cvCreateImage(cvSize(640, 480), 8, 3);
-static pcl17::PointCloud<pcl17::PointXYZRGB>::Ptr cloud_pcl (new pcl17::PointCloud<pcl17::PointXYZRGB>);
+static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl (new pcl::PointCloud<pcl::PointXYZRGB>);
 
 //void depthCb(const sensor_msgs::PointCloud2& cloud) {
-//    pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZ>);
+//    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_tmp (new pcl::PointCloud<pcl::PointXYZ>);
 //  if ((cloud.width * cloud.height) == 0)
 //    return; //return if the cloud is not dense!
 //
 //  try {
-//      pcl17::fromROSMsg(cloud, *cloud_tmp);
+//      pcl::fromROSMsg(cloud, *cloud_tmp);
 //
 //      listener->waitForTransform(logitech_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
 //      pcl17_ros::transformPointCloud(logitech_frame, *cloud_tmp, *cloud_pcl, *listener);
@@ -105,19 +106,23 @@ static pcl17::PointCloud<pcl17::PointXYZRGB>::Ptr cloud_pcl (new pcl17::PointClo
 //
 
 void depthCb(const sensor_msgs::PointCloud2& cloud) {
-    pcl17::PointCloud<pcl17::PointXYZRGB>::Ptr cloud_tmp (new pcl17::PointCloud<pcl17::PointXYZRGB>);
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_tmp (new pcl::PointCloud<pcl::PointXYZRGB>);
+    pcl::PCLPointCloud2 PCLPointCloud_tmp;
     //PointCloudT::Ptr cloud_tmp (new PointCloudT);
 
 	if ((cloud.width * cloud.height) == 0)
 		return; //return if the cloud is not dense!
 	try {
+
+        pcl_conversions::toPCL(cloud, PCLPointCloud_tmp);
+        pcl::fromPCLPointCloud2(PCLPointCloud_tmp, *cloud_tmp);
 		//frameId = cloud.header.frame_id;
         timeStamp = cloud.header.stamp;
-//		pcl17::fromROSMsg(cloud, *cloud_pcl);
-		pcl17::fromROSMsg(cloud, *cloud_tmp);
+//		pcl::fromROSMsg(cloud, *cloud_pcl);
+		pcl::fromROSMsg(cloud, *cloud_tmp);
 
 	  	listener->waitForTransform(rgb_frame, cloud.header.frame_id, cloud.header.stamp, ros::Duration(1.0));
-	  	pcl17_ros::transformPointCloud(rgb_frame, *cloud_tmp, *cloud_pcl, *listener);
+	  	pcl_ros::transformPointCloud(rgb_frame, *cloud_tmp, *cloud_pcl, *listener);
         
 
 		//ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
@@ -203,7 +208,7 @@ void webcamCallBack(const sensor_msgs::ImageConstPtr& msg)
         //circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
 
 
-		//pcl17::PointCloud<pcl17::PointXYZ>::Ptr cloud (new pcl17::PointCloud<pcl17::PointXYZ>), cloud_obj (new pcl17::PointCloud<pcl17::PointXYZ>);
+		//pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>), cloud_obj (new pcl::PointCloud<pcl::PointXYZ>);
 		
 		geometry_msgs::PointStamped kinect_point;
 		geometry_msgs::PointStamped logitech_point;

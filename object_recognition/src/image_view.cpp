@@ -15,7 +15,6 @@ int frameIndex=20;
 
 void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
-	//F
 	//cout << "in mouce call back method " << endl;
 	if  ( event == EVENT_LBUTTONDOWN )
 	{
@@ -56,14 +55,14 @@ void imageColorCb(const sensor_msgs::ImageConstPtr& msg)
 
 int main(int argc, char** argv)
 {
-	ros::init(argc,argv,"findCenter");
+	ros::init(argc,argv,"imageViewer");
 	ros::NodeHandle n;
 	ros::NodeHandle nh("~");
 
 	image_transport::ImageTransport it_(nh);
 	image_transport::Subscriber sub_imageColor;
-	//sub_imageColor = it_.subscribe("/camera/rgb/image_color", 1, imageColorCb);
-	sub_imageColor = it_.subscribe("/logitech_cam/image_raw", 1, imageColorCb);
+	sub_imageColor = it_.subscribe("/camera/image_raw", 1, imageColorCb);
+	//sub_imageColor = it_.subscribe("/logitech_cam/image_raw", 1, imageColorCb);
 	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION); //specify the compression technique
 	compression_params.push_back(9);//specify the compression quality
 
