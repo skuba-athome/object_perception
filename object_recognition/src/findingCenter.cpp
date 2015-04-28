@@ -3,7 +3,7 @@
 #include <object_recognition/classifyObject.h>
 #include <object_recognition/verifyObject.h>
 #include <tf/transform_listener.h>
-#include <manipulator/isManipulable.h>
+//#include <manipulator/isManipulable.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Header.h>
@@ -130,8 +130,8 @@ ros::ServiceClient verifyClient;
 object_recognition::verifyObject verifySrv;
 
 //is reachable service 
-ros::ServiceClient isManipulableClient;
-manipulator::isManipulable isManipulatableSrv;
+/*ros::ServiceClient isManipulableClient;
+manipulator::isManipulable isManipulatableSrv;*/
 
 tf::TransformListener* listener;
 ros::Time timeStamp,timeStamp_;
@@ -181,12 +181,12 @@ bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* object
 		*objectWorldY = base_point.point.y;
 		*objectWorldZ = base_point.point.z;
 
-	isManipulatableSrv.request.x = base_point.point.x;
+	/*isManipulatableSrv.request.x = base_point.point.x;
 	isManipulatableSrv.request.y = base_point.point.y;
-	isManipulatableSrv.request.z = base_point.point.z;
+	isManipulatableSrv.request.z = base_point.point.z;*/
 	//cout << "WORLD " << xWorld << " " << yWorld << " " << zWorld << endl;
 
-	if(isManipulableClient.call(isManipulatableSrv)){
+	/*if(isManipulableClient.call(isManipulatableSrv)){
 		bool tmp_ = (bool)isManipulatableSrv.response.isManipulable;
 		cout << "response from isManipulable server : " << tmp_ << endl;
 		cout << "--------------------------------------------" << endl;
@@ -194,7 +194,7 @@ bool isObjectReachable(float x,float y,float z,float* objectWorldX,float* object
 	}
 	else
 		ROS_ERROR("Failed to call isManipulable service");
-	return false;
+	return false;*/
 }
 
 
@@ -730,7 +730,7 @@ void getObjectPoint(){
 				object.category = classifySrv.response.objectCategory;
 				object.confident = classifySrv.response.confident;
 				//object.category = verifySrv.response.objectName;
-				object.isManipulable = isObjectManipulable[k];
+				//object.isManipulable = isObjectManipulable[k];
 				objectContainer.objects.push_back(object);
 			}
 			else{
@@ -862,8 +862,8 @@ int main (int argc, char** argv)
     //verify_object = rospy.ServiceProxy('/object_recognition/verify_object',classifyObject)
 	//object_recognition::classifyObject classifySrv;
 
-	isManipulableClient = n.serviceClient<manipulator::isManipulable>("isManipulable");
-	manipulator::isManipulable isManipulatableSrv;
+	/*isManipulableClient = n.serviceClient<manipulator::isManipulable>("isManipulable");
+	manipulator::isManipulable isManipulatableSrv;*/
 
 	listener = new tf::TransformListener();
 	ros::spin();
