@@ -2,7 +2,7 @@
 <package>
   <name>object_recognition</name>
   <version>0.0.0</version>
-  <description>The people_detection package</description>
+  <description>The object_detection package</description>
   <maintainer email="nicole@todo.todo">nicole</maintainer>
   <license>TODO</license>
 
