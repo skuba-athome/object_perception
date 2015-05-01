@@ -77,6 +77,7 @@ add_service_files(
   FILES
   classifyObject.srv
   verifyObject.srv
+  findObject.srv
 )
 
 ## Generate actions in the 'action' folder
