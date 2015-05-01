@@ -151,8 +151,7 @@ target_link_libraries(findingCenter ${OpenCV_LIBRARIES})
 target_link_libraries(findingCenter ${PCL_LIBRARIES})
 target_link_libraries(findingCenter ${tf_LIBRARIES})
 target_link_libraries(findingCenter ${pcl_ros_LIBRARIES})
-add_dependencies(findingCenter manipulator)
-
+add_dependencies(findingCenter object_recognition_gencpp)
 
 add_executable(drawKeypoints src/drawKeypoints.cpp)
 target_link_libraries(drawKeypoints ${catkin_LIBRARIES})
