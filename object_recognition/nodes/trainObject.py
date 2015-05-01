@@ -20,9 +20,7 @@ svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/confi
 class objectRecognition:
 
 	def __init__(self):
-		print('The svm version is {}.'.format(sklearn.svm__version__))
-		print('The kneighbors version is {}.'.format(sklearn.neighbors__version__))
-		print('The scikit-learn version is {}.'.format(sklearn.__version__))
+		
 		object_dic = self.listImageInDirectory(object_root_dir)
 		features_list, self.labels = self.extractFeatures(object_dic)
 		

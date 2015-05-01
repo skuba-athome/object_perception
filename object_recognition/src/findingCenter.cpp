@@ -420,7 +420,7 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
       		point.x = objectCentroidWorld[k][0];
             point.y = objectCentroidWorld[k][1];
             point.z = objectCentroidWorld[k][2];
-      		res.objectPositionXYZ.push_back(point);
+      		res.objectPos.push_back(point);
 
             //res.objectPositionXYZ.x.push_back(objectCentroidWorld[k][0]);
             //res.objectPositionXYZ.y.push_back(objectCentroidWorld[k][1]);
@@ -490,7 +490,7 @@ int main (int argc, char** argv)
     nh.param("TUNED_H_DISTANCE_TOP_LEFT", TUNED_H_DISTANCE_TOP_LEFT,0.0);
     nh.param("TUNED_V_DISTANCE_TOP_LEFT", TUNED_V_DISTANCE_TOP_LEFT,0.0);
     nh.param("TUNED_H_DISTANCE_BOTTOM_RIGHT", TUNED_H_DISTANCE_BOTTOM_RIGHT,0.0);
-    nh.param("TUNED_V_DISTANCE_BOTTOM_RIGHT", TUNED_V_DISTANCE_BOTTOM_RIGHT,0.0);
+    nh.param("TUNED_V_DISTANCEw_BOTTOM_RIGHT", TUNED_V_DISTANCE_BOTTOM_RIGHT,0.0);
     
     classifyClient = n.serviceClient<object_recognition::classifyObject>("classifyObject");
     
