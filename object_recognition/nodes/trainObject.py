@@ -12,12 +12,15 @@ import numpy
 from operator import add
 
 surf = cv2.SURF(400)
-object_root_dir = "/home/mukda/catkin_athome/src/object_recognition_new/data3"
-svm_model_filename = '/home/mukda/catkin_athome/src/object_recognition_new/svm_model/svm_model.pkl'
+#object_root_dir = "/home/mukda/catkin_athome/src/object_recognition_new/data3"
+object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data'
+#svm_model_filename = '/home/mukda/catkin_athome/src/object_recognition_new/svm_model/svm_model.pkl'
+svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/svm_model.pkl'
 
 class objectRecognition:
 
 	def __init__(self):
+		
 		object_dic = self.listImageInDirectory(object_root_dir)
 		features_list, self.labels = self.extractFeatures(object_dic)
 		
@@ -57,6 +60,8 @@ class objectRecognition:
 			for aImage in object_dic[object_name]:
 				feature = self.extractFeatureFromAImage(aImage, object_name)
 				#print aImage
+				if feature == None or len(feature) == 0:
+					continue            
 				for f in feature:
 					self.aFeature.append(map(float,f))
 					self.features.append(map(float,f))
@@ -83,6 +88,8 @@ class objectRecognition:
 
 	def calWeightSum(self, queryFeature):
 		weightSum = [0.0 for i in self.categorySet]
+		if queryFeature == None or len(queryFeature) == 0:
+			return 1000000
 		for aFeature in queryFeature:
 			weight = self.calWeight(aFeature)
 			weightSum = map(add, weight, weightSum)
@@ -101,7 +108,6 @@ class objectRecognition:
 				continue        
 			classSet.append(self.labels[ind[x]])            
 			weight[self.labels[ind[x]]] = dis[x] - dis[-1]
-
 		return weight
 	
 	def trainSVM(self, object_dic):

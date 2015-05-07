@@ -8,13 +8,16 @@ import numpy
 import roslib
 import rospy
 
+
 from operator import add
 from std_msgs.msg import String
-from object_recognition_new.srv import *
+from object_recognition.srv import *
 
 #svm_model_filename = 'svm_model.pkl'
-object_root_dir = "/home/mukda/object_recognition_new/data3/"
-svm_model_filename = '/home/mukda/object_recognition_new/src/svm_model/svm_model.pkl'
+#object_root_dir = "/home/mukda/object_recognition/data3/"
+#svm_model_filename = '/home/mukda/object_recognition/src/svm_model/svm_model.pkl'
+object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
+svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/svm_model.pkl'
 surf = cv2.SURF(400)
 
 class objectRecognition:
@@ -32,7 +35,7 @@ class objectRecognition:
         self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
         self.clf.fit(feature, self.labels) 
         
-        #cate, diff = self.predictObject("/home/mukda/object_recognition_new/data/minute_maid/frame0032.png")
+        #cate, diff = self.predictObject("/home/mukda/object_recognition/data/minute_maid/frame0032.png")
         self.clf_svm = joblib.load(svm_model_filename)
 
         #test
