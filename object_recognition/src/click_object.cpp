@@ -126,6 +126,7 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 //            pcl::toROSMsg(*cloud_pcl,cloud_tf_out);
             //vector_pub_pointcloud.publish(cloud_tf_out);
             vector_pub.publish(vector);
+            std::cout << "Raw pts: x:" << kinect_point.point.x << " y : " << kinect_point.point.y << " z : " << kinect_point.point.z << std::endl; 
             printf("send : x:%.5f y:%.5f z:%.5f\n",vector.x,vector.y,vector.z);						
 		}
 
