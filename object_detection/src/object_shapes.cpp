@@ -4,7 +4,8 @@
 #include <object_recognition_msgs/RecognizedObjectArray.h>
 //#include <shape_msgs/SolidPrimitive.h>
 #include <object_detection/ObjectDetection.h>
-
+#include <shape_tools/solid_primitive_dims.h>
+#include <moveit_msgs/CollisionObject.h>
 
 class ObjectShape
 {
@@ -14,6 +15,8 @@ public:
     object_sub = nh.subscribe("recognized_object_array", 1, &ObjectShape::objectCallback, this);
     marker_pub = nh.advertise<visualization_msgs::Marker>("object_marker", 1);
     solid_shape_pub = nh.advertise<object_detection::ObjectDetection>("object_shape", 1);
+    pub_co = nh.advertise<moveit_msgs::CollisionObject>("collision_object", 10);
+
     //solid_shape_pub = nh.advertise<shape_msgs::SolidPrimitive>("object_shape", 1);
     //solid_shape_serv = nh.advertiseService("object_shape", &ObjectShape::getSolidPrimitive, this);
   }
@@ -117,9 +120,7 @@ public:
     shape_msgs::SolidPrimitive solid_shape;
     solid_shape.type = shape_msgs::SolidPrimitive::BOX;
     solid_shape.dimensions.resize(3);
-    //solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_X] = 0.3;
-    //solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = 0.3;
-    //solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 0.03;
+
     solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_X] = 0.05;
     solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = 0.05;
     solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 0.1;
@@ -137,9 +138,37 @@ public:
     msg.centriod = object_pose.position;
     solid_shape_pub.publish(msg);
 
+    // publish collision message to moveit
+    moveit_msgs::CollisionObject co;
+    co.header.stamp = ros::Time::now();
+    co.header.frame_id = "base_link";
+
+    // remove object
+    co.id = "object";
+    co.operation = moveit_msgs::CollisionObject::REMOVE;
+    pub_co.publish(co);
+
+    // add object
+    co.operation = moveit_msgs::CollisionObject::ADD;
+    co.primitives.resize(1);
+    co.primitives[0].type = solid_shape.type;
+    co.primitives[0].dimensions.resize(shape_tools::SolidPrimitiveDimCount<shape_msgs::SolidPrimitive::BOX>::value);
+    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_X] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_X];
+    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Y] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Y];
+    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Z] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z];
+    co.primitive_poses.resize(1);
+    co.primitive_poses[0].position.x = object_pose.position.x;
+    co.primitive_poses[0].position.y = object_pose.position.y;
+    co.primitive_poses[0].position.z = object_pose.position.z;
+    co.primitive_poses[0].orientation.w = 1.0;
+    pub_co.publish(co);
+
+
     //ROS_INFO("Table Plane Primitive Shape: [%d %.2f %.2f]", (int)res.solid_shape.type, size_x, size_y);
     //return true;
   }
+
+
 
 
 private:
@@ -148,6 +177,7 @@ private:
   object_recognition_msgs::RecognizedObjectArray object_array;
   ros::Publisher marker_pub;
   //ros::ServiceServer solid_shape_serv;
+  ros::Publisher pub_co;
   ros::Publisher solid_shape_pub;
   geometry_msgs::Pose object_pose;
 };
