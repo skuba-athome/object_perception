@@ -2,9 +2,10 @@
 #include <visualization_msgs/Marker.h>
 #include "std_msgs/String.h"
 #include <object_recognition_msgs/TableArray.h>
-#include <shape_msgs/SolidPrimitive.h>
-//#include "using_markers/TableShape.h"
+//#include <shape_msgs/SolidPrimitive.h>
 #include <object_detection/ObjectDetection.h>
+#include <shape_tools/solid_primitive_dims.h>
+#include <moveit_msgs/CollisionObject.h>
 
 class TableShape
 {
@@ -14,6 +15,7 @@ public:
     table_sub = nh.subscribe("table_array", 1, &TableShape::tableCallback, this);
     marker_pub = nh.advertise<visualization_msgs::Marker>("table_marker", 1);
     solid_shape_pub = nh.advertise<object_detection::ObjectDetection>("table_shape", 1);
+    pub_co = nh.advertise<moveit_msgs::CollisionObject>("collision_object", 10);
     //solid_shape_pub = nh.advertise<shape_msgs::SolidPrimitive>("table_shape", 1);
     //solid_shape_serv = nh.advertiseService("table_shape", &TableShape::getSolidPrimitive, this);
   }
@@ -157,8 +159,32 @@ public:
     msg.solid_shape = solid_shape;
     msg.centriod = table_pose.position;
     solid_shape_pub.publish(msg);
-
     //solid_shape_pub.publish(solid_shape);
+
+    // publish collision message to moveit
+    moveit_msgs::CollisionObject co;
+    co.header.stamp = ros::Time::now();
+    co.header.frame_id = "base_link";
+
+    // remove table
+    co.id = "table";
+    co.operation = moveit_msgs::CollisionObject::REMOVE;
+    pub_co.publish(co);
+
+    // add table
+    co.operation = moveit_msgs::CollisionObject::ADD;
+    co.primitives.resize(1);
+    co.primitives[0].type = solid_shape.type;
+    co.primitives[0].dimensions.resize(shape_tools::SolidPrimitiveDimCount<shape_msgs::SolidPrimitive::BOX>::value);
+    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_X] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_X];
+    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Y] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Y];
+    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Z] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z];
+    co.primitive_poses.resize(1);
+    co.primitive_poses[0].position.x = table_pose.position.x;
+    co.primitive_poses[0].position.y = table_pose.position.y;
+    co.primitive_poses[0].position.z = table_pose.position.z;
+    pub_co.publish(co);
+
 
     //ROS_INFO("Table Plane Primitive Shape: [%d %.2f %.2f]", (int)res.solid_shape.type, size_x, size_y);
     //return true;
@@ -174,6 +200,7 @@ private:
   geometry_msgs::Pose table_pose;
   double size_x;
   double size_y;
+  ros::Publisher pub_co;
 };
 
 
