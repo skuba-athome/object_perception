@@ -25,10 +25,17 @@ public:
   void objectCallback(const object_recognition_msgs::RecognizedObjectArrayPtr& object_array)
   {
     //ROS_INFO("objectCallback");
-    
+    //ROS_INFO("object %d" ,object_array->objects.size() );
+    if( (int)object_array->objects.size() == 0)
+    { 
+      ROS_INFO("Object not found");
+      return;
+    }
+
     for (size_t index = 0; index < 1; ++index) 
     {
         object_recognition_msgs::RecognizedObject object = object_array->objects[index];
+
         std_msgs::Header object_header = object.header;
         //ROS_INFO("  header %s %f ", object_header.frame_id.c_str(), (double)object_header.seq);        
 
