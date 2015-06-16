@@ -6,6 +6,8 @@
 #include <object_detection/ObjectDetection.h>
 #include <shape_tools/solid_primitive_dims.h>
 #include <moveit_msgs/CollisionObject.h>
+#include <pcl_ros/transforms.h>
+
 
 class ObjectShape
 {
@@ -16,7 +18,7 @@ public:
     marker_pub = nh.advertise<visualization_msgs::Marker>("object_marker", 1);
     solid_shape_pub = nh.advertise<object_detection::ObjectDetection>("object_shape", 1);
     pub_co = nh.advertise<moveit_msgs::CollisionObject>("collision_object", 10);
-
+    listener = new tf::TransformListener();
     //solid_shape_pub = nh.advertise<shape_msgs::SolidPrimitive>("object_shape", 1);
     //solid_shape_serv = nh.advertiseService("object_shape", &ObjectShape::getSolidPrimitive, this);
   }
@@ -36,11 +38,12 @@ public:
     {
         object_recognition_msgs::RecognizedObject object = object_array->objects[index];
 
-        std_msgs::Header object_header = object.header;
+        //std_msgs::Header object_header = object.header;
         //ROS_INFO("  header %s %f ", object_header.frame_id.c_str(), (double)object_header.seq);        
 
         object_pose = object.pose.pose.pose;
         getCloudMarker(object_pose);
+        publishObjectArray(object);
         getSolidPrimitive();
         
 
@@ -140,10 +143,9 @@ public:
     
     //solid_shape_serv.publish(solid_shape);
     //solid_shape_pub.publish(solid_shape);
-    object_detection::ObjectDetection msg;
+    //object_detection::ObjectDetection msg;
     msg.solid_shape = solid_shape;
-    msg.centriod = object_pose.position;
-    solid_shape_pub.publish(msg);
+
 
     // publish collision message to moveit
     moveit_msgs::CollisionObject co;
@@ -160,19 +162,60 @@ public:
     co.primitives.resize(1);
     co.primitives[0].type = solid_shape.type;
     co.primitives[0].dimensions.resize(shape_tools::SolidPrimitiveDimCount<shape_msgs::SolidPrimitive::BOX>::value);
-    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_X] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_X];
-    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Y] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Y];
-    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Z] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z];
+    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_X] = msg.solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_X];
+    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Y] = msg.solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Y];
+    co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Z] = msg.solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z];
     co.primitive_poses.resize(1);
-    co.primitive_poses[0].position.x = object_pose.position.x;
-    co.primitive_poses[0].position.y = object_pose.position.y;
-    co.primitive_poses[0].position.z = object_pose.position.z;
+    co.primitive_poses[0].position.x = msg.centriod.x;
+    co.primitive_poses[0].position.y = msg.centriod.y;
+    co.primitive_poses[0].position.z = msg.centriod.z;
     co.primitive_poses[0].orientation.w = 1.0;
+
+    solid_shape_pub.publish(msg);
     pub_co.publish(co);
 
 
     //ROS_INFO("Table Plane Primitive Shape: [%d %.2f %.2f]", (int)res.solid_shape.type, size_x, size_y);
     //return true;
+  }
+
+
+  Eigen::Matrix4f getHomogeneousMatrix(std::string input_frame, std::string des_frame)
+  {
+
+    tf::StampedTransform transform;
+    try{
+      listener->lookupTransform(des_frame, input_frame, ros::Time(0), transform);
+    }
+    catch (tf::TransformException ex){
+      ROS_ERROR("%s",ex.what());
+    } 
+    Eigen::Matrix4f T;
+    pcl_ros::transformAsMatrix(transform,T);
+    return T;
+  }
+
+  void publishObjectArray(object_recognition_msgs::RecognizedObject object) //std::vector<person> &tracklist
+  {
+    std::string camera_optical_frame = "camera_rgb_optical_frame";
+    std::string robot_frame = "base_link";
+
+    std_msgs::Header object_header = object.header;
+    //people_detection::PersonObjectArray pubmsg;
+    object.header.stamp = ros::Time::now();
+    object.header.frame_id = robot_frame;
+    
+    Eigen::Matrix4f tfmat = getHomogeneousMatrix(camera_optical_frame, robot_frame);
+
+    //people_detection::PersonObject pers;
+    Eigen::Vector4f pubpts;
+    
+    //pubpts << tracklist[i].points(0),tracklist[i].points(1),tracklist[i].points(2),1.0;
+    pubpts << object.pose.pose.pose.position.x, object.pose.pose.pose.position.y, object.pose.pose.pose.position.z, 1.0;
+    pubpts = tfmat*pubpts;
+    msg.centriod.x = pubpts(0);
+    msg.centriod.y = pubpts(1);
+    msg.centriod.z = pubpts(2);
   }
 
 
@@ -187,6 +230,9 @@ private:
   ros::Publisher pub_co;
   ros::Publisher solid_shape_pub;
   geometry_msgs::Pose object_pose;
+  tf::TransformListener* listener;
+  object_detection::ObjectDetection msg;
+
 };
 
 // %Tag(INIT)%
