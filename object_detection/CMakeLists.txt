@@ -12,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   shape_msgs
   object_recognition_msgs
   message_generation
+  pcl_ros
+  pcl_conversions
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -131,11 +134,11 @@ include_directories(
 
 
 add_executable(table_shapes src/table_shapes.cpp)
-target_link_libraries(table_shapes ${catkin_LIBRARIES})
+target_link_libraries(table_shapes ${pcl_ros_LIBRARIES} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 add_dependencies(table_shapes object_dectection_generate_messages_cpp)
 
 add_executable(object_shapes src/object_shapes.cpp)
-target_link_libraries(object_shapes ${catkin_LIBRARIES})
+target_link_libraries(object_shapes ${pcl_ros_LIBRARIES} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 add_dependencies(object_shapes object_dectection_generate_messages_cpp)
 
 
