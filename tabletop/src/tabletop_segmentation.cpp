@@ -621,8 +621,9 @@ getClustersFromPointCloud2 (const pcl::PointCloud<PointT> &cloud_objects,
     pcl::PointCloud<PointT> cloud_cluster;
     pcl::copyPointCloud(cloud_objects, clusters2[i], cloud_cluster);
     sensor_msgs::PointCloud2 pc2;
-    //pcl::toROSMsg( cloud_cluster, pc2 ); 
-    cloud_cluster.header = pcl_conversions::toPCL(pc2.header);
+    pcl::toROSMsg( cloud_cluster, pc2 ); 
+    //cloud_cluster.header = pcl_conversions::toPCL(pc2.header);
+
     sensor_msgs::convertPointCloud2ToPointCloud (pc2, clusters[i]);    
   }
 }
