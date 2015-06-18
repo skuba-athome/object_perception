@@ -73,8 +73,9 @@ public:
       marker.type = visualization_msgs::Marker::CUBE;
 
       marker.pose.position.x = object_pose.position.x + 0.05;
+      //marker.pose.position.y = object_pose.position.y - 0.05;
       marker.pose.position.y = object_pose.position.y - 0.05;
-      marker.pose.position.z = object_pose.position.z - 0.1;
+      marker.pose.position.z = object_pose.position.z - 0.05;
       marker.pose.orientation.x = object_pose.orientation.x;
       marker.pose.orientation.y = object_pose.orientation.y;
       marker.pose.orientation.z = object_pose.orientation.z;
@@ -150,7 +151,7 @@ public:
     // publish collision message to moveit
     moveit_msgs::CollisionObject co;
     co.header.stamp = ros::Time::now();
-    co.header.frame_id = "base_link";
+    co.header.frame_id = "camera_link";
 
     // remove object
     co.id = "object";
@@ -169,7 +170,7 @@ public:
     co.primitive_poses[0].position.x = msg.centriod.x;
     co.primitive_poses[0].position.y = msg.centriod.y;
     co.primitive_poses[0].position.z = msg.centriod.z;
-    co.primitive_poses[0].orientation.w = 1.0;
+    //co.primitive_poses[0].orientation.w = 1.0;
 
     solid_shape_pub.publish(msg);
     pub_co.publish(co);
@@ -198,7 +199,7 @@ public:
   void publishObjectArray(object_recognition_msgs::RecognizedObject object) //std::vector<person> &tracklist
   {
     std::string camera_optical_frame = "camera_rgb_optical_frame";
-    std::string robot_frame = "base_link";
+    std::string robot_frame = "camera_link";
 
     std_msgs::Header object_header = object.header;
     //people_detection::PersonObjectArray pubmsg;
@@ -211,14 +212,13 @@ public:
     Eigen::Vector4f pubpts;
     
     //pubpts << tracklist[i].points(0),tracklist[i].points(1),tracklist[i].points(2),1.0;
-    pubpts << object.pose.pose.pose.position.x, object.pose.pose.pose.position.y, object.pose.pose.pose.position.z, 1.0;
+    pubpts << object.pose.pose.pose.position.x + 0.05, object.pose.pose.pose.position.y - 0.05, object.pose.pose.pose.position.z - 0.05, 1.0;
     pubpts = tfmat*pubpts;
     msg.centriod.x = pubpts(0);
     msg.centriod.y = pubpts(1);
     msg.centriod.z = pubpts(2);
+
   }
-
-
 
 
 private:
