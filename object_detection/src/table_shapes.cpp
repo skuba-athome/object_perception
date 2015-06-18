@@ -25,7 +25,12 @@ public:
   void tableCallback(const object_recognition_msgs::TableArrayPtr& table_array)
   {
     //ROS_INFO("tableCallback");
-    
+     if( (int)table_array->tables.size() == 0)
+    { 
+      ROS_INFO("Table not found");
+      return;
+    }
+
     for (size_t index = 0; index < 1; ++index) 
     //for (std::vector<int>::iterator it = table_array.begin(); table_array.end(); it++)
     {
@@ -39,44 +44,36 @@ public:
         std::vector<geometry_msgs::Point> table_convex_hull = table.convex_hull;
         //ROS_INFO("  table_convex_hull %d",(int)table_convex_hull.size());
 
-        double xmax = 2.2250738585072014e-308;
-        double xmin = 1.7976931348623158e+308;
-        double ymax = 2.2250738585072014e-308;
-        double ymin = 1.7976931348623158e+308;
+        double x_max;
+        double x_min;
+        double y_max;
+        double y_min;
         double z = 0;
+        
+
+		if (!table_convex_hull.empty()) 
+		{
+			x_min = table_convex_hull[0].x;
+			x_max = table_convex_hull[0].x;
+			y_min = table_convex_hull[0].y;
+			y_max = table_convex_hull[0].y;
+		}  
+		
+		for (size_t i=1; i<table_convex_hull.size(); ++i) 
+		{
+			if (table_convex_hull[i].x < x_min && table_convex_hull[i].x >-3.0) 
+				x_min = table_convex_hull[i].x ;
+			if (table_convex_hull[i].x > x_max && table_convex_hull[i].x < 3.0) 
+				x_max = table_convex_hull[i].x ;
+			if (table_convex_hull[i].y < y_min && table_convex_hull[i].y >-3.0) 
+				y_min = table_convex_hull[i].y ;
+			if (table_convex_hull[i].y > y_max && table_convex_hull[i].y < 3.0) 
+				y_max = table_convex_hull[i].y ;
+		}
+		size_x = x_max-x_min;
+        size_y = y_max-y_min;
 
 
-        for (size_t i = 0; i < table_convex_hull.size(); i++) 
-        {
-          geometry_msgs::Point vertex;
-          vertex.x = table_convex_hull[i].x;
-          vertex.y = table_convex_hull[i].y;
-          vertex.z = table_convex_hull[i].z;
-
-          if(xmin>=vertex.x)
-            xmin = vertex.x;
-          if(ymin>=vertex.y)
-            ymin = vertex.y;
-          if(xmax<=vertex.x)
-            xmax = vertex.x;
-          if(ymax<=vertex.y)
-            ymax = vertex.y;
-          z = vertex.z;
-
-          //ROS_INFO(" vertex: [%f %f %f]", vertex.x, vertex.y, vertex.z);  
-        }
-        //ROS_INFO(" min_max: [%f %f %f %f %f]", xmin, xmax, ymin, ymax, z);
-
-        //double size_x = xmax-xmin;
-        //double size_y = ymax-ymin;
-        size_x = xmax-xmin;
-        size_y = ymax-ymin;
-        //ROS_INFO(" size: [%f %f]", xmax-xmin, ymax-ymin);
-        //object_recognition_msgs::Table table = table_array->tables[*it];
-        //visualization_msgs::Marker marker = getCloudMarker(table);
-        //marker_table = getCloudMarker(table);
-
-        //getCloudMarker(table_pose, size_x, size_y);
         getCloudMarker(table);
         publishObjectArray(table);
         getSolidPrimitive();
@@ -99,6 +96,7 @@ public:
       marker.pose.position.x = table_pose.position.x;
       marker.pose.position.y = table_pose.position.y;
       marker.pose.position.z = table_pose.position.z;
+      
       marker.pose.orientation.x = table_pose.orientation.x;
       marker.pose.orientation.y = table_pose.orientation.y;
       marker.pose.orientation.z = table_pose.orientation.z;
@@ -246,6 +244,7 @@ private:
   geometry_msgs::Pose table_pose;
   double size_x;
   double size_y;
+  geometry_msgs::Point centroid;
   ros::Publisher pub_co;
   tf::TransformListener* listener;
   object_detection::ObjectDetection msg;
