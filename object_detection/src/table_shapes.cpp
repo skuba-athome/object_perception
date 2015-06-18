@@ -151,7 +151,7 @@ public:
     //solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 0.03;
     solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_X] = size_x;
     solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = size_y;
-    solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 0.03;
+    solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 0.01;
     
     //solid_shape.dimensions.push_back(0.3);
     //solid_shape.dimensions.push_back(0.3);
