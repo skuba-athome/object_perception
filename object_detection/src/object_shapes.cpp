@@ -151,7 +151,7 @@ public:
     // publish collision message to moveit
     moveit_msgs::CollisionObject co;
     co.header.stamp = ros::Time::now();
-    co.header.frame_id = "camera_link";
+    co.header.frame_id = "base_link";
 
     // remove object
     co.id = "object";
@@ -199,7 +199,7 @@ public:
   void publishObjectArray(object_recognition_msgs::RecognizedObject object) //std::vector<person> &tracklist
   {
     std::string camera_optical_frame = "camera_rgb_optical_frame";
-    std::string robot_frame = "camera_link";
+    std::string robot_frame = "base_link";
 
     std_msgs::Header object_header = object.header;
     //people_detection::PersonObjectArray pubmsg;
