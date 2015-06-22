@@ -1,0 +1,7 @@
+---
+string[] objectName
+float64[] confident
+geometry_msgs/Point[] objectPos
+
+
+
