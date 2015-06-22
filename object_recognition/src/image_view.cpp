@@ -36,14 +36,15 @@ void imageColorCb(const sensor_msgs::ImageConstPtr& msg)
 	{
 		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 		img = cv_ptr->image;
-		//ROS_INFO("Get image size : %d",img.rows*img.cols);
+		ROS_INFO("Get image size : %d",img.rows*img.cols);
 	
 		//show the image
-		//while(true){
-		namedWindow("My Window", 1);
-		setMouseCallback("My Window", CallBackFunc, NULL);
-		imshow("My Window", img);
-		waitKey(3);
+		while(true){
+			namedWindow("My Window", 1);
+			setMouseCallback("My Window", CallBackFunc, NULL);
+			imshow("My Window", img);
+			waitKey(3);
+		}
 	}
 	catch (cv_bridge::Exception& e)
 	{
@@ -59,10 +60,14 @@ int main(int argc, char** argv)
 	ros::NodeHandle n;
 	ros::NodeHandle nh("~");
 
+	ROS_ERROR("Start collecting data when click ...");
 	image_transport::ImageTransport it_(nh);
 	image_transport::Subscriber sub_imageColor;
-	sub_imageColor = it_.subscribe("/camera/image_raw", 1, imageColorCb);
+	//sub_imageColor = it_.subscribe("/camera/image_raw", 1, imageColorCb);
 	//sub_imageColor = it_.subscribe("/logitech_cam/image_raw", 1, imageColorCb);
+	//sub_imageColor = it_.subscribe("/external_cam/image_raw", 1, imageColorCb);
+	sub_imageColor = it_.subscribe("/camera/rgb/image_color", 1, imageColorCb);
+	
 	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION); //specify the compression technique
 	compression_params.push_back(9);//specify the compression quality
 

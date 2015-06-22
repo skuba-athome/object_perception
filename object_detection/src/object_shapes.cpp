@@ -168,7 +168,7 @@ public:
     co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Z] = msg.solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z];
     co.primitive_poses.resize(1);
     co.primitive_poses[0].position.x = msg.centriod.x;
-    co.primitive_poses[0].position.y = msg.centriod.y;
+    co.primitive_poses[0].position.y = msg.centriod.y+0.05;
     co.primitive_poses[0].position.z = msg.centriod.z;
     //co.primitive_poses[0].orientation.w = 1.0;
 

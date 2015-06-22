@@ -16,9 +16,15 @@ from object_recognition.srv import *
 #svm_model_filename = 'svm_model.pkl'
 #object_root_dir = "/home/mukda/object_recognition/data3/"
 #svm_model_filename = '/home/mukda/object_recognition/src/svm_model/svm_model.pkl'
-object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
+#object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
+
+#object_root_dir = "/home/skuba/Desktop/cocktail/"
+#object_root_dir = "/home/skuba/Desktop/data_cropped_seperate/"
+object_root_dir = "/home/skuba/Desktop/drink_cropped_seperate/"
+features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/Features.txt'
 svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/svm_model.pkl'
 surf = cv2.SURF(400)
+
 
 class objectRecognition:
 
@@ -27,11 +33,13 @@ class objectRecognition:
         #rospy.Subscriber("featureFilePath",String,self.classifyObjectHandle)
         #self.recognitionResult = rospy.Publisher('recognitionResult',String) 
         
-        object_dic = self.list_image_in_directory(object_root_dir,'/test/')
+        #object_dic = self.list_image_in_directory(object_root_dir,'/test/')
+        object_dic = self.list_image_in_directory(object_root_dir,'/train/')
         feature, self.labels = self.loadTrainData(object_dic)
+        #feature, self.labels = self.loadFeatures()        
 
-        K_neighbors = int(rospy.get_param('~k_neighbors', 35))
-        #K_neighbors = 35
+        #K_neighbors = int(rospy.get_param('~k_neighbors', 35))
+        K_neighbors = 35
         self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
         self.clf.fit(feature, self.labels) 
         
@@ -41,7 +49,7 @@ class objectRecognition:
         #test
         '''
         cate = 0
-        test_dic = self.list_image_in_directory(object_root_dir,'/train/')
+        test_dic = self.list_image_in_directory(object_root_dir,'/test/')
         for object_name in test_dic:
             count = 0
             count2 = 0
@@ -54,8 +62,8 @@ class objectRecognition:
                     count+=1
                 if svm_answer==cate: 
                     count2+=1
-                #print aImage, nb_answer, svm_answer
-                print "check cate", svm_answer, self.revertCategory[svm_answer]
+                print aImage, nb_answer, svm_answer
+                #print "check cate", svm_answer, self.revertCategory[svm_answer]
                 #print queryWeightSum
             print object_name, cate, "\tTotal:", len(test_dic[object_name]), "\tnb:", count, "\tsvm:", count2
             cate+=1
@@ -89,7 +97,6 @@ class objectRecognition:
         feature_list = []
         label_list = []
 
-
         #for object_dir in os.listdir(dir_name):
         for object_name in object_dic:
             #file_name = dir_name + object_dir + "/features.txt"
@@ -106,7 +113,8 @@ class objectRecognition:
             feature_list += feature
             label_list += label
             #print object_dir, self.categorySet[category]
-            #print object_name, self.categorySet[category]
+            print object_name, self.categorySet[category]
+
         return feature_list,label_list
 
 
@@ -137,6 +145,7 @@ class objectRecognition:
         nb_answer, confident, queryWeightSum = self.predictObject(req.filepath)
         svm_answer = self.clf_svm.predict(queryWeightSum)
         print str(self.revertCategory[nb_answer]),confident
+        #print str(self.revertCategory[svm_answer]),confident
         #return classifyObjectResponse(str(self.revertCategory[category]),confident)
         return classifyObjectResponse(str(self.revertCategory[nb_answer]),confident)
         #return classifyObjectResponse(str(self.revertCategory[svm_answer]),confident)
@@ -161,7 +170,6 @@ class objectRecognition:
         for aFeature in queryFeature:
             weight = self.predictFeature(aFeature)
             weightSum = map(add, weight, weightSum)
-        
 
         sortedWeightSum = sorted(weightSum)
         nb_answer = int(weightSum.index(min(weightSum)))

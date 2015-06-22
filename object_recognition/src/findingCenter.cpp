@@ -41,10 +41,14 @@
 
 using namespace std;
 
-#define DEPTH_LIMIT 0.86
+#define DEPTH_LIMIT 0.65
+//#define DEPTH_LIMIT 0.86  
 #define PLANE_LEFT 0.35
 #define PLANE_RIGHT -0.35
-#define ACCEPTED_AREA 300
+//#define ACCEPTED_AREA 2000
+#define ACCEPTED_AREA 1500
+//#define ACCEPTED_AREA 500
+//#define ACCEPTED_AREA 300
 //#define ACCEPTED_AREA 100
 #define FOCAL_LENGTH 525
 
@@ -122,6 +126,25 @@ void depthCB(const sensor_msgs::PointCloud2& cloud)
             //    cloud_tmp2->push_back(pcl::PointXYZ(it->x,it->y,it->z));
             //}
         }
+
+
+        // for realtime testing
+        /*
+        vector<std::string> fileName;
+    	vector<int> compression_params; //vector that stores the compression parameters of the image
+    	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION); //specify the compression technique    
+    	compression_params.push_back(9); //specify the compression quality
+    	bool bSuccess_ = imwrite(output_dir+"testing.png", img, compression_params); //write the image to file
+    	ROS_INFO("Writing test file output .png");
+
+    	pcl::PCDWriter writer;
+    	writer.write<pcl::PointXYZ> (output_dir+"testing_full_scene.pcd", *cloud_tmp, false); 
+    	ROS_INFO("Writing test file output .pcd");
+		
+    	writer.write<pcl::PointXYZ> (output_dir+"testing_onthetable_scene.pcd", *cloud_tmp2, false); 
+    	ROS_INFO("Writing test file output .pcd");
+		*/
+
         cloud_tmp2->header = cloud_tmp->header;
         //cout << "cloud_tmp2->header " << cloud_tmp2->header << endl;
         //cout << "first cloud size : " << cloud_tmp->width*cloud_tmp->height << " ,modified cloud size : " << cloud_tmp2->width*cloud_tmp2->height << endl;
@@ -142,7 +165,7 @@ void depthCB(const sensor_msgs::PointCloud2& cloud)
         //cout << "cloud_pcl->header.frame_id" << cloud_pcl->header.frame_id << endl;
         //ROS_INFO("Get PointCloud size : %d",cloud.width*cloud.height);
         //  cout << "point cloud get" << endl;
-        } 
+        }       
     catch (std::runtime_error e) {
             ROS_ERROR_STREAM("Error message: " << e.what());
         }
@@ -155,6 +178,7 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
 {
     //cout << "getObjectPoint" << endl;
     timeStamp_ = timeStamp;
+
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZ>);
     //pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_tmp (new pcl::PointCloud<pcl::PointXYZ>);
@@ -175,7 +199,7 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
     compression_params.push_back(9); //specify the compression quality
 
     bool bSuccess_ = imwrite(output_dir+"first_img.jpg", img, compression_params); //write the image to file
-    
+
     pcl::PCDWriter writer;
     writer.write<pcl::PointXYZ> (output_dir+"first_cloud_pcl.pcd", *cloud, false); 
 
@@ -191,9 +215,9 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
     //std::cout << "PointCloud(cloud) before filtering has: " << cloud->points.size () << " data points." << std::endl; //*
     //std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
 
-    if(cloud_filtered->size() != 0 )
+    ///if(cloud_filtered->size() != 0 )
 ///     writer.write<pcl::PointXYZ> ("/run/shm/object_perception/cloud_filtered.pcd", *cloud_filtered, false); 
-        writer.write<pcl::PointXYZ> (output_dir+"cloud_filtered.pcd", *cloud_filtered, false); 
+///     writer.write<pcl::PointXYZ> (output_dir+"cloud_filtered.pcd", *cloud_filtered, false); 
 
     // Create the segmentation object for the planar model and set all the parameters
     pcl::SACSegmentation<pcl::PointXYZ> seg;
@@ -210,8 +234,10 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
     int segmented_plane_no =0;
     //while (cloud_filtered->points.size () > 0.1 * nr_points)
     while (cloud_filtered->points.size () > 0.3 * nr_points)
+    //while (cloud_filtered->points.size () > 0.5 * nr_points)
     //while (cloud_filtered->points.size () > 0.7 * nr_points)
     {
+    	
         // Segment the largest planar component from the remaining cloud
         seg.setInputCloud (cloud_filtered);
         seg.segment (*inliers, *coefficients);
@@ -251,7 +277,8 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
         writer.write<pcl::PointXYZ> (output_dir+plane_name.str (), *cloud_plane, false); 
         segmented_plane_no++;
     }
-
+	writer.write<pcl::PointXYZ> (output_dir+"cloud_filtered.pcd", *cloud_filtered, false); 
+    cout << "cloud_filtered.pcd " << cloud_filtered->width*cloud_filtered->height << endl;
 
     // Creating the KdTree object for the search method of the extraction
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
@@ -260,12 +287,16 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
     pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
     ec.setClusterTolerance (0.02); // 2cm   
     ec.setMinClusterSize (ACCEPTED_AREA);
+    
+    cout << "ACCEPTED_AREA " << ACCEPTED_AREA << endl;
+
     //ec.setMinClusterSize (200);
     ec.setMaxClusterSize (25000);
     ec.setSearchMethod (tree);
     ec.setInputCloud (cloud_filtered);
     ec.extract (cluster_indices);
-    cout << "cluster_indeces.size() = " << cluster_indices.size() << endl;
+
+    cout << "cluster_indices.size() = " << cluster_indices.size() << endl;
 
     // finding center of object
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_center (new pcl::PointCloud<pcl::PointXYZ>);
@@ -278,20 +309,24 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
 
         stringstream pixelFileName;
         pixelFileName << output_dir << "file_pixel" << objectNumber;
-        //cout << pixelFileName.str() << endl;
+        cout << pixelFileName.str() << endl;
 
         FILE* fp = fopen(pixelFileName.str().c_str(),"w");
 
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZ>);
         for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++)
         {
+
             float tmpX,tmpY;
             cloud_cluster->points.push_back (cloud_filtered->points[*pit]); 
+         
+
             x += cloud_filtered->points[*pit].x;
             y += cloud_filtered->points[*pit].y;
             z += cloud_filtered->points[*pit].z;
 
             //for webcam 1280x720
+            
             tmpX = cloud_filtered->points[*pit].x*FOCAL_LENGTH_X/cloud_filtered->points[*pit].z + CALIBRATED_CENTER_IMAGE_X;
             tmpY = cloud_filtered->points[*pit].y*FOCAL_LENGTH_Y/cloud_filtered->points[*pit].z + CALIBRATED_CENTER_IMAGE_Y;// + 20;
 
@@ -299,6 +334,7 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
             if(tmpY > pixel_y_max) pixel_y_max = tmpY;
             if(tmpX < pixel_x_min) pixel_x_min = tmpX;
             if(tmpY < pixel_y_min) pixel_y_min = tmpY;
+            
 
             char pixelValue[100];
             sprintf(pixelValue,"(%f,%f,%f)  (%f,%f)\n",cloud_filtered->points[*pit].x,cloud_filtered->points[*pit].y,cloud_filtered->points[*pit].z,tmpX,tmpY);
@@ -318,12 +354,15 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
         cloud_cluster->width = cloud_cluster->points.size ();
         cloud_cluster->height = 1;
         cloud_cluster->is_dense = true;
-
+    
         stringstream ss;
         ss << output_dir << "cluster_" << objectNumber << ".pcd";        
-        if(cloud_cluster->size() != 0 )
+        
+        // set cloud.size to remove noise
+        //if( (cloud_cluster->size() != 0) && (cloud_cluster->size() >= 600) && (cloud_cluster->size() <= 2000) )
+        if( (cloud_cluster->size() != 0) && (cloud_cluster->size() <= 3500) )
+        //if(cloud_cluster->size() != 0)
             writer.write<pcl::PointXYZ> (ss.str (), *cloud_cluster, false);
-
 
         pixel_x_min = pixel_x_min > 0 ? pixel_x_min : 0;
         pixel_y_min = pixel_y_min > 0 ? pixel_y_min : 0;
@@ -331,14 +370,16 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
         pixel_y_max = pixel_y_max < CENTER_IMAGE_Y*2 ? pixel_y_max : CENTER_IMAGE_Y*2;        
 
         int size = std::distance(it->indices.begin(), it->indices.end());
+        cout << "pixel size " << size << endl;
         x/=size;
         y/=size;
         z/=size;
 
         float objectWorldX,objectWorldY,objectWorldZ;        
-
         pixel_x = x*FOCAL_LENGTH_X/z + CALIBRATED_CENTER_IMAGE_X;// + (-0.5);
         pixel_y = y*FOCAL_LENGTH_Y/z + CALIBRATED_CENTER_IMAGE_Y;// + 20;
+        
+        cout << "pixel_x pixel_y " << pixel_x << " " << pixel_y << endl;
         center_ss << pixel_x << " " << pixel_y << " ";
 
         double topLeftX,topLeftY;
@@ -346,6 +387,7 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
         topLeftX = min(topLeftX,double(CENTER_IMAGE_X*2));
         topLeftY = max(pixel_y_min+TUNED_V_DISTANCE_TOP_LEFT,double(0.0));
         topLeftY = min(topLeftY,double(CENTER_IMAGE_Y*2));
+
 
         int width_,height_;
         if(pixel_x_max+TUNED_H_DISTANCE_BOTTOM_RIGHT <= CENTER_IMAGE_X*2 )
@@ -361,6 +403,7 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
         cout << "value of the cropped conner with fixing and tuning" << '(' << topLeftX << ',' << topLeftY << ") (" <<topLeftX + width_<< ',' << topLeftY + height_<< ')' << endl;
         cout << "width : "<< width_<<  " height : " << height_ << endl;
 
+
         if(pixel_x_max <= 0 || pixel_x_min >= CENTER_IMAGE_X*2 || pixel_y_max <= 0 || pixel_y_min >= CENTER_IMAGE_Y*2)
             continue;
 
@@ -371,6 +414,8 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
         objectCentroidWorld[objectNumber][0] = objectWorldX;
         objectCentroidWorld[objectNumber][1] = objectWorldY;
         objectCentroidWorld[objectNumber][2] = objectWorldZ;
+
+        cout << "objectWorld X Y Z" << objectWorldX << objectWorldY << objectWorldZ << endl;
 
         cv::Mat m = img.clone();
         IplImage* iplImage = new IplImage(m);
@@ -389,6 +434,7 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
         ROS_INFO("center of clustering no.%d : (%f,%f,%f) \n",objectNumber,x,y,z);
 
         objectNumber++;
+        cout << "objectNumber " << objectNumber << endl;
     }
 
     // classify object call service 
@@ -480,27 +526,35 @@ int main (int argc, char** argv)
     image_transport::ImageTransport it(nh);
 
     ROS_INFO("Start finding center of the object ...");
-    nh.param("FOCAL_LENGTH_X", FOCAL_LENGTH_X, 814.03512);
-    nh.param("FOCAL_LENGTH_Y", FOCAL_LENGTH_Y, 815.46674);
+    //nh.param("FOCAL_LENGTH_X", FOCAL_LENGTH_X, 814.03512);
+    //nh.param("FOCAL_LENGTH_Y", FOCAL_LENGTH_Y, 815.46674);
+    nh.param("FOCAL_LENGTH_X", FOCAL_LENGTH_X, 525.0);
+    nh.param("FOCAL_LENGTH_Y", FOCAL_LENGTH_Y, 525.0);
     nh.param("CALIBRATED_CENTER_IMAGE_X", CALIBRATED_CENTER_IMAGE_X,313.73619);
     nh.param("CALIBRATED_CENTER_IMAGE_Y", CALIBRATED_CENTER_IMAGE_Y,254.26251);
-    nh.param("CENTER_IMAGE_X", CENTER_IMAGE_X,320.0);
-    nh.param("CENTER_IMAGE_Y", CENTER_IMAGE_Y,240.0);
+    nh.param("CENTER_IMAGE_X", CENTER_IMAGE_X, 320.0);
+    nh.param("CENTER_IMAGE_Y", CENTER_IMAGE_Y, 240.0);
     //nh.param("TUNED_H_DISTANCE_TOP_LEFT", TUNED_H_DISTANCE_TOP_LEFT,0.0);
-    nh.param("TUNED_H_DISTANCE_TOP_LEFT", TUNED_H_DISTANCE_TOP_LEFT,0.0);
-    nh.param("TUNED_V_DISTANCE_TOP_LEFT", TUNED_V_DISTANCE_TOP_LEFT,0.0);
-    nh.param("TUNED_H_DISTANCE_BOTTOM_RIGHT", TUNED_H_DISTANCE_BOTTOM_RIGHT,0.0);
-    nh.param("TUNED_V_DISTANCEw_BOTTOM_RIGHT", TUNED_V_DISTANCE_BOTTOM_RIGHT,0.0);
     
+    nh.param("TUNED_H_DISTANCE_TOP_LEFT", TUNED_H_DISTANCE_TOP_LEFT, 0.0);
+    nh.param("TUNED_V_DISTANCE_TOP_LEFT", TUNED_V_DISTANCE_TOP_LEFT, 0.0);
+    nh.param("TUNED_H_DISTANCE_BOTTOM_RIGHT", TUNED_H_DISTANCE_BOTTOM_RIGHT, 0.0);
+    nh.param("TUNED_V_DISTANCE_BOTTOM_RIGHT", TUNED_V_DISTANCE_BOTTOM_RIGHT, 0.0);
+    //nh.param("TUNED_H_DISTANCE_TOP_LEFT", TUNED_H_DISTANCE_TOP_LEFT, 0.0);
+    //nh.param("TUNED_V_DISTANCE_TOP_LEFT", TUNED_V_DISTANCE_TOP_LEFT, 0.0);
+    //nh.param("TUNED_H_DISTANCE_BOTTOM_RIGHT", TUNED_H_DISTANCE_BOTTOM_RIGHT, 0.0);
+    //nh.param("TUNED_V_DISTANCE_BOTTOM_RIGHT", TUNED_V_DISTANCE_BOTTOM_RIGHT, 0.0);
+
+
     classifyClient = n.serviceClient<object_recognition::classifyObject>("classifyObject");
     
-    image_transport::Subscriber sub_imageColor = it.subscribe("/external_cam/image_raw", 1, imageColorCb);
+    //image_transport::Subscriber sub_imageColor = it.subscribe("/external_cam/image_raw", 1, imageColorCb);
     //image_transport::Subscriber sub_imageColor = it.subscribe("/logitech_cam/image_raw", 1, imageColorCb);
-    //image_transport::Subscriber sub_imageColor = it.subscribe("/camera/rgb/image_color", 1, imageColorCb);
+    image_transport::Subscriber sub_imageColor = it.subscribe("/camera/rgb/image_color", 1, imageColorCb);
 
-    ros::Subscriber sub = n.subscribe("/depth_registered/depth_registered/points",1, depthCB);
+    //ros::Subscriber sub = n.subscribe("/depth_registered/depth_registered/points",1, depthCB);
     //ros::Subscriber sub = n.subscribe("/cloud_tf",1, depthCB);
-    //ros::Subscriber sub = n.subscribe("/camera/depth_registered/points",1,depthCB);
+    ros::Subscriber sub = n.subscribe("/camera/depth_registered/points",1,depthCB);
 
     ros::ServiceServer service = n.advertiseService("findObject", getObjectPoint);
 //    listener = new tf::TransformListener();

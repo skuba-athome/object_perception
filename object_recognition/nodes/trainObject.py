@@ -13,8 +13,15 @@ from operator import add
 
 surf = cv2.SURF(400)
 #object_root_dir = "/home/mukda/catkin_athome/src/object_recognition_new/data3"
-object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data'
+#object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data'
+#object_root_dir = "/home/skuba/Desktop/BASIC"
 #svm_model_filename = '/home/mukda/catkin_athome/src/object_recognition_new/svm_model/svm_model.pkl'
+
+#object_root_dir = "/home/skuba/Desktop/cocktail/"
+#svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/svm_model.pkl'
+#object_root_dir = "/home/skuba/Desktop/data_cropped_seperate/"
+object_root_dir = "/home/skuba/Desktop/drink_cropped_seperate/"
+features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/Features.txt'
 svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/svm_model.pkl'
 
 class objectRecognition:
@@ -28,15 +35,17 @@ class objectRecognition:
 		self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
 		self.clf.fit(features_list, self.labels)
 		self.trainSVM(object_dic)
+		
+		#self.loadFeature(features_filename, category)
 		#testing
 		#for queryFeature in features_list:
-		#	weightSum = calWeightSum(self, queryFeature)
+		#	weightSum = self.calWeightSum(queryFeature)
 		#	self.svm(histogram, category, weightSum)
 
 	def listImageInDirectory(self, dir):
 		image_dic = {}
 		for object_dir in os.listdir(dir):
-			object_dir_path = os.path.join(dir, object_dir) + '/test/'
+			object_dir_path = os.path.join(dir, object_dir + '/train/')
 			#object_dir_path = os.path.join(dir, object_dir)
 			if not os.path.isdir(object_dir_path):
 				continue
@@ -61,16 +70,17 @@ class objectRecognition:
 				feature = self.extractFeatureFromAImage(aImage, object_name)
 				#print aImage
 				if feature == None or len(feature) == 0:
+					#print aImage
 					continue            
 				for f in feature:
 					self.aFeature.append(map(float,f))
 					self.features.append(map(float,f))
 					self.aLabel.append(len(self.categorySet)-1)
-			#print object_name, len(self.categorySet)-1
-			self.writeFeatureFile(os.path.join(object_root_dir, object_name +"/features.txt"), self.features)	
+			print object_name, len(self.categorySet)-1
+			self.writeFeatureFile(os.path.join(object_root_dir, object_name +"/features.txt"), self.features)
 		return self.aFeature, self.aLabel
 
-	def extractFeatureFromAImage(self,aImage, object_name):
+	def extractFeatureFromAImage(self, aImage, object_name):
 		image = cv2.imread(aImage, 0)
 		keypoint, feature = surf.detectAndCompute(image, None)
 		basename = os.path.splitext(os.path.basename(aImage))[0]
@@ -85,7 +95,7 @@ class objectRecognition:
 			file_ptr.write(line+'\n')
 		file_ptr.close()
 		#print 'Write Feature File: '+file_ptr.name+' completed'
-
+	
 	def calWeightSum(self, queryFeature):
 		weightSum = [0.0 for i in self.categorySet]
 		if queryFeature == None or len(queryFeature) == 0:
@@ -121,14 +131,14 @@ class objectRecognition:
 				histogram.append(weightSum)
 				#print weightSum, index
 				category.append(index)
-			#print object_name, index
+			print object_name, index
 			index += 1
 		X = numpy.array(histogram)
 		y = numpy.array(category)
 
 		#clf_svm = SVC()
-		#clf_svm = SVC(kernel='linear')
-		clf_svm = SVC(kernel='rbf',C=3.0)
+		clf_svm = SVC(kernel='linear')
+		#clf_svm = SVC(kernel='rbf',C=3.0)
 		#clf_svm = SVC(kernel='rbf',C=5.0)
 		#clf_svm = SVC(kernel='polynomial')
 		#clf_svm = SVC(kernel='sigmoid')
