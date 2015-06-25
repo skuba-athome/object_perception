@@ -34,7 +34,7 @@
 // Author(s): Marius Muja and Matei Ciocarlie
 
 
-#include "marker_generator.h"
+#include "tabletop/marker_generator.h"
 
 //for random colors
 #include <stdlib.h>
@@ -83,19 +83,27 @@ visualization_msgs::Marker MarkerGenerator::getFitMarker(const shape_msgs::Mesh 
   It is the responsibility of the caller to set the appropriate pose for the marker so that
   it shows up in the right reference frame.
  */
+
 visualization_msgs::Marker MarkerGenerator::getTableMarker(float xmin, float xmax, float ymin, float ymax)
 {
-  visualization_msgs::Marker marker;
-  marker.action = visualization_msgs::Marker::ADD;
-  marker.type = visualization_msgs::Marker::LINE_STRIP;
-  marker.lifetime = ros::Duration();
-
   //create the marker in the table reference frame
   //the caller is responsible for setting the pose of the marker to match
+  
+  visualization_msgs::Marker marker;
+  marker.action = visualization_msgs::Marker::ADD;
+  marker.lifetime = ros::Duration();
 
-  marker.scale.x = 0.001;
-  marker.scale.y = 0.001;
-  marker.scale.z = 0.001;
+  
+  marker.type = visualization_msgs::Marker::LINE_STRIP;
+  
+  marker.scale.x = 0.01;
+  //marker.scale.y = 0.1;
+  //marker.scale.z = 0.1;
+
+  marker.color.r = 0.0;
+  marker.color.g = 1.0;
+  marker.color.b = 0.0;
+  marker.color.a = 1.0;
 
   marker.points.resize(5);
   marker.points[0].x = xmin;
@@ -122,14 +130,21 @@ visualization_msgs::Marker MarkerGenerator::getTableMarker(float xmin, float xma
   marker.points[5].x = xmin;
   marker.points[5].y = ymin;
   marker.points[5].z = 0.02;
-   
-  marker.color.r = 1.0;
-  marker.color.g = 1.0;
-  marker.color.b = 0.0;
+  
+  /*
+  marker.type = visualization_msgs::Marker::CUBE;
+  marker.scale.x = xmax-xmin;
+  marker.scale.y = ymax-ymin;
+  marker.scale.z = 0.01;
+  marker.color.b = 1.0;
   marker.color.a = 1.0;
-
+  ROS_INFO("xmax=%f ymax=%f xmin=%f ymin=%f",xmax,ymax,xmin,ymin);
+  */
   return marker;
 }
+
+
+
 
 /*! Create a marker for a convex hull table
   It is the responsibility of the caller to set the appropriate pose for the marker so that
@@ -142,12 +157,12 @@ visualization_msgs::Marker MarkerGenerator::getConvexHullTableMarker(const shape
   marker.lifetime = ros::Duration();
   marker.type = visualization_msgs::Marker::LINE_STRIP;
   marker.color.r = 0.0;
-  marker.color.g = 1.0;
+  marker.color.g = 0.0;
   marker.color.b = 1.0;
   marker.color.a = 1.0;
-  marker.scale.x = 0.001;
-  marker.scale.y = 0.001;
-  marker.scale.z = 0.001;
+  marker.scale.x = 0.01;
+  //marker.scale.y = 0.1;
+  //marker.scale.z = 0.1;
   for(size_t i=0; i<mesh.triangles.size(); i++)
   {
     marker.points.push_back( mesh.vertices[ mesh.triangles[i].vertex_indices[0] ] );
