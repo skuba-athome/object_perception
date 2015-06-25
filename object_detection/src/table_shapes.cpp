@@ -35,7 +35,8 @@ public:
     //for (std::vector<int>::iterator it = table_array.begin(); table_array.end(); it++)
     {
         //object_recognition_msgs::Table table = table_array->tables[index];
-         table = table_array->tables[index];
+        table = table_array->tables[index];
+
         std_msgs::Header table_header = table.header;
         //geometry_msgs::Pose table_pose = table.pose;
         table_pose = table.pose;
@@ -73,15 +74,27 @@ public:
 		size_x = x_max-x_min;
         size_y = y_max-y_min;
 
+		//compute centroid
+		centroid.x = centroid.y = centroid.z = 0.0;
+		for (size_t i=0; i<table_convex_hull.size(); i++)
+		{
+		centroid.x += table_convex_hull[i].x;
+		centroid.y += table_convex_hull[i].y;
+		centroid.z += table_convex_hull[i].z;
+		}
+		centroid.x /= table_convex_hull.size();
+		centroid.y /= table_convex_hull.size();
+		centroid.z /= table_convex_hull.size();
 
-        getCloudMarker(table);
+        //getCloudMarker(table);
+        getCloudMarker(centroid, table_pose, size_x, size_y);
         publishObjectArray(table);
         getSolidPrimitive();
     }
   }
 
-  void getCloudMarker(const object_recognition_msgs::Table table)
-  //void getCloudMarker(const geometry_msgs::Pose table_pose, const double size_x, const double size_y)
+  //void getCloudMarker(const object_recognition_msgs::Table table)
+  void getCloudMarker(const geometry_msgs::Point centriod ,const geometry_msgs::Pose table_pose, const double size_x, const double size_y)
   {
       //ROS_INFO("getCloudMarker");
       visualization_msgs::Marker marker;
@@ -93,10 +106,14 @@ public:
       
       marker.type = visualization_msgs::Marker::CUBE;
 
-      marker.pose.position.x = table_pose.position.x;
-      marker.pose.position.y = table_pose.position.y;
-      marker.pose.position.z = table_pose.position.z;
+      //marker.pose.position.x = table_pose.position.x;
+      //marker.pose.position.y = table_pose.position.y;
+      //marker.pose.position.z = table_pose.position.z;
       
+      marker.pose.position.x = centroid.x;
+      marker.pose.position.y = centroid.y;
+      marker.pose.position.z = table_pose.position.z;
+
       marker.pose.orientation.x = table_pose.orientation.x;
       marker.pose.orientation.y = table_pose.orientation.y;
       marker.pose.orientation.z = table_pose.orientation.z;
@@ -111,6 +128,9 @@ public:
       marker.color.b = 1.0f;
       marker.color.a = 1.0;
       
+      ROS_INFO("table_centriod %f %f %f %f %f", table_pose.position.x, table_pose.position.y, table_pose.position.z, centriod.x, centriod.y );
+      //ROS_INFO("centriod %f %f %f", centriod.x, centriod.y, centriod.z );
+
       /*
       marker.type = visualization_msgs::Marker::POINTS;
       marker.scale.x = 0.02;
@@ -139,7 +159,6 @@ public:
   //bool getSolidPrimitive(using_markers::TableShape::Request &req, using_markers::TableShape::Response &res)
   void getSolidPrimitive()
   {
-    ROS_INFO("Table Plane Primitive Shape");
 
     shape_msgs::SolidPrimitive solid_shape;
     solid_shape.type = shape_msgs::SolidPrimitive::BOX;
@@ -241,10 +260,10 @@ private:
   ros::Publisher solid_shape_pub;
   object_recognition_msgs::TableArray table_array;
   object_recognition_msgs::Table table;
-  geometry_msgs::Pose table_pose;
   double size_x;
   double size_y;
   geometry_msgs::Point centroid;
+  geometry_msgs::Pose table_pose;
   ros::Publisher pub_co;
   tf::TransformListener* listener;
   object_detection::ObjectDetection msg;
