@@ -1,0 +1,9 @@
+<launch>
+	<node pkg="dynamic_reconfigure" type="dynparam" name="kinect_set" args="set_from_parameters /camera/driver">
+		<param name="depth_registration" value="true" />
+	</node>
+	
+	<node pkg="object_detection" type="object_shapes" name="object_shapes" output="screen"/>
+	<node pkg="object_detection" type="table_shapes" name="table_shapes" output="screen"/>
+
+</launch>

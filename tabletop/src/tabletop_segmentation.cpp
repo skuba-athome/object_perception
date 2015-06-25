@@ -35,7 +35,7 @@
 // Author(s): Marius Muja and Matei Ciocarlie
 
 #include <string>
-
+#include <stdlib.h> 
 #include <ros/ros.h>
 
 #include <sensor_msgs/PointCloud.h>
@@ -65,7 +65,7 @@
 #include <pcl_ros/transforms.h>
 #include <pcl_conversions/pcl_conversions.h>
 
-#include "marker_generator.h"
+#include "tabletop/marker_generator.h"
 #include "tabletop/TabletopSegmentation.h"
 
 namespace tabletop {
@@ -349,15 +349,14 @@ namespace tabletop {
 		tf::poseTFToMsg(table_plane_trans, table_pose);
 		table.pose.pose = table_pose;
 		table.pose.header = cloud_header;
-
-
-		visualization_msgs::Marker tableMarker = MarkerGenerator::getTableMarker(table.x_min, table.x_max,
-			table.y_min, table.y_max);
+		
+		visualization_msgs::Marker tableMarker = MarkerGenerator::getTableMarker(table.x_min, table.x_max, table.y_min, table.y_max);
 		tableMarker.header = cloud_header;
 		tableMarker.pose = table_pose;
 		tableMarker.ns = "tabletop_node";
 		tableMarker.id = current_marker_id_++;
 		marker_pub_.publish(tableMarker);
+
 
 		return table;
 	}
@@ -612,8 +611,6 @@ namespace tabletop {
 			pcl::copyPointCloud(cloud_objects, clusters2[i], cloud_cluster);
 			sensor_msgs::PointCloud2 pc2;
 			pcl::toROSMsg( cloud_cluster, pc2 ); 
-    		//cloud_cluster.header = pcl_conversions::toPCL(pc2.header);
-
 			sensor_msgs::convertPointCloud2ToPointCloud (pc2, clusters[i]);    
 		}
 	}
