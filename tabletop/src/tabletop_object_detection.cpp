@@ -196,8 +196,8 @@ void TabletopObjectDetector::objectDetection(std::vector<PointCloudType> cluster
   		center.y /= clusters[i].points.size();
   		center.z /= clusters[i].points.size();
   		
-  		centriods.push_back(center);
-  		ROS_INFO("Compute centriods completed x y z: %.2f %.2f %.2f", center.x, center.y, center.z);
+  		//centriods.push_back(center);
+  		//ROS_INFO("Compute centriods completed x y z: %.2f %.2f %.2f", center.x, center.y, center.z);
 	
 		// create solid boxes to cover clusters 
 		//sensor_msgs::PointCloud2 clusters_pointcloud2;
@@ -239,33 +239,19 @@ void TabletopObjectDetector::objectDetection(std::vector<PointCloudType> cluster
     		fabs(max_points.x - min_points.x), fabs(max_points.y - min_points.y), fabs(max_points.z - min_points.z));
 
 
-    	visualization_msgs::Marker originMarker = 
-		MarkerGenerator::createMarker(table.pose.header.frame_id, 0, 0.1, 0.1, 0.02, 0, 1, 1, 
-			visualization_msgs::Marker::CUBE, current_marker_id_++, "tabletop_node", table.pose.pose);
-		originMarker.pose.position.y = table.pose.pose.position.y - 0.5;
-		originMarker.pose.position.z = table.pose.pose.position.z*2.0 - 0.02;
-
-		ROS_INFO_STREAM("originMarker " << originMarker.pose.position.x << " "
-			<<originMarker.pose.position.y << " "
-			<<originMarker.pose.position.z << " "
-			<<originMarker.pose.orientation.x << " "
-			<<originMarker.pose.orientation.y << " "
-			<<originMarker.pose.orientation.z << " "
-			<<originMarker.pose.orientation.w << " "
-			<< table.pose.header
-			);
-		marker_pub_.publish(originMarker);
-
-    	// create marker for objecT    	
+    	// create marker for object
     	visualization_msgs::Marker objectMarker = 
 		MarkerGenerator::createMarker(table.pose.header.frame_id, 0, 
 			fabs(max_points.x - min_points.x), fabs(max_points.y - min_points.y), fabs(max_points.z - min_points.z), 
 			1, 0, 0, 
 			visualization_msgs::Marker::CUBE, current_marker_id_++, "tabletop_node", table.pose.pose);
-		objectMarker.pose.position.y = table.pose.pose.position.y - 0.5;
-		objectMarker.pose.position.z = table.pose.pose.position.z + 0.4 - fabs(max_points.z - min_points.z);
+		objectMarker.pose.position.x = table.x_min + fabs(max_points.x - min_points.x)/2.0;
+		objectMarker.pose.position.z = table.pose.pose.position.z + 0.1 - 0.02;
 		marker_pub_.publish(objectMarker);
 		ROS_INFO("Object marker publish");
+
+		centriods.push_back(objectMarker.pose.position);
+  		ROS_INFO("Compute centriods completed x y z: %.2f %.2f %.2f", centriods[i].x, centriods[i].y, centriods[i].z);
 
 
 		// crop image object and save as .png
