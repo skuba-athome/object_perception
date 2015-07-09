@@ -41,10 +41,11 @@
 #include <time.h>
 
 #include <geometry_msgs/Pose.h>
-
 #include <tf/transform_datatypes.h>
+#include "tabletop/model_fitter.h"
 
-//#include "tabletop_object_detector/model_fitter.h"
+#include <shape_tools/solid_primitive_dims.h>
+#include <moveit_msgs/CollisionObject.h>
 
 namespace tabletop {
 
@@ -180,21 +181,55 @@ visualization_msgs::Marker MarkerGenerator::createMarker(std::string frame_id, d
 {
   visualization_msgs::Marker marker;
   marker.action = visualization_msgs::Marker::ADD;
-  marker.lifetime = ros::Duration(duration);
+  //marker.lifetime = ros::Duration(duration);
+  marker.lifetime = ros::Duration();
   marker.type = type;
   marker.id = id;
   marker.ns = ns;
+  marker.scale.x = xdim;
+  marker.scale.y = ydim;
+  marker.scale.z = zdim;
   marker.pose = pose;
   marker.header.frame_id = frame_id;
   marker.color.r = r;
   marker.color.g = g;
   marker.color.b = b;
   marker.color.a = 1.0;
-  marker.scale.x = xdim;
-  marker.scale.y = ydim;
-  marker.scale.z = zdim;
+
   return marker;
 }
 
 
-} //namespace tabletop_object_detector
+moveit_msgs::CollisionObject MarkerGenerator::getTableCollision(std::string frame_id, double xdim, double ydim, int id, geometry_msgs::Pose pose)
+{
+  shape_msgs::SolidPrimitive solid_shape;
+  solid_shape.type = shape_msgs::SolidPrimitive::BOX;
+  solid_shape.dimensions.resize(3);
+  solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_X] = xdim;
+  solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = ydim;
+  solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 0.02;
+
+  // publish collision message to moveit
+  moveit_msgs::CollisionObject co;
+  co.header.stamp = ros::Time::now();
+  co.header.frame_id = frame_id;
+  co.id = id;
+
+  // add table
+  co.operation = moveit_msgs::CollisionObject::ADD;
+  co.primitives.resize(1);
+  co.primitives[0].type = solid_shape.type;
+  co.primitives[0].dimensions.resize(shape_tools::SolidPrimitiveDimCount<shape_msgs::SolidPrimitive::BOX>::value);
+  co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_X] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_X];
+  co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Y] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Y];
+  co.primitives[0].dimensions[shape_msgs::SolidPrimitive::BOX_Z] = solid_shape.dimensions[shape_msgs::SolidPrimitive::BOX_Z];
+  co.primitive_poses.resize(1);
+  co.primitive_poses[0].position.x = pose.position.x;
+  co.primitive_poses[0].position.y = pose.position.y;
+  co.primitive_poses[0].position.z = pose.position.z;
+  return co;
+}
+
+//moveit_msgs::CollisionObject MarkerGenerator::getObjectCollision
+
+} //namespace tabletop
