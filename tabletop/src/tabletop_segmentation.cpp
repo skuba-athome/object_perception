@@ -68,6 +68,8 @@
 #include "tabletop/marker_generator.h"
 #include "tabletop/TabletopSegmentation.h"
 
+#include <moveit_msgs/CollisionObject.h>
+
 namespace tabletop {
 
 	class TabletopSegmentor 
@@ -85,10 +87,15 @@ namespace tabletop {
 	  		//! Service server for object detection
 			ros::ServiceServer segmentation_srv_;
 
+			ros::Publisher collision_pub_;
+
 	  		//! Used to remember the number of markers we publish so we can delete them later
 			int num_markers_published_;
 	  		//! The current marker being published
 			int current_marker_id_;
+
+			int num_collision_published_;
+			int current_collision_id_;
 
 	  		//! Min number of inliers for reliable plane detection
 			int inlier_threshold_;
@@ -137,13 +144,15 @@ namespace tabletop {
 	  		template <class PointCloudType>
 			void publishClusterMarkers(const std::vector<PointCloudType> &clusters, std_msgs::Header cloud_header);
 
+
+
 	  		//------------------- Complete processing -----
 
 	  		//! Complete processing for new style point cloud
 			void processCloud(const sensor_msgs::PointCloud2 &cloud, TabletopSegmentation::Response &response, Table table);
 
 	  		//! Clears old published markers and remembers the current number of published markers
-			void clearOldMarkers(std::string frame_id);
+			void clearOldMarkersAndCollisionObject(std::string frame_id);
 
 	  		//! Pull out and transform the convex hull points from a Table message
 	  		template <class PointCloudType>
@@ -157,9 +166,14 @@ namespace tabletop {
 				num_markers_published_ = 1;
 				current_marker_id_ = 1;
 
+				num_collision_published_ = 1;
+				current_collision_id_ = 1;
+
 				marker_pub_ = nh_.advertise<visualization_msgs::Marker>(nh_.resolveName("markers_out"), 10);
 
 				segmentation_srv_ = nh_.advertiseService(nh_.resolveName("segmentation_srv"), &TabletopSegmentor::serviceCallback, this);
+
+				collision_pub_ = nh_.advertise<moveit_msgs::CollisionObject>("table_collision", 10);
 
     			//initialize operational flags
 				priv_nh_.param<int>("inlier_threshold", inlier_threshold_, 300);
@@ -209,6 +223,7 @@ namespace tabletop {
 		ROS_INFO_STREAM("Point cloud received after " << ros::Time::now() - start_time << " seconds; processing");
 		if (!processing_frame_.empty())
 		{
+			ROS_INFO_STREAM("Processing_frame_ is not empty." << processing_frame_);
     		//convert cloud to processing_frame_ (usually base_link)
 			sensor_msgs::PointCloud old_cloud;  
 			sensor_msgs::convertPointCloud2ToPointCloud (*recent_cloud, old_cloud);
@@ -241,12 +256,13 @@ namespace tabletop {
 			ROS_INFO_STREAM("Input cloud converted to " << processing_frame_ << " frame after " <<
 				ros::Time::now() - start_time << " seconds");
 			processCloud(converted_cloud, response, request.table);
-			clearOldMarkers(converted_cloud.header.frame_id);
+			clearOldMarkersAndCollisionObject(converted_cloud.header.frame_id);
 		}
 		else
 		{
+			ROS_INFO("Processing_frame_ is empty");
 			processCloud(*recent_cloud, response, request.table);
-			clearOldMarkers(recent_cloud->header.frame_id);
+			clearOldMarkersAndCollisionObject(recent_cloud->header.frame_id);
 		}
 
   		//add the timestamp from the original cloud
@@ -281,6 +297,13 @@ namespace tabletop {
 		centroid.x /= convex_hull.points.size();
 		centroid.y /= convex_hull.points.size();
 		centroid.z /= convex_hull.points.size();
+		/*
+		ROS_INFO_STREAM("Centroid " << centroid.x << " "
+			<< centroid.y << " "
+			<< centroid.z << " "
+			<< table.pose.header
+			);
+		*/
 
   		//create a triangle mesh out of the convex hull points and add it to the table message
 		for (size_t i=0; i<convex_hull.points.size(); i++)
@@ -313,14 +336,28 @@ namespace tabletop {
 		tableMarker.header = table.pose.header;
 		tableMarker.pose = table.pose.pose;
 		tableMarker.ns = "tabletop_node";
-		tableMarker.id = current_marker_id_++;
-		marker_pub_.publish(tableMarker);
+		//tableMarker.id = current_marker_id_++;
+		//marker_pub_.publish(tableMarker);
 
+		/*
 		visualization_msgs::Marker originMarker = 
-		MarkerGenerator::createMarker(table.pose.header.frame_id, 0, .0025, .0025, .01, 0, 1, 1, 
+		MarkerGenerator::createMarker(table.pose.header.frame_id, 0, 
+			1.0, 1.0, 0.02, 0, 1, 1, 
 			visualization_msgs::Marker::CUBE, current_marker_id_++, 
 			"tabletop_node", table.pose.pose);
-		marker_pub_.publish(originMarker);
+		
+		
+		ROS_INFO_STREAM("originMarker " << originMarker.pose.position.x << " "
+			<<originMarker.pose.position.y << " "
+			<<originMarker.pose.position.z << " "
+			<<originMarker.pose.orientation.x << " "
+			<<originMarker.pose.orientation.y << " "
+			<<originMarker.pose.orientation.z << " "
+			<<originMarker.pose.orientation.w << " "
+			<< table.pose.header
+			);
+		*/
+		//marker_pub_.publish(originMarker);
 	}
 
 	template <class PointCloudType>
@@ -344,26 +381,64 @@ namespace tabletop {
 			if (table_points.points[i].y<table.y_min && table_points.points[i].y>-3.0) table.y_min = table_points.points[i].y;
 			if (table_points.points[i].y>table.y_max && table_points.points[i].y< 3.0) table.y_max = table_points.points[i].y;
 		}
+		ROS_INFO("x_min %f x_max %f y_min %f y_max %f size_x %f size_y %f", table.x_min, table.x_max, table.y_min, table.y_max, table.x_max-table.x_min, table.y_max-table.y_min);
+
 
 		geometry_msgs::Pose table_pose;
+		// convert Point to Geometry Point msg 
 		tf::poseTFToMsg(table_plane_trans, table_pose);
 		table.pose.pose = table_pose;
 		table.pose.header = cloud_header;
-		
+		/*
+		ROS_INFO_STREAM("table_pose " << table_pose.position.x << " "
+			<< table_pose.position.y << " "
+			<< table_pose.position.z << " "
+			<< table_pose.orientation.x << " "
+			<< table_pose.orientation.y << " "
+			<< table_pose.orientation.z << " "
+			<< table_pose.orientation.w << " "
+			<< cloud_header
+			);
+		*/
+		/*
 		visualization_msgs::Marker tableMarker = MarkerGenerator::getTableMarker(table.x_min, table.x_max, table.y_min, table.y_max);
 		tableMarker.header = cloud_header;
 		tableMarker.pose = table_pose;
 		tableMarker.ns = "tabletop_node";
 		tableMarker.id = current_marker_id_++;
 		marker_pub_.publish(tableMarker);
+		*/
 
+		
+		visualization_msgs::Marker originMarker = 
+		MarkerGenerator::createMarker(table.pose.header.frame_id, 0, table.x_max-table.x_min, table.y_max-table.y_min, 0.02, 0, 1, 1, 
+			visualization_msgs::Marker::CUBE, current_marker_id_++, "tabletop_node", table_pose);
+		originMarker.pose.position.y = table_pose.position.y - (table.y_max - table.y_min)/2.0;
+		originMarker.pose.position.z = table_pose.position.z*2.0 - 0.02;
+
+		ROS_INFO_STREAM("originMarker " << originMarker.pose.position.x << " "
+			<<originMarker.pose.position.y << " "
+			<<originMarker.pose.position.z << " "
+			<<originMarker.pose.orientation.x << " "
+			<<originMarker.pose.orientation.y << " "
+			<<originMarker.pose.orientation.z << " "
+			<<originMarker.pose.orientation.w << " "
+			<< table.pose.header
+			);
+		marker_pub_.publish(originMarker);
+		
+		moveit_msgs::CollisionObject tableCollision =
+		MarkerGenerator::getTableCollision(table.pose.header.frame_id, table.x_max-table.x_min, table.y_max-table.y_min, 
+			current_collision_id_++, originMarker.pose);
+		collision_pub_.publish(tableCollision);
 
 		return table;
 	}
 
 	template <class PointCloudType>
 	void TabletopSegmentor::publishClusterMarkers(const std::vector<PointCloudType> &clusters, std_msgs::Header cloud_header)
-	{
+	{	
+		/*
 		for (size_t i=0; i<clusters.size(); i++) 
 		{
 			visualization_msgs::Marker cloud_marker =  MarkerGenerator::getCloudMarker(clusters[i]);
@@ -371,11 +446,12 @@ namespace tabletop {
 			cloud_marker.pose.orientation.w = 1;
 			cloud_marker.ns = "tabletop_node";
 			cloud_marker.id = current_marker_id_++;
-			marker_pub_.publish(cloud_marker);
+			//marker_pub_.publish(cloud_marker);
 		}
+		*/
 	}
 
-	void TabletopSegmentor::clearOldMarkers(std::string frame_id)
+	void TabletopSegmentor::clearOldMarkersAndCollisionObject(std::string frame_id)
 	{
 		for (int id=current_marker_id_; id < num_markers_published_; id++)
 		{
@@ -389,6 +465,17 @@ namespace tabletop {
 		}
 		num_markers_published_ = current_marker_id_;
 		current_marker_id_ = 0;
+
+		for (int id=current_collision_id_; id < num_collision_published_; id++)
+		{
+			moveit_msgs::CollisionObject remove_collision;
+  			remove_collision.header.stamp = ros::Time::now();
+  			remove_collision.header.frame_id = frame_id;
+  			remove_collision.operation = moveit_msgs::CollisionObject::REMOVE;
+  			collision_pub_.publish(remove_collision);
+		}
+		num_collision_published_ = current_collision_id_;
+		current_collision_id_ = 0;
 	}
 
 	/*! Assumes plane coefficients are of the form ax+by+cz+d=0, normalized */
@@ -396,7 +483,7 @@ namespace tabletop {
 	{
 		ROS_ASSERT(coeffs.values.size() > 3);
 		double a = coeffs.values[0], b = coeffs.values[1], c = coeffs.values[2], d = coeffs.values[3];
-  		//asume plane coefficients are normalized
+  		//assume plane coefficients are normalized
 		tf::Vector3 position(-a*d, -b*d, -c*d);
 		tf::Vector3 z(a, b, c);
 
@@ -447,6 +534,7 @@ namespace tabletop {
   		//table_frame_points.header.stamp = now;
 		table_frame_points.header.stamp = now.toNSec()/1e3;
 		table_frame_points.header.frame_id = "table_frame";
+		
 		table_frame_points.points.resize(table.convex_hull.vertices.size());
 
 		for(size_t i=0; i < table.convex_hull.vertices.size(); i++)
@@ -529,8 +617,8 @@ namespace tabletop {
 		pcl_conversions::toPCL(tableMarker.header, table_hull.header);
 		tableMarker.pose.orientation.w = 1.0;
 		tableMarker.ns = "tabletop_node";
-		tableMarker.id = current_marker_id_++;
-		marker_pub_.publish(tableMarker);
+		//tableMarker.id = current_marker_id_++;
+		//marker_pub_.publish(tableMarker);
 
 		return true;
 	}
@@ -662,26 +750,33 @@ namespace tabletop {
 		pcl_cluster_.setSearchMethod (clusters_tree_);
 
   		// Step 1 : Filter, remove NaNs and downsample
+
 		pcl::PointCloud<Point>::Ptr cloud_ptr (new pcl::PointCloud<Point>); 
 		pcl::fromROSMsg (cloud, *cloud_ptr);
+		ROS_INFO("Cloud has %d points", (int)cloud_ptr->points.size());
+
 		pass_.setInputCloud (cloud_ptr);
 		pass_.setFilterFieldName ("z");
 		pass_.setFilterLimits (z_filter_min_, z_filter_max_);
 		pcl::PointCloud<Point>::Ptr z_cloud_filtered_ptr (new pcl::PointCloud<Point>); 
 		pass_.filter (*z_cloud_filtered_ptr);
+		ROS_INFO("After z filter cloud has %d points", (int)z_cloud_filtered_ptr->points.size());
 
 		pass_.setInputCloud (z_cloud_filtered_ptr);
 		pass_.setFilterFieldName ("y");
 		pass_.setFilterLimits (y_filter_min_, y_filter_max_);
 		pcl::PointCloud<Point>::Ptr y_cloud_filtered_ptr (new pcl::PointCloud<Point>); 
 		pass_.filter (*y_cloud_filtered_ptr);
+		ROS_INFO("After y filter cloud has %d points", (int)y_cloud_filtered_ptr->points.size());
 
 		pass_.setInputCloud (y_cloud_filtered_ptr);
 		pass_.setFilterFieldName ("x");
 		pass_.setFilterLimits (x_filter_min_, x_filter_max_);
 		pcl::PointCloud<Point>::Ptr cloud_filtered_ptr (new pcl::PointCloud<Point>); 
 		pass_.filter (*cloud_filtered_ptr);
+		ROS_INFO("After x filter cloud has %d points", (int)cloud_filtered_ptr->points.size());
 
+		
 		ROS_INFO("Step 1 done");
 		if (cloud_filtered_ptr->points.size() < (unsigned int)min_cluster_size_)
 		{
@@ -704,14 +799,14 @@ namespace tabletop {
 		pcl::PointCloud<pcl::Normal>::Ptr cloud_normals_ptr (new pcl::PointCloud<pcl::Normal>); 
 		n3d_.setInputCloud (cloud_downsampled_ptr);
 		n3d_.compute (*cloud_normals_ptr);
-		ROS_INFO("Step 2 done");
+		ROS_INFO("Step 2 done: Estimate normals");
 
   		// Step 3 : Perform planar segmentation, if table is not given, otherwise use given table
 		tf::Transform table_plane_trans; 
 		tf::Transform table_plane_trans_flat;
 		if(input_table.convex_hull.vertices.size() != 0)
 		{  
-			ROS_INFO("Table input, skipping Step 3");
+			ROS_INFO("Table has been input, skipping Step 3");
 			bool success = tableMsgToPointCloud<pcl::PointCloud<Point> >(input_table, cloud.header.frame_id, *table_hull_ptr);
 			if(!success)
 			{
@@ -727,6 +822,8 @@ namespace tabletop {
 		}
 		else
 		{
+			ROS_INFO("Table has been input in this Step 3");
+			// Table plane segmentation
 			pcl::PointIndices::Ptr table_inliers_ptr (new pcl::PointIndices); 
 			pcl::ModelCoefficients::Ptr table_coefficients_ptr (new pcl::ModelCoefficients); 
 			seg_.setInputCloud (cloud_downsampled_ptr);
@@ -752,7 +849,7 @@ namespace tabletop {
 				(int)table_inliers_ptr->indices.size (),
 				table_coefficients_ptr->values[0], table_coefficients_ptr->values[1], 
 				table_coefficients_ptr->values[2], table_coefficients_ptr->values[3]);
-			ROS_INFO("Step 3 done");
+			ROS_INFO("Step 3 done : plane segmentation");
 
     		// Step 4 : Project the table inliers on the table
 			pcl::PointCloud<Point>::Ptr table_projected_ptr (new pcl::PointCloud<Point>); 
@@ -760,7 +857,7 @@ namespace tabletop {
 			proj_.setIndices (table_inliers_ptr);
 			proj_.setModelCoefficients (table_coefficients_ptr);
 			proj_.filter (*table_projected_ptr);
-			ROS_INFO("Step 4 done");
+			ROS_INFO("Step 4 done : Project the table inliers on the table");
 
 			sensor_msgs::PointCloud table_points;
 			sensor_msgs::PointCloud table_hull_points;
@@ -772,7 +869,8 @@ namespace tabletop {
 
 			if(!flatten_table_)
 			{
-	      		// --- [ Take the points projected on the table and transform them into the PointCloud message
+				ROS_INFO("Not flatten_table_");
+	      		// --- [ Take the points projected on the table and transform them  into the PointCloud message
 	      		//  while also transforming them into the table's coordinate system
 				if (!getPlanePoints<Point> (*table_projected_ptr, table_plane_trans, table_points))
 				{
@@ -792,6 +890,7 @@ namespace tabletop {
 			}
 			if(flatten_table_)
 			{
+				ROS_INFO("Not flatten_table_");
       			// if flattening the table, find the center of the convex hull and move the table frame there
 				table_plane_trans_flat = getPlaneTransform (*table_coefficients_ptr, up_direction_, flatten_table_);
 				tf::Vector3 flat_table_pos;
@@ -862,6 +961,7 @@ namespace tabletop {
 
 		if (cloud_objects_ptr->points.empty ()) 
 		{
+			response.result = response.NO_OBJECT;
 			ROS_INFO("No objects on table");
 			return;
 		}
@@ -886,7 +986,7 @@ namespace tabletop {
 		std::vector<sensor_msgs::PointCloud> clusters;
 		getClustersFromPointCloud2<Point> (*cloud_objects_downsampled_ptr, clusters2, clusters);
 		ROS_INFO("Clusters converted");
-		response.clusters = clusters;  
+		response.clusters = clusters;  		
 
 		publishClusterMarkers(clusters, cloud.header);
 	}

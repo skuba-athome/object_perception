@@ -24,6 +24,7 @@ include_directories(include ${EIGEN_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${catkin
 add_message_files(FILES
   Table.msg
   TabletopDetectionResult.msg
+  ObjectDetection.msg
   )
 
 add_service_files(FILES
@@ -70,10 +71,7 @@ add_library(marker_generator src/marker_generator.cpp )
 target_link_libraries(marker_generator ${catkin_LIBRARIES})
 add_dependencies(marker_generator ${PROJECT_NAME}_gencpp)
 
-add_library(model_fitter
-  src/model_fitter.cpp
-  src/iterative_distance_fitter.cpp
-)
+add_library(model_fitter src/model_fitter.cpp)
 target_link_libraries(model_fitter ${catkin_LIBRARIES})
 add_dependencies(model_fitter ${PROJECT_NAME}_gencpp)
 
@@ -86,10 +84,6 @@ add_executable(tabletop_object_recognition
 )
 target_link_libraries(tabletop_object_recognition model_fitter ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
-add_executable(ping_tabletop_segmentation src/ping_tabletop_segmentation.cpp)
-target_link_libraries(ping_tabletop_segmentation ${catkin_LIBRARIES})
-add_dependencies(ping_tabletop_segmentation ${PROJECT_NAME}_gencpp)
-
 add_executable(publish_database_object src/publish_database_object.cpp)
 target_link_libraries(publish_database_object ${catkin_LIBRARIES})
 add_dependencies(publish_database_object ${PROJECT_NAME}_gencpp)
@@ -97,6 +91,14 @@ add_dependencies(publish_database_object ${PROJECT_NAME}_gencpp)
 add_executable(tabletop_complete_node src/tabletop_complete_node.cpp)
 target_link_libraries(tabletop_complete_node ${catkin_LIBRARIES})
 add_dependencies(tabletop_complete_node ${PROJECT_NAME}_gencpp)
+
+add_executable(ping_tabletop_node src/ping_tabletop_node.cpp)
+target_link_libraries(ping_tabletop_node ${catkin_LIBRARIES})
+add_dependencies(ping_tabletop_node ${PROJECT_NAME}_gencpp)
+
+add_executable(tabletop_object_detection src/tabletop_object_detection.cpp )
+target_link_libraries(tabletop_object_detection marker_generator ${catkin_LIBRARIES})
+add_dependencies(tabletop_object_detection ${PROJECT_NAME}_gencpp)
 
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
@@ -107,10 +109,10 @@ install(
     model_fitter
     tabletop_segmentation
     tabletop_object_recognition
-    ping_tabletop_segmentation
+    tabletop_complete_node
+    ping_tabletop_node
     publish_database_object
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
