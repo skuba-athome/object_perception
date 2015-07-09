@@ -413,8 +413,10 @@ namespace tabletop {
 		visualization_msgs::Marker originMarker = 
 		MarkerGenerator::createMarker(table.pose.header.frame_id, 0, table.x_max-table.x_min, table.y_max-table.y_min, 0.02, 0, 1, 1, 
 			visualization_msgs::Marker::CUBE, current_marker_id_++, "tabletop_node", table_pose);
-		originMarker.pose.position.y = table_pose.position.y - (table.y_max - table.y_min)/2.0;
-		originMarker.pose.position.z = table_pose.position.z*2.0 - 0.02;
+		originMarker.pose.position.x = table.x_min + (table.x_max - table.x_min)/2.0;
+		originMarker.pose.position.z = table_pose.position.z + 0.1 - 0.02;
+		//originMarker.pose.position.y = table_pose.position.y - (table.y_max - table.y_min)/2.0;
+		//originMarker.pose.position.z = table_pose.position.z*2.0 - 0.02;
 
 		ROS_INFO_STREAM("originMarker " << originMarker.pose.position.x << " "
 			<<originMarker.pose.position.y << " "
@@ -424,6 +426,7 @@ namespace tabletop {
 			<<originMarker.pose.orientation.z << " "
 			<<originMarker.pose.orientation.w << " "
 			<< table.pose.header
+			<< current_marker_id_
 			);
 		marker_pub_.publish(originMarker);
 		
@@ -431,6 +434,7 @@ namespace tabletop {
 		MarkerGenerator::getTableCollision(table.pose.header.frame_id, table.x_max-table.x_min, table.y_max-table.y_min, 
 			current_collision_id_++, originMarker.pose);
 		collision_pub_.publish(tableCollision);
+
 
 		return table;
 	}
@@ -453,6 +457,7 @@ namespace tabletop {
 
 	void TabletopSegmentor::clearOldMarkersAndCollisionObject(std::string frame_id)
 	{
+		ROS_INFO_STREAM("delete current marker id " << current_marker_id_);
 		for (int id=current_marker_id_; id < num_markers_published_; id++)
 		{
 			visualization_msgs::Marker delete_marker;
@@ -462,6 +467,7 @@ namespace tabletop {
 			delete_marker.action = visualization_msgs::Marker::DELETE;
 			delete_marker.ns = "tabletop_node";
 			marker_pub_.publish(delete_marker);
+			ROS_INFO_STREAM("delete marker id " << id);
 		}
 		num_markers_published_ = current_marker_id_;
 		current_marker_id_ = 0;
