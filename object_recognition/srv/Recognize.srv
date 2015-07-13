@@ -8,7 +8,7 @@ int32 result
 
 string[] names 
 float64[] confidences
-geometry_msgs/Point[] centriods
-shape_msgs/SolidPrimitive[] solid_boxes
-sensor_msgs/PointCloud[] clusters
+#geometry_msgs/Point[] centriods
+#shape_msgs/SolidPrimitive[] solid_boxes
+#sensor_msgs/PointCloud[] clusters
 #Table table

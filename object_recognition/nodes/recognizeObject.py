@@ -72,7 +72,7 @@ class objectRecognition:
             names.append(cate)
             confidences.append(diff)        
             #print aImage    
-        return RecognizeResponse(result, names, confidences, centriods, solid_boxes, clusters)#, table)
+        return RecognizeResponse(result, names, confidences)#, centriods, solid_boxes, clusters)#, table)
 
 
     def listImageInDirectory(self, dir, name):
