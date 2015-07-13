@@ -16,7 +16,7 @@ surf = cv2.SURF(400)
 object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
 object_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/object_names.txt'
 features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/'
-nb_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Nb_model/nb_model'
+#nb_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Nb_model/nb_model'
 #svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/svm_model.pkl'
 
 class objectRecognition:
@@ -29,7 +29,7 @@ class objectRecognition:
 		K_neighbors = 35
 		self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
 		self.clf.fit(features_list, self.labels)
-		joblib.dump(self.clf, nb_model_filename) 
+		#joblib.dump(self.clf, nb_model_filename) 
 		
 		#self.trainSVM(object_dic)
 		#self.loadFeature(features_filename, category)
