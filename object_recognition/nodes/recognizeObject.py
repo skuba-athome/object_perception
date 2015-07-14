@@ -16,6 +16,8 @@ import numpy as np
 import roslib
 import rospy
 from array import array
+import shutil
+
 
 #object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
 #features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/'
@@ -29,15 +31,15 @@ class objectRecognition:
         rospy.init_node('objectRecognition', anonymous=True)
         rospy.wait_for_service('tabletop_object_detection')        
         try:
-            callback = rospy.ServiceProxy('tabletop_object_detection', TabletopObjectDetection)
-            self.response = callback()
+            self.callback = rospy.ServiceProxy('tabletop_object_detection', TabletopObjectDetection)
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
 
         K_neighbors = int(rospy.get_param('~k_neighbors', 35))
         self.features_filename = rospy.get_param('~features_filename', roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/')
         self.object_root_dir = rospy.get_param('~object_root_dir', roslib.packages.get_pkg_dir('object_recognition') + '/data/')
-        self.object_image_dir = rospy.get_param('~object_image_dir', roslib.packages.get_pkg_dir('tabletop') + '/out')
+        self.object_image_dir_in = rospy.get_param('~object_image_dir_in', roslib.packages.get_pkg_dir('tabletop') + '/out')
+        self.object_image_dir_out = rospy.get_param('~object_image_dir_out', roslib.packages.get_pkg_dir('object_recognition') + '/out')
 
         object_dic = self.listImageInDirectory(self.object_root_dir, '/test/')
         feature, self.labels = self.loadTrainData(object_dic)
@@ -57,21 +59,39 @@ class objectRecognition:
         rospy.spin()        
 
     def recognizeObjectService(self, req):
-        result = self.response.result
-        centriods = self.response.centriods
-        solid_boxes = self.response.solid_boxes
-        clusters = self.response.clusters
-        table = self.response.table
+        response = self.callback()
+        result = response.result
+        centriods = response.centriods
+        solid_boxes = response.solid_boxes
+        clusters = response.clusters
+        table = response.table
 
-        image_dic = [ str(os.path.join(self.object_image_dir, image)) for image in os.listdir(self.object_image_dir) if image.endswith(".png")]
-    
-        names = []
-        confidences = []
-        for aImage in image_dic:
-            cate, diff = self.predictObject(aImage)
-            names.append(cate)
-            confidences.append(diff)        
-            #print aImage    
+        image_dic = [ str(os.path.join(self.object_image_dir_in, image)) for image in os.listdir(self.object_image_dir_in) if image.endswith(".png")]
+        image_dic.sort()
+
+    	if not os.path.exists(self.object_image_dir_out):
+    		os.makedirs(self.object_image_dir_out)
+    	else:
+    		shutil.rmtree(self.object_image_dir_out)
+
+		names = []
+		confidences = []
+		cnt = 0
+		for aImage in image_dic:
+			cate, diff = self.predictObject(aImage)
+			names.append(cate)
+			confidences.append(diff)
+			print aImage        
+
+			object_image_name = self.object_image_dir_out + "Object" + cnt + ".png"
+
+			with open(aImage, 'rb') as f:
+				data = f.read()
+			
+			with open(object_image_name, 'wb') as f:
+				f.write(data)
+			cnt+=1
+
         return RecognizeResponse(result, names, confidences)#, centriods, solid_boxes, clusters)#, table)
 
 

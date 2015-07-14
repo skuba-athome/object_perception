@@ -2,7 +2,7 @@
 
 import roslib
 import rospy
-
+import shutil
 from sklearn import neighbors, datasets
 from sklearn.externals import joblib
 from sklearn.svm import SVC
@@ -10,6 +10,7 @@ import cv2
 import os
 import numpy
 from operator import add
+
 
 surf = cv2.SURF(400)
 
@@ -22,6 +23,11 @@ features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/
 class objectRecognition:
 
 	def __init__(self):
+
+		if not os.path.exists(features_filename):
+			os.makedirs(features_filename)
+		else:
+			shutil.rmtree(features_filename)
 		
 		object_dic = self.listImageInDirectory(object_root_dir)
 		features_list, self.labels = self.extractFeatures(object_dic)
@@ -31,6 +37,7 @@ class objectRecognition:
 		self.clf.fit(features_list, self.labels)
 		#joblib.dump(self.clf, nb_model_filename) 
 		
+
 		#self.trainSVM(object_dic)
 		#self.loadFeature(features_filename, category)
 		#testing

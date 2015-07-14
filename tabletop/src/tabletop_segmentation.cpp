@@ -37,6 +37,9 @@
 #include <string>
 #include <stdlib.h> 
 #include <ros/ros.h>
+#include <ros/package.h>
+#include <stdio.h>
+#include <dirent.h>
 
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -47,6 +50,7 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
 
+#include <pcl/common/common.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/io.h>
@@ -121,6 +125,8 @@ namespace tabletop {
 			bool flatten_table_;
 	  		//! How much the table gets padded in the horizontal direction
 			double table_padding_;
+			
+			std::string output_dir;
 
 	  		//! A tf transform listener
 			tf::TransformListener listener_;
@@ -204,6 +210,27 @@ namespace tabletop {
 	/*! Processes the latest point cloud and gives back the resulting array of models. */
 	bool TabletopSegmentor::serviceCallback(TabletopSegmentation::Request &request, TabletopSegmentation::Response &response)
 	{
+		// save table to /out directory
+		output_dir = ros::package::getPath("tabletop") + "/out";
+		const char* path = output_dir.c_str();
+
+		struct dirent *next_file;
+		DIR *theFolder;
+		char filepath[256];
+		theFolder = opendir(path);
+		while ( next_file = readdir(theFolder) )
+		{
+    		// build the full path for each file in the folder
+    		sprintf(filepath, "%s/%s",path, next_file->d_name);
+    		remove(filepath);
+		}
+
+		boost::filesystem::path dir(path);
+		if(boost::filesystem::create_directory(dir))
+		{
+			ROS_INFO_STREAM("Directory Created: " << path);
+		}
+
 		ros::Time start_time = ros::Time::now();
 		std::string topic = nh_.resolveName("cloud_in");
 		ROS_INFO("Tabletop detection service called; waiting for a point_cloud2 on topic %s", topic.c_str());
@@ -846,13 +873,15 @@ namespace tabletop {
 					inlier_threshold_);
 				response.result = response.NO_TABLE;
 				return;
-			}
+			}			
 
 			ROS_INFO ("[TableObjectDetector::input_callback] Model found with %d inliers: [%f %f %f %f].", 
 				(int)table_inliers_ptr->indices.size (),
 				table_coefficients_ptr->values[0], table_coefficients_ptr->values[1], 
 				table_coefficients_ptr->values[2], table_coefficients_ptr->values[3]);
 			ROS_INFO("Step 3 done : plane segmentation");
+
+
 
     		// Step 4 : Project the table inliers on the table
 			pcl::PointCloud<Point>::Ptr table_projected_ptr (new pcl::PointCloud<Point>); 
@@ -861,6 +890,15 @@ namespace tabletop {
 			proj_.setModelCoefficients (table_coefficients_ptr);
 			proj_.filter (*table_projected_ptr);
 			ROS_INFO("Step 4 done : Project the table inliers on the table");
+
+			
+
+			std::stringstream tableFileName;
+    		tableFileName << output_dir << "/table.pcd";        
+    		pcl::PCDWriter writer;
+    		writer.write<Point> (tableFileName.str(), *table_projected_ptr, false);
+    		ROS_INFO("Saved Table pointcloud file Table.h");
+
 
 			sensor_msgs::PointCloud table_points;
 			sensor_msgs::PointCloud table_hull_points;

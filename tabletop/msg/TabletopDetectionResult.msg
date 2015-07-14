@@ -15,9 +15,9 @@ household_objects_database_msgs/DatabaseModelPoseList[] models
 int32[] cluster_model_indices
 
 # Whether the detection has succeeded or failed
-int32 NO_CLOUD_RECEIVED = 1
-int32 NO_TABLE = 2
-int32 OTHER_ERROR = 3
-int32 SUCCESS = 4
-int32 NO_OBJECT = 5
 int32 result
+int32 NO_TABLE = 1 
+int32 NO_OBJECT = 2 
+int32 SUCCESS = 3 
+int32 OTHER_ERROR = 4	
+int32 NO_CLOUD_RECEIVED = 5
