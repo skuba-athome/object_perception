@@ -87,6 +87,7 @@ static pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pcl (new pcl::PointCloud<pcl::P
 
 void depthCB(const sensor_msgs::PointCloud2& cloud) 
 {
+    //ROS_INFO("depthCB start");
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_tmp (new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_tmp2 (new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PCLPointCloud2 PCLPointCloud_tmp;
@@ -122,7 +123,7 @@ void depthCB(const sensor_msgs::PointCloud2& cloud)
                 cloud_tmp2->push_back(pcl::PointXYZ(it->x,it->y,it->z));
                 n++;
             }
-            //if( sqrt(x*x+y*y+z*z) < ARM_RAIDUS){
+            //if( sqrt(x*x+y*y+z*z) < ARM_RAIDUS){mg
             //    cloud_tmp2->push_back(pcl::PointXYZ(it->x,it->y,it->z));
             //}
         }
@@ -319,7 +320,6 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
 
             float tmpX,tmpY;
             cloud_cluster->points.push_back (cloud_filtered->points[*pit]); 
-         
 
             x += cloud_filtered->points[*pit].x;
             y += cloud_filtered->points[*pit].y;
@@ -337,7 +337,7 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
             
 
             char pixelValue[100];
-            sprintf(pixelValue,"(%f,%f,%f)  (%f,%f)\n",cloud_filtered->points[*pit].x,cloud_filtered->points[*pit].y,cloud_filtered->points[*pit].z,tmpX,tmpY);
+            sprintf(pixelValue,"(%f,%f,%f)  (%f,%f)\n",cloud_filtered->points[*pit].x,cloud_filtered->points[*pit].y,cloud_filtered->points[*pit].z, tmpX,tmpY);
             fputs (pixelValue,fp);
 
             //--------------------------------------------------------test--------------------------------------
@@ -363,6 +363,7 @@ bool getObjectPoint(object_recognition::findObject::Request &req, object_recogni
         if( (cloud_cluster->size() != 0) && (cloud_cluster->size() <= 3500) )
         //if(cloud_cluster->size() != 0)
             writer.write<pcl::PointXYZ> (ss.str (), *cloud_cluster, false);
+
 
         pixel_x_min = pixel_x_min > 0 ? pixel_x_min : 0;
         pixel_y_min = pixel_y_min > 0 ? pixel_y_min : 0;
@@ -523,7 +524,7 @@ int main (int argc, char** argv)
 	ros::init(argc,argv,"finding_CenterTest");
 	ros::NodeHandle n;	
     ros::NodeHandle nh;
-    image_transport::ImageTransport it(nh);
+    image_transport::ImageTransport it(n);
 
     ROS_INFO("Start finding center of the object ...");
     //nh.param("FOCAL_LENGTH_X", FOCAL_LENGTH_X, 814.03512);

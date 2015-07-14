@@ -15,11 +15,20 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
   visualization_msgs
+  cv_bridge
+  image_transport
 )
 
 find_package(Eigen REQUIRED)
+
 find_package(Boost REQUIRED COMPONENTS filesystem)
 include_directories(include ${EIGEN_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
+
+find_package(OpenCV)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+find_package(pcl_ros REQUIRED)
+include_directories(${pcl_ros_INCLUDE_DIRS})
 
 add_message_files(FILES
   Table.msg
@@ -34,6 +43,7 @@ add_service_files(FILES
   ClearExclusionsList.srv
   TabletopDetection.srv
   TabletopSegmentation.srv
+  TabletopObjectDetection.srv
   )
 
 generate_messages(DEPENDENCIES

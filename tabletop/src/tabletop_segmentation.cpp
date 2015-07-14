@@ -145,7 +145,6 @@ namespace tabletop {
 			void publishClusterMarkers(const std::vector<PointCloudType> &clusters, std_msgs::Header cloud_header);
 
 
-
 	  		//------------------- Complete processing -----
 
 	  		//! Complete processing for new style point cloud
@@ -279,15 +278,13 @@ namespace tabletop {
 	template <class PointCloudType>
 	void TabletopSegmentor::addConvexHullTable(Table &table, const PointCloudType &convex_hull, bool flatten_table)
 	{
+		geometry_msgs::Point centroid;
 		if (convex_hull.points.empty())
 		{
 			ROS_ERROR("Trying to add convex hull, but it contains no points");
 			return;
 		}
-  
-  		//compute centroid
-		geometry_msgs::Point centroid;
-		centroid.x = centroid.y = centroid.z = 0.0;
+		
 		for (size_t i=0; i<convex_hull.points.size(); i++)
 		{
 			centroid.x += convex_hull.points[i].x;
@@ -442,7 +439,7 @@ namespace tabletop {
 	template <class PointCloudType>
 	void TabletopSegmentor::publishClusterMarkers(const std::vector<PointCloudType> &clusters, std_msgs::Header cloud_header)
 	{	
-		/*
+		
 		for (size_t i=0; i<clusters.size(); i++) 
 		{
 			visualization_msgs::Marker cloud_marker =  MarkerGenerator::getCloudMarker(clusters[i]);
@@ -452,7 +449,7 @@ namespace tabletop {
 			cloud_marker.id = current_marker_id_++;
 			//marker_pub_.publish(cloud_marker);
 		}
-		*/
+		
 	}
 
 	void TabletopSegmentor::clearOldMarkersAndCollisionObject(std::string frame_id)
@@ -998,7 +995,7 @@ namespace tabletop {
 	}
 
 
-} //namespace tabletop_object_detector
+} //namespace tabletop
 
 int main(int argc, char **argv) 
 {

@@ -1,0 +1,38 @@
+<launch>
+
+	<!-- segmentation -->
+	<!--include file="$(find tabletop)/launch/tabletop_segmentation.launch"-->
+	<!--/include-->
+
+	<!-- object detection -->
+	<node pkg="tabletop" name="tabletop_object_detection" type="tabletop_object_detection" respawn="true" output="screen">
+		<!--topic remapping-->
+	        <remap from="markers_out" to="tabletop_object_detection_markers" />
+
+	    <!--tuning parameter resolution 1280x720-->
+    		<param name="FOCAL_LENGTH_X" value="981.383623674383"/>
+		    <param name="FOCAL_LENGTH_Y" value="978.403976366632"/>
+
+		    <param name="RESOLUTION_WIDTH" value="1280"/>
+		    <param name="RESOLUTION_HEIGHT" value="720"/>
+
+		    <param name="CALIBRATED_CENTER_IMAGE_X_" value="640"/>
+		    <param name="CALIBRATED_CENTER_IMAGE_Y_" value="360"/>
+
+		<!--book center ok (-30,-100,0,50) -->
+		<!--book up ok () -->
+		<!--book down ok () -->
+		<!--book left ok () -->
+		<!--book right 20cm ok (-30,-100,0,50) -->
+
+		    <param name="TUNED_H_DISTANCE_TOP_LEFT_" value="-30"/>
+		    <param name="TUNED_V_DISTANCE_TOP_LEFT_" value="-100"/>
+
+		    <param name="TUNED_H_DISTANCE_BOTTOM_RIGHT_" value="0"/>	<!--width-->
+		    <param name="TUNED_V_DISTANCE_BOTTOM_RIGHT_" value="50"/>	<!--height-->
+
+    </node>
+    
+</launch>
+
+
