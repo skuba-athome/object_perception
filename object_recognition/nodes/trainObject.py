@@ -12,17 +12,12 @@ import numpy
 from operator import add
 
 surf = cv2.SURF(400)
-#object_root_dir = "/home/mukda/catkin_athome/src/object_recognition_new/data3"
-#object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data'
-#object_root_dir = "/home/skuba/Desktop/BASIC"
-#svm_model_filename = '/home/mukda/catkin_athome/src/object_recognition_new/svm_model/svm_model.pkl'
 
-#object_root_dir = "/home/skuba/Desktop/cocktail/"
+object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
+object_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/object_names.txt'
+features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/'
+nb_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Nb_model/nb_model'
 #svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/svm_model.pkl'
-#object_root_dir = "/home/skuba/Desktop/data_cropped_seperate/"
-object_root_dir = "/home/skuba/Desktop/drink_cropped_seperate/"
-features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/Features.txt'
-svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/svm_model.pkl'
 
 class objectRecognition:
 
@@ -34,50 +29,54 @@ class objectRecognition:
 		K_neighbors = 35
 		self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
 		self.clf.fit(features_list, self.labels)
-		self.trainSVM(object_dic)
+		joblib.dump(self.clf, nb_model_filename) 
 		
+		#self.trainSVM(object_dic)
 		#self.loadFeature(features_filename, category)
 		#testing
 		#for queryFeature in features_list:
 		#	weightSum = self.calWeightSum(queryFeature)
 		#	self.svm(histogram, category, weightSum)
 
+
 	def listImageInDirectory(self, dir):
 		image_dic = {}
+		#filename = open(object_filename, 'w')
 		for object_dir in os.listdir(dir):
-			object_dir_path = os.path.join(dir, object_dir + '/train/')
-			#object_dir_path = os.path.join(dir, object_dir)
-			if not os.path.isdir(object_dir_path):
-				continue
-			image_dic[str(object_dir)] = []
-			for object_pic in os.listdir(object_dir_path):
-				if object_pic.endswith(".jpg") or object_pic.endswith(".png"):
-					image_dic[str(object_dir)].append(str(os.path.join(object_dir_path, object_pic)))
+		    #filename.write(str(object_dir) + '\n')
+		    object_dir_path = os.path.join(dir, object_dir + '/test/')
+		    if not os.path.isdir(object_dir_path):
+		        continue
+		    image_dic[str(object_dir)] = []
+		    for object_pic in os.listdir(object_dir_path):
+		        if object_pic.endswith(".jpg") or object_pic.endswith(".png"):
+		            image_dic[str(object_dir)].append(str(os.path.join(object_dir_path, object_pic)))
+		#filename.close()
 		return image_dic
+
 
 	def extractFeatures(self, object_dic):
 		self.aFeature = []
 		self.aLabel = []
 		self.categorySet = []
-
+		filename = open(object_filename, 'w')
 		for object_name in object_dic:
 			self.features = []			
 			category = object_name
 			if not category in self.categorySet:
 				self.categorySet.append(category)
-
+				filename.write(str(category) + '\n')
 			for aImage in object_dic[object_name]:
 				feature = self.extractFeatureFromAImage(aImage, object_name)
-				#print aImage
 				if feature == None or len(feature) == 0:
-					#print aImage
 					continue            
 				for f in feature:
 					self.aFeature.append(map(float,f))
 					self.features.append(map(float,f))
-					self.aLabel.append(len(self.categorySet)-1)
-			print object_name, len(self.categorySet)-1
-			self.writeFeatureFile(os.path.join(object_root_dir, object_name +"/features.txt"), self.features)
+					self.aLabel.append(len(self.categorySet)-1)			
+			#self.writeFeatureFile(os.path.join(object_root_dir, object_name +"/features.txt"), self.features)
+			self.writeFeatureFile(os.path.join(features_filename + object_name + ".txt"), self.features)
+		filename.close()
 		return self.aFeature, self.aLabel
 
 	def extractFeatureFromAImage(self, aImage, object_name):
@@ -94,7 +93,7 @@ class objectRecognition:
 			line = reduce((lambda x, y: '%s %s' % (x,y)), line)
 			file_ptr.write(line+'\n')
 		file_ptr.close()
-		#print 'Write Feature File: '+file_ptr.name+' completed'
+		print 'Write Feature File: '+file_ptr.name+' completed'
 	
 	def calWeightSum(self, queryFeature):
 		weightSum = [0.0 for i in self.categorySet]

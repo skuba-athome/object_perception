@@ -1,14 +1,13 @@
 <launch>
-	<node pkg="dynamic_reconfigure" type="dynparam" name="kinect_set" args="set_from_parameters /camera/driver">
-		<param name="image_mode" value="2" />
-		<param name="depth_mode" value="2" />
-		<param name="depth_registration" value="true" />
-	</node>
+    
+    <!-- object recognition -->
+    <node pkg="object_recognition" type="recognizeObject.py" name="objectRecognition" output="screen">
+        <param name="k_neighbors" value="35"/>
+        <param name="feature_directory" value="$(find object_recognition)/learn/Features"/>
+        
+        <param name="object_root_dir" value="$(find object_recognition)/data"/>
+
+        <param name="object_image_dir" value="$(find object_recognition)/data/pringles/train"/>
+    </node>
 	
-	<node pkg="object_recognition" type="findingCenter" name="findingCenter" output="screen"/>
-
-	<!--node pkg="object_recognition" type="objectRecognitionNaivesBayes.py" name="objectRecognitionNaivesBayes" output="screen"/-->
-
-	<node pkg="manipulator" name="manipulator" type="manipulator.py" output="screen"/>
-
 </launch>

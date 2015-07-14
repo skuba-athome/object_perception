@@ -3,12 +3,16 @@ project(object_recognition)
 
 find_package(catkin REQUIRED COMPONENTS
   rospy
-  sensor_msgs
-  cv_bridge
   roscpp
+  std_msgs
+  cv_bridge
   image_transport
+  sensor_msgs
+  shape_msgs
+  visualization_msgs
   message_generation
 )
+
 
 find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
@@ -35,6 +39,7 @@ add_service_files(
   classifyObject.srv
   verifyObject.srv
   findObject.srv
+  Recognize.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -44,20 +49,24 @@ add_service_files(
 #   Action2.action
 # )
 
-## Generate added messages and services with any dependencies listed here
- generate_messages(
+##Generate added messages and services with any dependencies listed here
+# Or other packages containing msgs
+generate_messages(
    DEPENDENCIES
-   std_msgs  # Or other packages containing msgs
+   std_msgs  
    geometry_msgs
+   sensor_msgs
+   shape_msgs
+   visualization_msgs
  )
 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES object_recognition
-  CATKIN_DEPENDS 
-    roscpp 
-    rospy 
-    message_runtime
+#  CATKIN_DEPENDS 
+#    roscpp 
+#    rospy 
+#    message_runtime
 #  DEPENDS system_lib
 )
 
@@ -81,16 +90,12 @@ add_executable(image_view src/image_view.cpp)
 target_link_libraries(image_view ${catkin_LIBRARIES})
 target_link_libraries(image_view ${OpenCV_LIBRARIES})
 
-
-
 add_executable(click_object src/click_object.cpp)
 target_link_libraries(click_object ${catkin_LIBRARIES})
 target_link_libraries(click_object ${OpenCV_LIBRARIES})
 target_link_libraries(click_object ${PCL_LIBRARIES})
 target_link_libraries(click_object ${tf_LIBRARIES})
 target_link_libraries(click_object ${pcl_ros_LIBRARIES})
-
-
 
 add_executable(findingCenter src/findingCenter.cpp)
 target_link_libraries(findingCenter ${catkin_LIBRARIES})
@@ -126,3 +131,6 @@ target_link_libraries(tune_cropped ${OpenCV_LIBRARIES})
 target_link_libraries(tune_cropped ${PCL_LIBRARIES})
 target_link_libraries(tune_cropped ${tf_LIBRARIES})
 target_link_libraries(tune_cropped ${pcl_ros_LIBRARIES})
+
+
+

@@ -1,0 +1,14 @@
+---
+int32 result
+#int32 NO_TABLE = 1 
+#int32 NO_OBJECT = 2 
+#int32 SUCCESS = 3 
+#int32 OTHER_ERROR = 4	
+#int32 NO_CLOUD_RECEIVED = 5
+
+string[] names 
+float64[] confidences
+geometry_msgs/Point[] centriods
+shape_msgs/SolidPrimitive[] solid_boxes
+sensor_msgs/PointCloud[] clusters
+#Table table

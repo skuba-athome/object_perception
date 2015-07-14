@@ -1,4 +1,5 @@
 #!/usr/bin/python
+
 from sklearn import neighbors, datasets
 from sklearn.externals import joblib
 from sklearn.svm import SVC
@@ -8,23 +9,17 @@ import numpy
 import roslib
 import rospy
 
-
 from operator import add
 from std_msgs.msg import String
-from object_recognition.srv import *
+#from object_recognition.srv import *
 
-#svm_model_filename = 'svm_model.pkl'
-#object_root_dir = "/home/mukda/object_recognition/data3/"
 #svm_model_filename = '/home/mukda/object_recognition/src/svm_model/svm_model.pkl'
-#object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
-
-#object_root_dir = "/home/skuba/Desktop/cocktail/"
-#object_root_dir = "/home/skuba/Desktop/data_cropped_seperate/"
-object_root_dir = "/home/skuba/Desktop/drink_cropped_seperate/"
-features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/Features.txt'
+object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
+features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/features.txt'
 svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/svm_model.pkl'
-surf = cv2.SURF(400)
+object_image_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/pringles/train'
 
+surf = cv2.SURF(400)
 
 class objectRecognition:
 
@@ -33,8 +28,7 @@ class objectRecognition:
         #rospy.Subscriber("featureFilePath",String,self.classifyObjectHandle)
         #self.recognitionResult = rospy.Publisher('recognitionResult',String) 
         
-        #object_dic = self.list_image_in_directory(object_root_dir,'/test/')
-        object_dic = self.list_image_in_directory(object_root_dir,'/train/')
+        object_dic = self.list_image_in_directory(object_root_dir, '/test/')
         feature, self.labels = self.loadTrainData(object_dic)
         #feature, self.labels = self.loadFeatures()        
 
@@ -43,8 +37,12 @@ class objectRecognition:
         self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
         self.clf.fit(feature, self.labels) 
         
-        #cate, diff = self.predictObject("/home/mukda/object_recognition/data/minute_maid/frame0032.png")
-        self.clf_svm = joblib.load(svm_model_filename)
+        image_dic = [ str(os.path.join(object_image_dir, image)) for image in os.listdir(object_image_dir) if image.endswith(".png")]
+        for aImage in image_dic:
+            cate, diff = self.predictObject(aImage)
+            print aImage
+            print cate, diff
+        #self.clf_svm = joblib.load(svm_model_filename)
 
         #test
         '''
@@ -69,10 +67,10 @@ class objectRecognition:
             cate+=1
         '''
 
-        rospy.Service('classifyObject', classifyObject, self.classifyObjectService)
+        #rospy.Service('classifyObject', classifyObject, self.classifyObjectService)
 
-        rospy.loginfo('Verification Start')
-        rospy.spin()            
+        #rospy.loginfo('Verification Start')
+        #rospy.spin()            
 
 
     def list_image_in_directory(self, dir, name):
@@ -108,6 +106,7 @@ class objectRecognition:
             if not category in self.categorySet:
                 self.categorySet[category] = len(self.categorySet)
                 self.revertCategory.append(category)
+                
 
             feature,label = self.loadFeature(file_name, self.categorySet[category])
             feature_list += feature
@@ -159,7 +158,7 @@ class objectRecognition:
         image = cv2.imread(featureFileName, 0)
         queryFeature = []
         keypoint, features = surf.detectAndCompute(image, None)        
-
+        
         if features == None or len(features) == 0:
             return -1
 
@@ -170,13 +169,13 @@ class objectRecognition:
         for aFeature in queryFeature:
             weight = self.predictFeature(aFeature)
             weightSum = map(add, weight, weightSum)
-
+        #print weightSum
         sortedWeightSum = sorted(weightSum)
         nb_answer = int(weightSum.index(min(weightSum)))
         confident = sortedWeightSum[0]-sortedWeightSum[1]
         #print "\nfilename :",featureFileName ,int(weightSum.index(min(weightSum)))
         #return weightSum
-        return nb_answer, confident, weightSum
+        return nb_answer, confident
         #print "  with difference :",str(sortedWeightSum[0]-sortedWeightSum[1])
         #return int(weightSum.index(min(weightSum))), 
         
@@ -184,21 +183,19 @@ class objectRecognition:
     def predictFeature(self,feature):
         classSet = []
         weight = [0.0 for i in self.categorySet]
-        
         dis, ind = self.clf.kneighbors(feature)
         dis = dis[0]
         ind = ind[0]
-
         for x in range(len(ind)):
             if(self.labels[ind[x]] in classSet):
                 continue            
             classSet.append(self.labels[ind[x]])            
-            weight[self.labels[ind[x]]] = dis[x] - dis[-1]
-
+            weight[self.labels[ind[x]]] = dis[x] - dis[-1]        
+            #print self.labels[ind[x]]
         return weight
 
 if __name__ == '__main__':
-    try:
+    try:        
         rospy.loginfo('Verification Node Start Initializing')
         objectRecognition()
     except rospy.ROSInterruptException:
