@@ -92,7 +92,7 @@ class objectRecognition:
             names.append(cate)
             confidences.append(diff)
             
-            object_image_name = self.object_image_dir_out + "Object" + str(cnt) + ".png"
+            object_image_name = self.object_image_dir_out + "/object_" + str(names[cnt]) + ".png"
             with open(aImage, 'rb') as f:
                 data = f.read()
             with open(object_image_name, 'wb') as f:
@@ -101,7 +101,13 @@ class objectRecognition:
         print result
         print names
         print confidences
-        return RecognizeResponse(result, names, confidences)
+
+        if not os.path.exists(self.object_image_dir_in):
+            os.makedirs(self.object_image_dir_in)
+        else:
+            shutil.rmtree(self.object_image_dir_in)
+
+        return RecognizeResponse(result, names, confidences, clusters)
         #, centriods, solid_boxes, clusters)#, table)
 
 
@@ -159,7 +165,7 @@ class objectRecognition:
         keypoint, features = surf.detectAndCompute(image, None)        
         weightSum = [0.0 for i in self.categorySet]
         if features == None or len(features) == 0:
-            return " Lemon", -5.00
+            return "Not found object", -5.00
         for feature in features:
             queryFeature.append(map(float,feature))
         for aFeature in queryFeature:
