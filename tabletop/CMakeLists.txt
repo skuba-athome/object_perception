@@ -110,6 +110,9 @@ add_executable(tabletop_object_detection src/tabletop_object_detection.cpp )
 target_link_libraries(tabletop_object_detection marker_generator ${catkin_LIBRARIES})
 add_dependencies(tabletop_object_detection ${PROJECT_NAME}_gencpp)
 
+add_executable(shelf_segmentation src/shelf_segmentation.cpp)
+target_link_libraries(shelf_segmentation ${catkin_LIBRARIES})
+
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
