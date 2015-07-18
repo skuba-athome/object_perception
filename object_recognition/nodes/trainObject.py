@@ -2,7 +2,7 @@
 
 import roslib
 import rospy
-import shutil
+
 from sklearn import neighbors, datasets
 from sklearn.externals import joblib
 from sklearn.svm import SVC
@@ -11,33 +11,31 @@ import os
 import numpy
 from operator import add
 
-
 surf = cv2.SURF(400)
 
-object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
+K_neighbors = 35
+#object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
 object_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/object_names.txt'
-features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/'
+#features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/'
 #nb_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Nb_model/nb_model'
 #svm_model_filename = roslib.packages.get_pkg_dir('object_recognition') + '/config/svm_model.pkl'
 
 class objectRecognition:
 
 	def __init__(self):
+		#K_neighbors = int(rospy.get_param('~k_neighbors', 35))
+		#self.features_filename = rospy.get_param('~features_filename', roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/')
+		#object_root_dir = rospy.get_param('~object_root_dir', roslib.packages.get_pkg_dir('object_recognition') + '/data/')
+		self.features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/'
+		object_root_dir = "/home/mukda/Desktop/Skuba_hefei/full_cropped"
 
-		if not os.path.exists(features_filename):
-			os.makedirs(features_filename)
-		else:
-			shutil.rmtree(features_filename)
-		
 		object_dic = self.listImageInDirectory(object_root_dir)
 		features_list, self.labels = self.extractFeatures(object_dic)
-		
-		K_neighbors = 35
 		self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
-		self.clf.fit(features_list, self.labels)
+		self.clf.fit(features_list, self.labels)        
+		
 		#joblib.dump(self.clf, nb_model_filename) 
 		
-
 		#self.trainSVM(object_dic)
 		#self.loadFeature(features_filename, category)
 		#testing
@@ -48,17 +46,17 @@ class objectRecognition:
 
 	def listImageInDirectory(self, dir):
 		image_dic = {}
-		#filename = open(object_filename, 'w')
+		filename = open(object_filename, 'w')
 		for object_dir in os.listdir(dir):
-		    #filename.write(str(object_dir) + '\n')
-		    object_dir_path = os.path.join(dir, object_dir + '/test/')
+		    filename.write(str(object_dir) + '\n')
+		    object_dir_path = os.path.join(dir, object_dir)#+ '/test/')
 		    if not os.path.isdir(object_dir_path):
 		        continue
 		    image_dic[str(object_dir)] = []
 		    for object_pic in os.listdir(object_dir_path):
 		        if object_pic.endswith(".jpg") or object_pic.endswith(".png"):
 		            image_dic[str(object_dir)].append(str(os.path.join(object_dir_path, object_pic)))
-		#filename.close()
+		filename.close()
 		return image_dic
 
 
@@ -76,13 +74,15 @@ class objectRecognition:
 			for aImage in object_dic[object_name]:
 				feature = self.extractFeatureFromAImage(aImage, object_name)
 				if feature == None or len(feature) == 0:
+					print aImage
 					continue            
-				for f in feature:
-					self.aFeature.append(map(float,f))
-					self.features.append(map(float,f))
-					self.aLabel.append(len(self.categorySet)-1)			
+				else:
+					for f in feature:
+						self.aFeature.append(map(float,f))
+						self.features.append(map(float,f))
+						self.aLabel.append(len(self.categorySet)-1)			
 			#self.writeFeatureFile(os.path.join(object_root_dir, object_name +"/features.txt"), self.features)
-			self.writeFeatureFile(os.path.join(features_filename + object_name + ".txt"), self.features)
+			self.writeFeatureFile(os.path.join(self.features_filename + object_name + ".txt"), self.features)		
 		filename.close()
 		return self.aFeature, self.aLabel
 

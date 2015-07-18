@@ -18,11 +18,17 @@ import rospy
 from array import array
 import shutil
 
-
+#K_neighbors = 35
 #object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
 #features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/'
-#object_image_dir = roslib.packages.get_pkg_dir('object_recognition')
-#K_neighbors = 35
+#object_image_dir_in = roslib.packages.get_pkg_dir('object_recognition')
+
+object_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/object_names.txt'
+#features_filename = "/home/mukda/Desktop/result/Features_full/"
+#object_root_dir = "/home/mukda/Desktop/full"
+#object_image_dir_in = "/home/mukda/Desktop/full_test"
+#object_image_dir_out = "/home/mukda/Desktop/result/out_full"
+
 surf = cv2.SURF(400)
 
 class objectRecognition:
@@ -34,38 +40,41 @@ class objectRecognition:
             self.callback = rospy.ServiceProxy('tabletop_object_detection', TabletopObjectDetection)
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
-
+        
         K_neighbors = int(rospy.get_param('~k_neighbors', 35))
         self.features_filename = rospy.get_param('~features_filename', roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/')
-        self.object_root_dir = rospy.get_param('~object_root_dir', roslib.packages.get_pkg_dir('object_recognition') + '/data/')
         self.object_image_dir_in = rospy.get_param('~object_image_dir_in', roslib.packages.get_pkg_dir('tabletop') + '/out')
         self.object_image_dir_out = rospy.get_param('~object_image_dir_out', roslib.packages.get_pkg_dir('object_recognition') + '/out')
-
-        object_dic = self.listImageInDirectory(self.object_root_dir, '/test/')
+        
+        #object_dic = self.listImageInDirectory(object_root_dir)#, '/test/')
+        object_dic =  self.listImageFromFilename()
+        #print object_dic
         feature, self.labels = self.loadTrainData(object_dic)
         self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
         self.clf.fit(feature, self.labels) 
-        
-        '''
-        image_dic = [ str(os.path.join(object_image_dir, image)) for image in os.listdir(object_image_dir) if image.endswith(".png")]
-        for aImage in image_dic:
-            cate, diff = self.predictObject(aImage)
-            print aImage
-            print cate, diff
-        '''
 
+        '''
+        image_dic = [ str(os.path.join(object_image_dir_in, image)) for image in os.listdir(object_image_dir_in) if image.endswith(".png") or image.endswith(".jpg")]
+        image_dic.sort()
+        for aImage in image_dic:
+            print aImage
+            cate, diff = self.predictObject(aImage)
+            print "\t",cate, diff
+        '''
+        
         rospy.Service('object_recognition', Recognize, self.recognizeObjectService)
         rospy.loginfo('Object Recognition Node Ready')
         rospy.spin()        
+        
 
-    def recognizeObjectService(self, req):
+    def recognizeObjectService(self, req):    
         response = self.callback()
         result = response.result
         centriods = response.centriods
         solid_boxes = response.solid_boxes
         clusters = response.clusters
         table = response.table
-
+        
         image_dic = [ str(os.path.join(self.object_image_dir_in, image)) for image in os.listdir(self.object_image_dir_in) if image.endswith(".png")]
         image_dic.sort()
 
@@ -73,32 +82,33 @@ class objectRecognition:
     		os.makedirs(self.object_image_dir_out)
     	else:
     		shutil.rmtree(self.object_image_dir_out)
+		
+        names = []
+        confidences = []
+        cnt = 0
+        for aImage in image_dic:
+            print aImage
+            cate, diff = self.predictObject(aImage)
+            names.append(cate)
+            confidences.append(diff)
+            
+            object_image_name = self.object_image_dir_out + "Object" + str(cnt) + ".png"
+            with open(aImage, 'rb') as f:
+                data = f.read()
+            with open(object_image_name, 'wb') as f:
+                f.write(data)
+            cnt+=1
+        print result
+        print names
+        print confidences
+        return RecognizeResponse(result, names, confidences)
+        #, centriods, solid_boxes, clusters)#, table)
 
-		names = []
-		confidences = []
-		cnt = 0
-		for aImage in image_dic:
-			cate, diff = self.predictObject(aImage)
-			names.append(cate)
-			confidences.append(diff)
-			print aImage        
 
-			object_image_name = self.object_image_dir_out + "Object" + cnt + ".png"
-
-			with open(aImage, 'rb') as f:
-				data = f.read()
-			
-			with open(object_image_name, 'wb') as f:
-				f.write(data)
-			cnt+=1
-
-        return RecognizeResponse(result, names, confidences)#, centriods, solid_boxes, clusters)#, table)
-
-
-    def listImageInDirectory(self, dir, name):
+    def listImageInDirectory(self):
         image_dic = {}
         for object_dir in os.listdir(dir):
-            object_dir_path = os.path.join(dir, object_dir) + name
+            object_dir_path = os.path.join(dir, object_dir)# + name
             if not os.path.isdir(object_dir_path):
                 continue
             image_dic[str(object_dir)] = []
@@ -107,6 +117,12 @@ class objectRecognition:
                     image_dic[str(object_dir)].append(str(os.path.join(object_dir_path, object_pic)))
         return image_dic
 
+    def listImageFromFilename(self):
+        filePtr = open(object_filename,"r")
+        object_names = [line.strip() for line in filePtr]
+        filePtr.close()
+        #print object_names
+        return object_names
 
     def loadTrainData(self, object_dic):
         self.categorySet = {}       #dict
@@ -143,16 +159,30 @@ class objectRecognition:
         keypoint, features = surf.detectAndCompute(image, None)        
         weightSum = [0.0 for i in self.categorySet]
         if features == None or len(features) == 0:
-            return -1
+            return " Lemon", -5.00
         for feature in features:
             queryFeature.append(map(float,feature))
         for aFeature in queryFeature:
             weight = self.predictFeature(aFeature)
             weightSum = map(add, weight, weightSum)
+        
+        #print weightSum
+        #print self.revertCategory
+
         sortedWeightSum = sorted(weightSum)
         nb_answer_num = int(weightSum.index(min(weightSum)))
         confident = sortedWeightSum[0]-sortedWeightSum[1]
+
+        #print "\tpercent", confident/sortedWeightSum[0]
+        i = 0        
+        while (confident/sortedWeightSum[i]) <0.1:
+            confident = sortedWeightSum[i]-sortedWeightSum[i+1]
+            nb_answer_num = int(weightSum.index( sortedWeightSum[i] ))
+            i+=1
+            print confident, str(self.revertCategory[nb_answer_num])
+
         nb_answer = str(self.revertCategory[nb_answer_num])
+        
         return nb_answer, confident
 
     def predictFeature(self,feature):
@@ -171,6 +201,9 @@ class objectRecognition:
 if __name__ == '__main__':
     try:        
         rospy.loginfo('Object Recognition Node Ready')
+        # for test
+        rospy.init_node('objectRecognition', anonymous=True)
+        
         objectRecognition()
     except rospy.ROSInterruptException:
         rospy.logerror('Error ROS')

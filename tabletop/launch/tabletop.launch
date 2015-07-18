@@ -20,9 +20,9 @@
     <node pkg="object_recognition" type="recognizeObject.py" name="objectRecognition" output="screen">
         <param name="k_neighbors" value="35"/>
         <param name="feature_directory" value="$(find object_recognition)/learn/Features"/>
-        <param name="object_root_dir" value="$(find object_recognition)/data"/>
         <param name="object_image_dir_in" value="$(find tabletop)/out"/>
         <param name="object_image_dir_out" value="$(find object_recognition)/out"/>
     </node>
 
 </launch>
+

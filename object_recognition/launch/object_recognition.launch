@@ -1,13 +1,19 @@
-<launch>
-    
-    <!-- object recognition -->
-    <node pkg="object_recognition" type="recognizeObject.py" name="objectRecognition" output="screen">
+ <launch>
+ 	    <!-- object recognition TRAINING -->
+	<node pkg="object_recognition" type="trainObject.py" name="objectRecognition" output="screen">
         <param name="k_neighbors" value="35"/>
-        <param name="feature_directory" value="$(find object_recognition)/learn/Features"/>
-        
-        <param name="object_root_dir" value="$(find object_recognition)/data"/>
-
-        <param name="object_image_dir" value="$(find object_recognition)/data/pringles/train"/>
+        <param name="feature_filename" value="/home/mukda/Desktop/result/Features_drinks"/>
+        <param name="object_root_dir" value="/home/mukda/Desktop/drinks"/>
     </node>
-	
+    
+    <!-- object recognition TESTING-->
+    <node pkg="object_recognition" type="recognizeObject.py" name="trainObject" output="screen">
+        <param name="k_neighbors" value="35"/>
+        <param name="feature_filename" value="/home/mukda/Desktop/result/Features_drinks"/>
+        <param name="object_root_dir" value="/home/mukda/Desktop/drinks"/>
+        <param name="object_image_dir_in" value="/home/mukda/Desktop/drinks_test"/>
+        <param name="object_image_dir_out" value="/home/mukda/Desktop/result/out_drinks"/>
+    </node>
+    
 </launch>
+

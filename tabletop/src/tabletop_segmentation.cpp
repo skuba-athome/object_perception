@@ -212,6 +212,8 @@ namespace tabletop {
 	{
 		// save table to /out directory
 		output_dir = ros::package::getPath("tabletop") + "/out";
+
+		/*
 		const char* path = output_dir.c_str();
 
 		struct dirent *next_file;
@@ -224,13 +226,14 @@ namespace tabletop {
     		sprintf(filepath, "%s/%s",path, next_file->d_name);
     		remove(filepath);
 		}
+		
 
 		boost::filesystem::path dir(path);
 		if(boost::filesystem::create_directory(dir))
 		{
 			ROS_INFO_STREAM("Directory Created: " << path);
 		}
-
+		*/
 		ros::Time start_time = ros::Time::now();
 		std::string topic = nh_.resolveName("cloud_in");
 		ROS_INFO("Tabletop detection service called; waiting for a point_cloud2 on topic %s", topic.c_str());
