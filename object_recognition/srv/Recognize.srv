@@ -9,5 +9,5 @@ string[] names
 float64[] confidences
 #geometry_msgs/Point[] centriods
 #shape_msgs/SolidPrimitive[] solid_boxes
-#sensor_msgs/PointCloud[] clusters
+sensor_msgs/PointCloud[] clusters
 #Table table

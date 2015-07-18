@@ -774,6 +774,7 @@ namespace tabletop {
 		seg_.setModelType (pcl::SACMODEL_NORMAL_PLANE);
 		seg_.setMethodType (pcl::SAC_RANSAC);
 		seg_.setProbability (0.99);
+		//seg_.setProbability (0.8);
 
 		proj_.setModelType (pcl::SACMODEL_PLANE);
 
