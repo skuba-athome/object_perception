@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <pcl_ros/transforms.h>
+#include <cv.h>
 
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -407,15 +408,14 @@ void TabletopObjectDetector::objectDetection(std::vector<PointCloudType> cluster
     ROS_INFO("topLeft(x,y) = (%f %f)", topLeftX, topLeftY);
     ROS_INFO("width_ height_ = (%d %d)", width_, height_);
 
-    //cv::namedWindow("window", 1);
-    //cv::imshow("window",object_image);
-    //cv::waitKey(3);
+    cv::namedWindow("window", 1);
+    cv::imshow("window",cv::Mat(iplImage));
+    cv::waitKey(3);
 
 	}
 }
 
 } // namespace tabletop
-
 
 int main(int argc, char **argv) 
 {
