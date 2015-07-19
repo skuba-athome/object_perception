@@ -84,8 +84,8 @@ class objectRecognition:
         if not os.path.exists(self.object_image_dir_in):
             os.makedirs(self.object_image_dir_in)
 
-        if not os.path.exists(self.permanent_dir):
-            os.makedirs(self.permanent_dir)
+        if not os.path.exists(permanent_dir):
+            os.makedirs(permanent_dir)
 
         #image_dic = [ str(os.path.join(self.object_image_dir_in, image)) for image in os.listdir(self.object_image_dir_in) if image.endiswith(".png") or image.endswith(".jpg")]
 
