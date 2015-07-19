@@ -22,7 +22,7 @@ import shutil
 #object_root_dir = roslib.packages.get_pkg_dir('object_recognition') + '/data/'
 #features_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/Features/'
 #object_image_dir_in = roslib.packages.get_pkg_dir('object_recognition')
-
+permanent_dir = roslib.packages.get_pkg_dir('object_recognition') + '/permanent'
 object_filename = roslib.packages.get_pkg_dir('object_recognition') + '/learn/object_names.txt'
 #features_filename = "/home/mukda/Desktop/result/Features_full/"
 #object_root_dir = "/home/mukda/Desktop/full"
@@ -75,14 +75,28 @@ class objectRecognition:
         clusters = response.clusters
         table = response.table
         
-        image_dic = [ str(os.path.join(self.object_image_dir_in, image)) for image in os.listdir(self.object_image_dir_in) if image.endswith(".png") or image.endswith(".jpg")]
+        if not os.path.exists(self.object_image_dir_out):
+            os.makedirs(self.object_image_dir_out)
+        else:
+            shutil.rmtree(self.object_image_dir_out)
+            os.makedirs(self.object_image_dir_out)
+
+        if not os.path.exists(self.object_image_dir_in):
+            os.makedirs(self.object_image_dir_in)
+
+        if not os.path.exists(self.permanent_dir):
+            os.makedirs(self.permanent_dir)
+
+        #image_dic = [ str(os.path.join(self.object_image_dir_in, image)) for image in os.listdir(self.object_image_dir_in) if image.endiswith(".png") or image.endswith(".jpg")]
+
+        image_dic = []
+        for image in os.listdir(self.object_image_dir_in):
+            if image.endswith(".png") or image.endswith(".jpg"):
+                image_names = str(os.path.join(self.object_image_dir_in, image))
+                image_dic.append(image_names)
+
         image_dic.sort()
 
-    	if not os.path.exists(self.object_image_dir_out):
-    		os.makedirs(self.object_image_dir_out)
-    	else:
-    		shutil.rmtree(self.object_image_dir_out)
-		
         names = []
         confidences = []
         cnt = 0
@@ -93,18 +107,20 @@ class objectRecognition:
             confidences.append(diff)
             
             object_image_name = self.object_image_dir_out + "/object_" + str(names[cnt]) + ".png"
+            permanet_name = permanent_dir + "/object_" + str(names[cnt]) + ".png"
             with open(aImage, 'rb') as f:
                 data = f.read()
             with open(object_image_name, 'wb') as f:
                 f.write(data)
+            with open(permanent_name, 'wb') as f:
+                f.write(data)
+
             cnt+=1
         print result
         print names
         print confidences
 
-        if not os.path.exists(self.object_image_dir_in):
-            os.makedirs(self.object_image_dir_in)
-        else:
+        if os.path.exists(self.object_image_dir_in):
             shutil.rmtree(self.object_image_dir_in)
             os.makedirs(self.object_image_dir_in)
 
