@@ -75,7 +75,7 @@ class objectRecognition:
         clusters = response.clusters
         table = response.table
         
-        image_dic = [ str(os.path.join(self.object_image_dir_in, image)) for image in os.listdir(self.object_image_dir_in) if image.endswith(".png")]
+        image_dic = [ str(os.path.join(self.object_image_dir_in, image)) for image in os.listdir(self.object_image_dir_in) if image.endswith(".png") or image.endswith(".jpg")]
         image_dic.sort()
 
     	if not os.path.exists(self.object_image_dir_out):
@@ -106,6 +106,7 @@ class objectRecognition:
             os.makedirs(self.object_image_dir_in)
         else:
             shutil.rmtree(self.object_image_dir_in)
+            os.makedirs(self.object_image_dir_in)
 
         return RecognizeResponse(result, names, confidences, clusters)
         #, centriods, solid_boxes, clusters)#, table)
