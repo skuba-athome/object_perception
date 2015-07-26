@@ -1,8 +1,8 @@
 <launch>
 
 	<!-- segmentation -->
-	<!--include file="$(find tabletop)/launch/tabletop_segmentation.launch"-->
-	<!--/include-->
+	<include file="$(find tabletop)/launch/tabletop_segmentation.launch">
+	</include>
 
 	<!-- object detection -->
 	<node pkg="tabletop" name="tabletop_object_detection" type="tabletop_object_detection" respawn="true" output="screen">

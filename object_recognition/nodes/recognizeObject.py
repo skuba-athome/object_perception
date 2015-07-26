@@ -50,6 +50,7 @@ class objectRecognition:
         object_dic =  self.listImageFromFilename()
         #print object_dic
         feature, self.labels = self.loadTrainData(object_dic)
+        print self.labels
         self.clf = neighbors.KNeighborsClassifier(K_neighbors, weights='distance')
         self.clf.fit(feature, self.labels) 
 
