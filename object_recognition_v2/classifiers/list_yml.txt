@@ -1,0 +1,5 @@
+/home/antonio/athome/src/object_perception/object_recognition_v2/classifiers/hog/oicha--80x240--.yml	ON
+/home/antonio/athome/src/object_perception/object_recognition_v2/classifiers/hog/itoen--80x240--.yml	ON
+/home/antonio/athome/src/object_perception/object_recognition_v2/classifiers/hog/pringle_red--80x232--.yml	ON
+/home/antonio/athome/src/object_perception/object_recognition_v2/classifiers/hog/pringle_green--80x232--.yml	ON
+/home/antonio/athome/src/object_perception/object_recognition_v2/classifiers/hog/pringle_yellow--80x232--.yml	ON
