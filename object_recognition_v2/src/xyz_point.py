@@ -44,6 +44,7 @@ class XYZPoint:
             centriods = pc2.read_points(point_cloud2_temp, skip_nans=False, field_names=("x","y","z"), uvs=points)
             for centriod in centriods:
                 if not (np.isnan(centriod[0]) or np.isnan(centriod[1]) or np.isnan(centriod[2])):
+                    self.header.stamp = rospy.Time(0)
                     point_tf = self.tf_listener.transformPoint('base_link', PointStamped(header=self.header, point=Point(x=centriod[0], y=centriod[1], z=centriod[2])))
                     thing.centriod.x = point_tf.point.x
                     thing.centriod.y = point_tf.point.y

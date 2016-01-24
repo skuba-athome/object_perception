@@ -18,3 +18,4 @@ object_recognition/config/*
 object_recognition/learn/file_location.txt
 object_recognition/learn/
 *.orig
+.*
