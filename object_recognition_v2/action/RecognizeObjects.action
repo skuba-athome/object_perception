@@ -2,7 +2,8 @@
 std_msgs/String[] names  # Specify which object we want to recognize
 ---
 # Define the result
-object_recognition_v2/ObjectRecognition[] objects
+std_msgs/Header header
+geometry_msgs/Point centriod
 ---
 # Define a feedback message
 std_msgs/String progress

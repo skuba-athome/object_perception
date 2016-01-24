@@ -14,11 +14,10 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
   actionlib
   pcl_ros
+
 )
 
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
-
+find_package(Boost REQUIRED COMPONENTS system)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -66,7 +65,7 @@ add_message_files(
 ## Generate actions in the 'action' folder
 add_action_files(
   FILES
-  Objects3D.action
+  Object3Ds.action
   # Action2.action
 )
 
@@ -108,10 +107,10 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES object_3d_detector
-#  CATKIN_DEPENDS message_generation roscpp rospy std_msgs
-#  DEPENDS system_lib
+  INCLUDE_DIRS include
+  LIBRARIES object_3d_detector
+  CATKIN_DEPENDS message_generation roscpp rospy std_msgs actionlib_msgs
+  DEPENDS system_lib
 )
 
 ###########

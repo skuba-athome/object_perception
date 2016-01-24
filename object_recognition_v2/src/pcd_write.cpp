@@ -29,6 +29,7 @@ int main (int argc, char** argv)
 
   ros::Subscriber cloub_sub = n.subscribe("/depth_registered/depth_registered/points", 1, cloudCallback);
   ros::spin();
+  
   // pcl::PointCloud<pcl::PointXYZ> cloud;
 
   // Fill in the cloud data
