@@ -135,14 +135,14 @@ include_directories(
 # add_dependencies(object_3d_detector ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(cluster_extraction_node src/cluster_extraction.cpp)
+add_executable(cluster_extraction src/cluster_extraction.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(cluster_extraction_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(cluster_extraction ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(cluster_extraction_node
+target_link_libraries(cluster_extraction
    ${catkin_LIBRARIES}
 )
 
