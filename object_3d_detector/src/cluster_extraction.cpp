@@ -344,6 +344,7 @@ public:
 //        std::cout << *result << std::endl;
         ROS_INFO("ClusterExtraction COMPLETED");
         server.setSucceeded(*result);
+	this->flag = false;
     }
 
 };
@@ -351,7 +352,7 @@ public:
 int
 main(int argc, char **argv) {
     ros::init(argc, argv, "cluster_extraction");
-    ClusterExtraction clusterExtraction(ros::this_node::getName());
+    ClusterExtraction clusterExtraction("/object/cluster_extraction");
 
     ros::spin();
     return (0);

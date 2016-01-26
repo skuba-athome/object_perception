@@ -105,13 +105,13 @@ generate_messages(
 ## INCLUDE_DIRS: uncomment this if you package contains header files
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES object_3d_detector
-  CATKIN_DEPENDS message_generation roscpp rospy std_msgs actionlib_msgs
-  DEPENDS system_lib
-)
+## DEPENDS: system dependencies of this project that dependent projects also need#
+#catkin_package(
+#  INCLUDE_DIRS include
+#  LIBRARIES object_3d_detector
+#  CATKIN_DEPENDS message_generation roscpp rospy std_msgs actionlib_msgs
+#  DEPENDS system_lib
+#)
 
 ###########
 ## Build ##
