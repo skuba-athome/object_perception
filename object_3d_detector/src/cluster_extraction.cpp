@@ -93,7 +93,7 @@ protected:
         pcl::PassThrough <pcl::PointXYZ> pass;
         pass.setInputCloud(cloud);
         pass.setFilterFieldName("z");
-        pass.setFilterLimits(0.0, 0.8);
+        pass.setFilterLimits(0.0, 1.1);
         pass.filter(*cut_cloud);
         writer.write<pcl::PointXYZ>(this->path.str()+"cloud_pass_through_z.pcd", *cut_cloud, false);
         ROS_INFO("Saved: %s%s", this->path.str().c_str(), "cloud_pass_through_z.pcd");
@@ -277,6 +277,9 @@ protected:
                 object->point.x = pointStamped_.point.x;
                 object->point.y = pointStamped_.point.y;
                 object->point.z = pointStamped_.point.z;
+                object->width.data = std::abs(left_x - right_x);
+                object->height.data = std::abs(down_y - up_y);
+                object->depth.data = std::abs(neg_z - pos_z);
                 object3DsResult->objects.push_back(*object);
                 ss << "cloud_cluster_" << j << ".pcd";
                 writer.write<pcl::PointXYZ>(this->path.str()+ss.str(), *cloud_cluster, false); //*
@@ -335,9 +338,9 @@ public:
             ROS_INFO("Wait for point_cloud_2");
 //            this->reset();
 //            pcl::PCDReader reader;
-//            reader.read ("/home/kumamon/at_home/src/object_perception/object_3d_detector/src/table_scene_lms400.pcd", *cloud);
+//            reader.read ("/home/kumamon/frank_ku/code/cluster_extraction/table_scene_lms400.pcd", *cloud);
 //            writer.write<pcl::PointXYZ>(this->path.str()+"cloud_filtered__.pcd", *cloud, false);
-//            this->flag = true;
+            this->flag = true;
 
         }
         object_3d_detector::Object3DsResult::Ptr result = this->compute(cloud);
