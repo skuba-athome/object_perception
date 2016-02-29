@@ -19,6 +19,18 @@ class Size:
         self.width = width;
         self.height = height;
 
+class Area:
+    def __init__(self, x1, y1, x2, y2, confident, name):
+        self.x1 = x1
+        self.x2 = x2
+        self.y1 = y1
+        self.y2 = y2
+        self.confident = confident
+        self.name = name
+    def __repr__(self):
+        return "x1:{0} x2:{1} y1:{2} y2:{3} confident: {4} name:{5}".format(self.x1, self.x2, self.y1, self.y2, self.confident, self.name)
+
+
 class HOGReconition:
 
     def __init__(self):
@@ -52,6 +64,47 @@ class HOGReconition:
         self.image = data
         self.image_subscriber.unregister()
 
+    def isOverlab(self, area1, area2):
+        return range_overlap(area1.x1, area1.x2, area2.x1, area2.x2) and range_overlap(area1.x1, area1.x2, area2.x1, area2.x2)
+
+    def range_overlap(self, a_min, a_max, b_min, b_max):
+        '''Neither range is completely greater than the other
+        '''
+        return (a_min <= b_max) and (b_min <= a_max)
+
+    def remove_overlap_objects(self, objects):
+        temp_object = []
+        for i in objects:
+            temp = i
+            for j in objects:
+                if temp == j:
+                    continue
+                if isOverlab(temp, j) or isOverlab(j, temp):
+                    print temp.name , temp.confident, '****', j.name, j.confident
+                    if temp.confident > j.confident:
+                        temp = temp
+                    else:
+                        temp = j
+            print temp.name, temp not in temp_object
+            if temp not in temp_object:
+                is_vaild = True
+                while True:
+                    for j in temp_object:
+                        if temp == j:
+                            continue
+                        if isOverlab(temp, j) or isOverlab(j, temp):
+                            if temp.confident > j.confident:
+                                print temp.name,'------', j.name
+                                temp_object.pop(j)
+                                temp_object.append(temp)
+                                break
+                            else:
+                                is_vaild = False
+                    break
+                if is_vaild:
+                    temp_object.append(temp)
+        return temp_object
+
     def recognize_objects(self, goal):
         self.image_subscriber = rospy.Subscriber("/external_cam/image_color", Image, self.update_image, queue_size=1)
         while self.image == None:
@@ -62,7 +115,7 @@ class HOGReconition:
         names = [i.data for i in goal.names]
         things = ObjectRecognitions()
         rospy.loginfo("Input: {0}".format(names))
-
+        objects = []
         # thing = ObjectRecognition(name=String("TEST"), point=Pose2D(x=640, y=360))
         # things.objects.append(thing)
         # cv2.rectangle(frame, (639, 359),
@@ -80,19 +133,35 @@ class HOGReconition:
             for i in range(num):
                 point = points[0][i]
                 confident = points[1][i]
-                if confident > 0:
-                    center = (float(round(point[0]+1.0*point[2]/2)),
-                                float(round(point[1]+1.0*point[3]/2)))
-                    image = frame[point[1]:point[1]+point[3], point[0]:point[0]+point[2]]
-                    thing = ObjectRecognition(name=String(name), point=Pose2D(x=center[0], y=center[1]))
-                    things.objects.append(thing)
+                if confident > 0.3:
+                    area = Area(point[0], point[1], point[0]+point[2], point[1]+point[3], confident=confident, name=name)
+                    objects.append(area)
 
-                    rospy.loginfo("FOUND: {0} CENTER: x: {1:>4}, y:{2:>4}".format(name, center[0], center[1]))
-                    cv2.rectangle(frame, (point[0], point[1]),
-                                    (point[0]+point[2], point[1]+point[3]),
-                                    (0,0,255), 3)
-                    cv2.putText(frame, name, (point[0], point[1]),
-                                    cv2.FONT_HERSHEY_PLAIN, 1.3, (47, 211, 25),2)
+                    # center = (float(round(point[0]+1.0*point[2]/2)),
+                    #             float(round(point[1]+1.0*point[3]/2)))
+                    # image = frame[point[1]:point[1]+point[3], point[0]:point[0]+point[2]]
+                    # thing = ObjectRecognition(name=String(name), point=Pose2D(x=center[0], y=center[1]))
+                    # things.objects.append(thing)
+                    #
+                    # rospy.loginfo("FOUND: {0} CENTER: x: {1:>4}, y:{2:>4}".format(name, center[0], center[1]))
+                    # cv2.rectangle(frame, (point[0], point[1]),
+                    #                 (point[0]+point[2], point[1]+point[3]),
+                    #                 (0,0,255), 3)
+                    # cv2.putText(frame, name, (point[0], point[1]),
+                    #                 cv2.FONT_HERSHEY_PLAIN, 1.3, (47, 211, 25),2)
+
+        objects = remove_overlap_objects(objects)
+
+        for area in temp_object:
+            cv2.rectangle(frame, (area.x1, area.y1),(area.x2, area.y2) ,(0,0,255), 3)
+            cv2.putText(frame, area.name + " " +  str(area.confident), (area.x1, area.y1), cv2.FONT_HERSHEY_PLAIN, 1.3,(47, 211, 25),2)
+
+        for area in temp_object:
+            center = (float(round(area.x1+1.0*area.x2/2)),
+                        float(round(area.y1+1.0*point.y2/2)))
+            thing = ObjectRecognition(name=String(area.name), point=Pose2D(x=center[0], y=center[1]))
+            things.objects.append(thing)
+
         filename = os.path.join(self.history_location, datetime.today().isoformat(" ") + ".jpg")
         cv2.imwrite(os.path.join(self.history_location, filename), frame)
         rospy.loginfo("SAVED : {0}".format(filename))
