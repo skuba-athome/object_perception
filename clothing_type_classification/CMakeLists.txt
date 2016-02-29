@@ -132,20 +132,19 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
-  ${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS} include lib
 )
-include_directories(
-  include
-)
+
 
 ## Declare a C++ library
 # add_library(clothing_type_classification
 #   src/${PROJECT_NAME}/clothing_type_classification.cpp
 # )
 
-set(EGBIS_HEADER include/egbis.h lib/egbis/convolve.h lib/egbis/disjoint-set.h lib/egbis/filter.h lib/egbis/image.h lib/egbis/imconv.h lib/egbis/misc.h lib/egbis/imutil.h lib/egbis/pnmfile.h lib/egbis/segment-graph.h lib/egbis/segment-image.h)
+set(EGBIS_HEADER include/egbis.h lib/egbis/convolve.h lib/egbis/disjoint-set.h lib/egbis/filter.h lib/egbis/image.h lib/egbis/imconv.h
+        lib/egbis/misc.h lib/egbis/imutil.h lib/egbis/pnmfile.h lib/egbis/segment-graph.h lib/egbis/segment-image.h)
 
-set(EGBIS_SOURCE src/egbis.cpp lib/egbis/disjoint-set.cpp lib/egbis/filter.cpp lib/egbis/misc.cpp 
+set(EGBIS_SOURCE  src/egbis.cpp lib/egbis/disjoint-set.cpp lib/egbis/filter.cpp lib/egbis/misc.cpp
 		 lib/egbis/segment-graph.cpp lib/egbis/segment-image.cpp)
 
 add_library(egbis ${EGBIS_HEADER} ${EGBIS_SOURCE})
