@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #ifndef EGBIS_H
 #define EGBIS_H
 #include <opencv2/opencv.hpp>
-#include "../lib/egbis/segment-image.h"
+#include "egbis/segment-image.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
