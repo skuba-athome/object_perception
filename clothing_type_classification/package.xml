@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>clothing_type_classifier</name>
+  <name>clothing_type_classification</name>
   <version>0.0.0</version>
-  <description>The clothing_type_classifier package</description>
+  <description>The clothing_type_classification package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but mutiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/clothing_type_classifier</url> -->
+  <!-- <url type="website">http://wiki.ros.org/clothing_type_classification</url> -->
 
 
   <!-- Author tags are optional, mutiple are allowed, one per tag -->
@@ -48,15 +48,19 @@
   <build_depend>pcl_ros</build_depend>
   <build_depend>pcl_conversions</build_depend>
   <build_depend>sensor_msgs</build_depend>
+  <build_depend>actionlib_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
+  <run_depend>tf</run_depend>
   <run_depend>pcl_ros</run_depend>
   <run_depend>pcl_conversions</run_depend>
   <run_depend>sensor_msgs</run_depend>
-  <run_depend>tf</run_depend>
+  <run_depend>actionlib_msgs</run_depend>
+  <run_depend>message_runtime</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
