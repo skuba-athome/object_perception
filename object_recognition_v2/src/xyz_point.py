@@ -61,7 +61,7 @@ class XYZPoint:
 
     def update_point_cloud2(self, data):
         self.point_cloud2 = data
-        self.self.point_cloud2_subscriber.unregister()
+        self.point_cloud2_subscriber.unregister()
         rospy.loginfo("XYZ service: Start Subscribe PointCloud2.")
 
 
