@@ -1,0 +1,5 @@
+<launch>
+  <group ns="object_3d_detector">
+    <node name="cluster_extraction" pkg="object_3d_detector" type="cluster_extraction" output="screen"/>
+  </group>
+</launch>

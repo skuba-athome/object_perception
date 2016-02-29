@@ -1,0 +1,23 @@
+
+---
+# The information for the plane that has been detected
+Table table
+
+# The information for the objects on the plane
+#string[] names 
+sensor_msgs/PointCloud[] clusters
+geometry_msgs/Point[] centriods
+shape_msgs/SolidPrimitive[] solid_boxes
+
+# Whether the detection has succeeded or failed
+int32 NO_CLOUD_RECEIVED = 5 #1
+int32 NO_TABLE = 1	#2
+int32 OTHER_ERROR = 4	#3
+int32 SUCCESS = 3	#4
+int32 NO_OBJECT = 2	#5
+int32 result
+
+#int32 NO_TABLE = 1 
+#int32 NO_OBJECT = 2 
+#int32 SUCCESS = 3 (FOUND_OBJECT)
+
