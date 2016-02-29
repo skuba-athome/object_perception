@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(clothing_type_classifier)
+project(clothing_type_classification)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -14,6 +14,8 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   pcl_ros
   pcl_conversions
+  actionlib_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -51,11 +53,11 @@ find_package( OpenCV REQUIRED )
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+    FILES
+    Clothes.msg
+    ClothesArray.msg
+ )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -71,11 +73,19 @@ find_package( OpenCV REQUIRED )
 #   Action2.action
 # )
 
+add_action_files(
+        DIRECTORY action
+        FILES FindClothes.action
+)
+
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
+  std_msgs
+  sensor_msgs
+  actionlib_msgs
+  )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -108,9 +118,9 @@ find_package( OpenCV REQUIRED )
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
    INCLUDE_DIRS include
-#  LIBRARIES clothing_type_classifier
+#  LIBRARIES clothing_type_classification
    LIBRARIES egbis
-   CATKIN_DEPENDS roscpp rospy std_msgs sensor_msgs tf pcl_ros pcl_conversions geometry_msgs
+   CATKIN_DEPENDS roscpp rospy std_msgs sensor_msgs tf pcl_ros pcl_conversions geometry_msgs actionlib_msgs
 #  DEPENDS system_lib
 )
 
@@ -129,8 +139,8 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(clothing_type_classifier
-#   src/${PROJECT_NAME}/clothing_type_classifier.cpp
+# add_library(clothing_type_classification
+#   src/${PROJECT_NAME}/clothing_type_classification.cpp
 # )
 
 set(EGBIS_HEADER include/egbis.h lib/egbis/convolve.h lib/egbis/disjoint-set.h lib/egbis/filter.h lib/egbis/image.h lib/egbis/imconv.h lib/egbis/misc.h lib/egbis/imutil.h lib/egbis/pnmfile.h lib/egbis/segment-graph.h lib/egbis/segment-image.h)
@@ -144,19 +154,19 @@ add_library(egbis ${EGBIS_HEADER} ${EGBIS_SOURCE})
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(clothing_type_classifier ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(clothing_type_classification ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(clothing_type_classifier_node src/clothing_type_classifier_node.cpp)
+# add_executable(clothing_type_classification_node src/clothing_type_classification_node.cpp)
 add_executable(clothes_detection_node nodes/clothes_detection_node.cpp src/ClothesDetector.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(clothing_type_classifier_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(clothing_type_classification_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(clothes_detection_node ${catkin_EXPORTED_TARGETS} egbis)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(clothing_type_classifier_node
+# target_link_libraries(clothing_type_classification_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -177,7 +187,7 @@ target_link_libraries(clothes_detection_node ${catkin_LIBRARIES} egbis ${pcl_ros
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS clothing_type_classifier clothing_type_classifier_node
+# install(TARGETS clothing_type_classification clothing_type_classification_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -202,7 +212,7 @@ target_link_libraries(clothes_detection_node ${catkin_LIBRARIES} egbis ${pcl_ros
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_clothing_type_classifier.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_clothing_type_classification.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
