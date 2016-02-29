@@ -1,0 +1,8 @@
+# Define the goal
+std_msgs/String[] names  # Specify which object we want to recognize
+---
+# Define the result
+object_recognition_v2/ObjectRecognition[] objects
+---
+# Define a feedback message
+std_msgs/String progress

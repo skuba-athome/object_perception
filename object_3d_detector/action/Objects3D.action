@@ -1,0 +1,8 @@
+# Define the goal
+  # empty
+---
+# Define the result
+object_3d_detector/Object3D objects
+---
+# Define a feedback message
+std_msgs/String progress
