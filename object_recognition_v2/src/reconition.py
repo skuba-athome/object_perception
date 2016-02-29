@@ -65,7 +65,7 @@ class HOGReconition:
         self.image_subscriber.unregister()
 
     def isOverlab(self, area1, area2):
-        return range_overlap(area1.x1, area1.x2, area2.x1, area2.x2) and range_overlap(area1.x1, area1.x2, area2.x1, area2.x2)
+        return self.range_overlap(area1.x1, area1.x2, area2.x1, area2.x2) and self.range_overlap(area1.x1, area1.x2, area2.x1, area2.x2)
 
     def range_overlap(self, a_min, a_max, b_min, b_max):
         '''Neither range is completely greater than the other
@@ -79,7 +79,7 @@ class HOGReconition:
             for j in objects:
                 if temp == j:
                     continue
-                if isOverlab(temp, j) or isOverlab(j, temp):
+                if self.isOverlab(temp, j) or self.isOverlab(j, temp):
                     print temp.name , temp.confident, '****', j.name, j.confident
                     if temp.confident > j.confident:
                         temp = temp
@@ -92,7 +92,7 @@ class HOGReconition:
                     for j in temp_object:
                         if temp == j:
                             continue
-                        if isOverlab(temp, j) or isOverlab(j, temp):
+                        if self.isOverlab(temp, j) or self.isOverlab(j, temp):
                             if temp.confident > j.confident:
                                 print temp.name,'------', j.name
                                 temp_object.pop(j)
@@ -150,7 +150,7 @@ class HOGReconition:
                     # cv2.putText(frame, name, (point[0], point[1]),
                     #                 cv2.FONT_HERSHEY_PLAIN, 1.3, (47, 211, 25),2)
 
-        objects = remove_overlap_objects(objects)
+        temp_object = self.remove_overlap_objects(objects)
 
         for area in temp_object:
             cv2.rectangle(frame, (area.x1, area.y1),(area.x2, area.y2) ,(0,0,255), 3)
@@ -158,10 +158,9 @@ class HOGReconition:
 
         for area in temp_object:
             center = (float(round(area.x1+1.0*area.x2/2)),
-                        float(round(area.y1+1.0*point.y2/2)))
+                        float(round(area.y1+1.0*area.y2/2)))
             thing = ObjectRecognition(name=String(area.name), point=Pose2D(x=center[0], y=center[1]))
             things.objects.append(thing)
-
         filename = os.path.join(self.history_location, datetime.today().isoformat(" ") + ".jpg")
         cv2.imwrite(os.path.join(self.history_location, filename), frame)
         rospy.loginfo("SAVED : {0}".format(filename))
