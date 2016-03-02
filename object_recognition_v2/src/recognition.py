@@ -57,7 +57,8 @@ class HOGReconition:
                 sizes[data[0]] = Size(width = width, height = height)
                 hog = cv2.HOGDescriptor()
                 hogs.append((data[0], hog))
-                rospy.loginfo("LOADED: {0:<70} {1}".format(data[0].split('object_recognition_v2/')[1], hog.load(data[0])))
+                path = os.path.join(self.rospack.get_path('object_recognition_v2'), data[0].split('object_recognition_v2/')[1])
+                rospy.loginfo("LOADED: {0:<70} {1}".format(data[0].split('object_recognition_v2/')[1], hog.load(path)))
         return hogs
 
     def update_image(self, data):
@@ -198,6 +199,7 @@ class HOGReconition:
 
     def init_node(self):
         rospy.init_node('object_recognition_node',anonymous=False)
+        self.rospack = rospkg.RosPack()
         self.create_dir()
         self.load_ymls_from_dir()
         self.connect_service()
