@@ -81,8 +81,7 @@ protected:
         vg.setLeafSize(0.01f, 0.01f, 0.01f);
         vg.filter(*cloud_filtered);
         ROS_INFO("Saved: %s%s", this->path.str().c_str(), "cloud_filtered.pcd");
-        writer.write<pcl::PointXYZ>(this->path.str()+"cloud_filtered.pcd", *cloud_filtered, false);
-
+        writer.write<pcl::PointXYZ>(this->path.str() + "cloud_filtered.pcd", *cloud_filtered, false);
 //        delete *vg;
         return cloud_filtered;
     }
@@ -95,8 +94,10 @@ protected:
         pass.setFilterFieldName("z");
         pass.setFilterLimits(0.0, 1.1);
         pass.filter(*cut_cloud);
-        writer.write<pcl::PointXYZ>(this->path.str()+"cloud_pass_through_z.pcd", *cut_cloud, false);
-        ROS_INFO("Saved: %s%s", this->path.str().c_str(), "cloud_pass_through_z.pcd");
+        if (not cut_cloud->empty()) {
+            writer.write<pcl::PointXYZ>(this->path.str() + "cloud_pass_through_z.pcd", *cut_cloud, false);
+            ROS_INFO("Saved: %s%s", this->path.str().c_str(), "cloud_pass_through_z.pcd");
+        }
 //        delete pass;
         return cut_cloud;
     }
@@ -169,15 +170,19 @@ protected:
         std::cout << "pos_z_plane  " << pos_z_plane << std::endl;
         std::cout << "neg_z_plane  " << neg_z_plane << std::endl;
 
-        writer.write<pcl::PointXYZ>(this->path.str()+"cloud_plane.pcd", *cloud_plane, false);
-
+        if (not cloud_plane->empty()) {
+            writer.write<pcl::PointXYZ>(this->path.str() + "cloud_plane.pcd", *cloud_plane, false);
+            ROS_INFO("Saved: %s%s", this->path.str().c_str(), "cloud_plane.pcd");
+        }
         ROS_INFO("ClusterExtraction CUT_NORMAL_PLANE");
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered(new pcl::PointCloud <pcl::PointXYZ>);
         extract.setNegative(true);
         extract.filter(*cloud_filtered);
 
-        writer.write<pcl::PointXYZ>(this->path.str()+"cloud_remove_plane.pcd", *cloud_filtered, false);
-        ROS_INFO("Saved: %s%s", this->path.str().c_str(),  "cloud_filtered.pcd");
+        if (not cloud_filtered->empty()) {
+            writer.write<pcl::PointXYZ>(this->path.str() + "cloud_remove_plane.pcd", *cloud_filtered, false);
+            ROS_INFO("Saved: %s%s", this->path.str().c_str(), "cloud_remove_plane.pcd");
+        }
 //        pcl::ExtractIndices<pcl::Normal> extract_normals;
 //        pcl::PointCloud<pcl::Normal>::Ptr cloud_normals2 (new pcl::PointCloud<pcl::Normal>);
 //        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered2 (new pcl::PointCloud<pcl::PointXYZ>);
@@ -323,7 +328,15 @@ public:
         this->reset();
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered = this->downsample(cloud);
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pass_through_z = this->passThroughZ(cloud_filtered);
+        if (cloud_pass_through_z->empty()){
+            object_3d_detector::Object3DsResult::Ptr object3DsResult(new object_3d_detector::Object3DsResult);
+            return object3DsResult;
+        }
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_remove_plane = this->removeNormalPlane(cloud_pass_through_z);
+        if (cloud_remove_plane->empty()){
+            object_3d_detector::Object3DsResult::Ptr object3DsResult(new object_3d_detector::Object3DsResult);
+            return object3DsResult;
+        }
         object_3d_detector::Object3DsResult::Ptr result = this->findObjects(cloud_remove_plane);
         std::cout << *result << std::endl;
         return result;
@@ -340,7 +353,7 @@ public:
 //            pcl::PCDReader reader;
 //            reader.read ("/home/kumamon/frank_ku/code/cluster_extraction/table_scene_lms400.pcd", *cloud);
 //            writer.write<pcl::PointXYZ>(this->path.str()+"cloud_filtered__.pcd", *cloud, false);
-            this->flag = true;
+//            this->flag = true;
 
         }
         object_3d_detector::Object3DsResult::Ptr result = this->compute(cloud);
