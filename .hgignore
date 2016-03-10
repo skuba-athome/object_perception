@@ -17,5 +17,6 @@ object_recognition/config/feature/*
 object_recognition/config/*
 object_recognition/learn/file_location.txt
 object_recognition/learn/
+object_3d_detector/history/*
 *.orig
 .*
