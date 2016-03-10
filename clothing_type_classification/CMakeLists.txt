@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(clothing_type_classification)
 
-set(CMAKE_CXX_FLAGS"$
-{CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -120,9 +119,6 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-   INCLUDE_DIRS include
-#  LIBRARIES clothing_type_classification
-   LIBRARIES egbis
    CATKIN_DEPENDS roscpp rospy std_msgs sensor_msgs tf pcl_ros pcl_conversions geometry_msgs actionlib_msgs
 #  DEPENDS system_lib
 )
@@ -135,8 +131,13 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
-  ${catkin_INCLUDE_DIRS} include lib
+  ${catkin_INCLUDE_DIRS}
 )
+
+include_directories(include)
+include_directories(lib)
+
+
 
 
 ## Declare a C++ library
@@ -144,13 +145,6 @@ include_directories(
 #   src/${PROJECT_NAME}/clothing_type_classification.cpp
 # )
 
-#set(EGBIS_HEADER include/egbis.h lib/egbis/convolve.h lib/egbis/disjoint-set.h lib/egbis/filter.h lib/egbis/image.h lib/egbis/imconv.h
-#        lib/egbis/misc.h lib/egbis/imutil.h lib/egbis/pnmfile.h lib/egbis/segment-graph.h lib/egbis/segment-image.h)
-
-#set(EGBIS_SOURCE  src/egbis.cpp lib/egbis/disjoint-set.cpp lib/egbis/filter.cpp lib/egbis/misc.cpp
-#		 lib/egbis/segment-graph.cpp lib/egbis/segment-image.cpp)
-
-#add_library(egbis ${EGBIS_HEADER} ${EGBIS_SOURCE})
 
 
 ## Add cmake target dependencies of the library
@@ -158,21 +152,25 @@ include_directories(
 ## either from message generation or dynamic reconfigure
 # add_dependencies(clothing_type_classification ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+set(EGBIS_SRC lib/egbis/segment-image.cpp lib/egbis/segment-image.h lib/egbis/segment-graph.cpp lib/egbis/segment-graph.h
+        lib/egbis/disjoint-set.cpp lib/egbis/disjoint-set.h lib/egbis/image.h lib/egbis/filter.cpp lib/egbis/filter.h
+        lib/egbis/misc.cpp lib/egbis/misc.h)
+
 ## Declare a C++ executable
 # add_executable(clothing_type_classification_node src/clothing_type_classification_node.cpp)
-#add_executable(clothes_detection_node nodes/clothes_detection_node.cpp src/ClothesDetector.cpp)
+add_executable(clothes_detection_node nodes/clothes_detection_node.cpp src/ClothesDetector.cpp ${EGBIS_SRC})
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(clothing_type_classification_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#add_dependencies(clothes_detection_node ${catkin_EXPORTED_TARGETS} egbis)
+#add_dependencies(clothing_type_classification_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(clothes_detection_node ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(clothing_type_classification_node
 #   ${catkin_LIBRARIES}
 # )
 
-#target_link_libraries(clothes_detection_node ${catkin_LIBRARIES} egbis ${pcl_ros_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(clothes_detection_node ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 #############
 ## Install ##

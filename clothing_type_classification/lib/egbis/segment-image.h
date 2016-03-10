@@ -25,9 +25,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #include "misc.h"
 #include "filter.h"
 #include "segment-graph.h"
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 
 // random color
 rgb random_rgb(); 
@@ -46,7 +43,8 @@ static inline float diff(image<float> *r, image<float> *g, image<float> *b, int 
  * min_size: minimum component size (enforced by post-processing stage).
  * num_ccs: number of connected components in the segmentation.
  */
-image<rgb> *segment_image(image<rgb> *im, float sigma, float c, int min_size, int *num_ccs,const cv::Mat& input);
+
+image<rgb> *segment_image(image<rgb> *im, float sigma, float c, int min_size, int *num_ccs);
 universe *segmentation(image<rgb> *im, float sigma, float c, int min_size, int *num_ccs);
-image<rgb> *visualize(universe *u, int width, int height,const cv::Mat& input);
+image<rgb> *visualize(universe *u, int width, int height);
 #endif

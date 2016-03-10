@@ -22,14 +22,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #define EGBIS_H
 #include <opencv2/opencv.hpp>
 #include "egbis/segment-image.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
-using namespace cv;
+#include "egbis/misc.h"
+#include "egbis/image.h"
+#include <set>
+#include <cstdio>
 /****
  * OpenCV C++ Wrapper using the Mat class
  ***/
+
+image<rgb>* convertMatToNativeImage(const cv::Mat& input);
+cv::Mat convertNativeToMat(image<rgb>* input);
 cv::Mat runEgbisOnMat(const cv::Mat& input, float sigma, float k, int min_size, int *numccs);
+void getEgbisSegment(const cv::Mat& input, std::vector<cv::Mat>& output,float sigma, float k, int min_size, int *numccs);
+void universe2MatVector(universe *u, const cv::Mat& input, std::vector<cv::Mat>& out_vec);
 #endif
