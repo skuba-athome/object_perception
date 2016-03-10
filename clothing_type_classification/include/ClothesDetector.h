@@ -51,7 +51,7 @@ class ClothesDetector
         //Morphological Kernel MORPH_RECT,MORPH_CROSS,MORPH_ELLIPSE
         void setOriginalImage(cv::Mat img);
         void getBinaryImage(std::vector<cv::Mat>& images, std::vector<cv::Mat>& image_th, int threshold_value,
-                            int closing_window_size = 5, int opening_window_size = 5, int kernel_type = MORPH_ELLIPSE );
+                            int closing_window_size = 5, int opening_window_size = 5, int kernel_type = cv::MORPH_ELLIPSE );
 
         void detectClothesObjects(std::vector<cv::Mat> &images_th, std::vector<DetectorDescriptors>& out, bool crop_original = true);
         void saveOutputImages(std::vector<DetectorDescriptors>& images, std::string filename = "out",

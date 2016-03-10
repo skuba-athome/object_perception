@@ -16,29 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
-#include <stdio.h>
+
 #include "segment-image.h"
-#include <iostream>
-#include <set>
-#include <cstdio>
-#include "egbis.h"
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <sstream>
 
-using namespace cv;
-using namespace std;
-
-set<int> iset;
-
-void print_set(set<int>& s)
-{
-  for(set<int>::iterator i = s.begin();
-      i != s.end(); ++i) {
-    printf("%d\n", *i);
-  }
-}
 // random color
 rgb random_rgb(){ 
   rgb c;
@@ -47,17 +27,6 @@ rgb random_rgb(){
   c.r = (uchar)random();
   c.g = (uchar)random();
   c.b = (uchar)random();
-
-  return c;
-}
-
-rgb black_rgb(){ 
-  rgb c;
-  double r;
-  
-  c.r = 1;
-  c.g = 1;
-  c.b = 1;
 
   return c;
 }
@@ -111,31 +80,31 @@ universe *segmentation(image<rgb> *im, float sigma, float c, int min_size,
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       if (x < width-1) {
-      	edges[num].a = y * width + x;
-      	edges[num].b = y * width + (x+1);
-      	edges[num].w = diff(smooth_r, smooth_g, smooth_b, x, y, x+1, y);
-      	num++;
+	edges[num].a = y * width + x;
+	edges[num].b = y * width + (x+1);
+	edges[num].w = diff(smooth_r, smooth_g, smooth_b, x, y, x+1, y);
+	num++;
       }
 
       if (y < height-1) {
-      	edges[num].a = y * width + x;
-      	edges[num].b = (y+1) * width + x;
-      	edges[num].w = diff(smooth_r, smooth_g, smooth_b, x, y, x, y+1);
-      	num++;
+	edges[num].a = y * width + x;
+	edges[num].b = (y+1) * width + x;
+	edges[num].w = diff(smooth_r, smooth_g, smooth_b, x, y, x, y+1);
+	num++;
       }
 
       if ((x < width-1) && (y < height-1)) {
-      	edges[num].a = y * width + x;
-      	edges[num].b = (y+1) * width + (x+1);
-      	edges[num].w = diff(smooth_r, smooth_g, smooth_b, x, y, x+1, y+1);
-      	num++;
+	edges[num].a = y * width + x;
+	edges[num].b = (y+1) * width + (x+1);
+	edges[num].w = diff(smooth_r, smooth_g, smooth_b, x, y, x+1, y+1);
+	num++;
       }
 
       if ((x < width-1) && (y > 0)) {
-      	edges[num].a = y * width + x;
-      	edges[num].b = (y-1) * width + (x+1);
-      	edges[num].w = diff(smooth_r, smooth_g, smooth_b, x, y, x+1, y-1);
-      	num++;
+	edges[num].a = y * width + x;
+	edges[num].b = (y-1) * width + (x+1);
+	edges[num].w = diff(smooth_r, smooth_g, smooth_b, x, y, x+1, y-1);
+	num++;
       }
     }
   }
@@ -159,98 +128,29 @@ universe *segmentation(image<rgb> *im, float sigma, float c, int min_size,
   return u;
 }
 
-cv::Mat convertNativeToMat2(image<rgb>* input){
-    int w = input->width();
-    int h = input->height();
-  cv::Mat output(cv::Size(w,h),CV_8UC3);
-
-    for(int i =0; i<h; i++){
-        for(int j=0; j<w; j++){
-            rgb curr = input->data[i*w+j];
-            output.at<cv::Vec3b>(i,j)[0] = curr.b;
-            output.at<cv::Vec3b>(i,j)[1] = curr.g;
-            output.at<cv::Vec3b>(i,j)[2] = curr.r;
-        }
-    }
-
-    return output;
-}
-
-
-image<rgb>* visualize(universe *u, int width, int height,const cv::Mat& input){
+image<rgb>* visualize(universe *u, int width, int height){
   image<rgb> *output = new image<rgb>(width, height);
-  set<int> s;
 
   // pick random colors for each component
   rgb *colors = new rgb[width*height];
-  for (int i = 0; i < width*height; i++){
-      colors[i] = black_rgb();
-  }
-
-  //This path is to keep unique number of the component in the set.
+  for (int i = 0; i < width*height; i++)
+    colors[i] = random_rgb();
+  
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      //for finding number of segment
-      int comp = u->find(y*(width) + x);
-      //insert numbers in the set
-      s.insert(comp);
-      //This path is to generate colors for each component.
+      int comp = u->find(y * width + x);
       imRef(output, x, y) = colors[comp];
     }
-  } 
-  //print set number.
-  print_set(s); 
-
-  set<int>::iterator it;
-  cout << "S size: " <<s.size();
-  for (it=s.begin(); it!=s.end(); it++ ) {
-
-    image<rgb>* out = new image<rgb>(width, height);
-    int color = *it; //number in the set (it) total int color
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        int comp = u->find(y*(width) + x); 
-
-        if(comp == color){
-        imRef(out, x, y) = colors[comp];
-        //printf("comp = %d\n",comp );
-        }
-      }  
-    }
-    printf("TEST %d", *it);
-    Mat outt = convertNativeToMat2(out);
-    Mat crossing = input.mul(outt);
-    //Mat crossing = convertNativeToMat2(out);
-    string name;
-    ostringstream convert;   // stream used for the conversion
-
-    convert << color;      // insert the textual representation of 'Number' in the characters in the stream
-    name = convert.str();
-    stringstream ss;
-
-    string names = "image";
-    string type = ".jpg";
-
-    ss<<names<<color<<type;
-
-    string filename = ss.str();
-    ss.str("");
-    imwrite(filename,crossing);
-    //namedWindow( name, CV_WINDOW_AUTOSIZE );
-    //imshow( name, crossing);
-  }
-  // end for-loop for printing image
+  }  
 
   delete [] colors;  
   return output;
 }
 
-
 image<rgb> *segment_image(image<rgb> *im, float sigma, float c, int min_size,
-			  int *num_ccs,const cv::Mat& input) {
-  Mat original_image = input;
+			  int *num_ccs) {
 	universe *u = segmentation(im, sigma, c, min_size, num_ccs);
-	image<rgb> *visualized = visualize(u, im->width(), im->height(),original_image);
+	image<rgb> *visualized = visualize(u, im->width(), im->height());
 	delete u;
 	return visualized;
 }

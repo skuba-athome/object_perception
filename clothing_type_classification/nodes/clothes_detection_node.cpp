@@ -1,11 +1,10 @@
 #include <cstdlib>
 #include "ros/ros.h"
 #include <sensor_msgs/PointCloud2.h>
-#include "ClothesDetector.h"
+#include <ClothesDetector.h>
 #include <actionlib/server/simple_action_server.h>
 #include <clothing_type_classification/FindClothesAction.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include "ClothesDetector.h"
 
 #define DEFAULT_CLOUD_TOPIC "/camera/depth_registered/points"
 

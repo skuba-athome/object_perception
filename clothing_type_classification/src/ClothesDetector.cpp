@@ -232,7 +232,7 @@ void ClothesDetector::drawDescriptors(DetectorDescriptors& input, cv::Mat& outpu
         print = print + "Clothes";
     else
         print = print + "Unknown";
-    putText(output, print, Point(0,25), FONT_HERSHEY_PLAIN, 2, color, 3, LINE_8);
+    putText(output, print, Point(0,25), FONT_HERSHEY_PLAIN, 2, color, 3);
 }
 
 
