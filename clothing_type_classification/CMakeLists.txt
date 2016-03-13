@@ -167,19 +167,19 @@ set(EGBIS_SRC lib/egbis/segment-image.cpp lib/egbis/segment-image.h lib/egbis/se
 
 ## Declare a C++ executable
 # add_executable(clothing_type_classification_node src/clothing_type_classification_node.cpp)
-add_executable(clothes_detection_node nodes/clothes_detection_node.cpp src/ClothesDetector.cpp ${EGBIS_SRC})
+###add_executable(clothes_detection_node nodes/clothes_detection_node.cpp src/ClothesDetector.cpp ${EGBIS_SRC})
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 #add_dependencies(clothing_type_classification_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(clothes_detection_node ${catkin_EXPORTED_TARGETS})
+###add_dependencies(clothes_detection_node ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(clothing_type_classification_node
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries(clothes_detection_node ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
+#target_link_libraries(clothes_detection_node ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 #############
 ## Install ##
