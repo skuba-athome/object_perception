@@ -287,7 +287,6 @@ class ClothesDetectionRunner
 
                     for(int i = 0 ; i < segment_coarse.size(); i++) //One Cluster will get only One Coarse
                     {
-                        std::cout << "segment_coarse size = " << segment_coarse.size() << std::endl;
                         std::vector<cv::Mat> segment_tmp, segment_out;
                         std::vector<double> segment_area_percent;
                         //---------- Do Fine EGBIS ---------
@@ -344,6 +343,8 @@ class ClothesDetectionRunner
                 else if(this->algorithm == ANALYZE_FROM_PLANE)
                 {
                     std::vector<double> segment_area_percent;
+                    clothes_detector.setEgbisConstraint((float)egbis_coarse_constraint[0],
+                                                        (int)egbis_coarse_constraint[1], (int)egbis_coarse_constraint[2]);
                     int normal_num = clothes_detector.getEgbisSegmentVisualize(plane_img, egbis_img);
                     clothes_detector.getEgbisSegment(plane_img, segment_img, segment_area_percent, this->egbis_coarse_percent_area_th);
                     ROS_INFO("Total Segment : %d", normal_num);
@@ -378,8 +379,17 @@ class ClothesDetectionRunner
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 80)));
                 for(int i=0; i< out.size(); i++)
                     clothes_detector.findDominantColor(out[i], 2);
-
-                clothes_detector.saveOutputImages(out, (this->package_path + "/output/out") );
+                try
+                {
+                    //TODO -- FIXTHIS Error if pcl cluster > 1
+                    clothes_detector.saveOutputImages(out, (this->package_path + "/output/out") );
+                }
+                catch(cv::Exception& e)
+                {
+                    ROS_WARN("Error in saving Descriptors Files");
+                    ROS_WARN("%s", e.what());
+                }
+                
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 90)));
 
                 for(int i=0; i< out.size(); i++)

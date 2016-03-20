@@ -1,2 +1,4 @@
 src/tabletop/msg/
 src/tabletop/srv/
+clothing_type_classification/output/*
+clothing_type_classification/.idea/*
