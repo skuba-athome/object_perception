@@ -29,10 +29,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 /****
  * OpenCV C++ Wrapper using the Mat class
  ***/
+namespace egbis
+{
+    image<rgb>* convertMatToNativeImage(const cv::Mat& input);
+    cv::Mat convertNativeToMat(image<rgb>* input);
+    cv::Mat runEgbisOnMat(const cv::Mat& input, float sigma, float k, int min_size, int *numccs);
+    void getEgbisSegment(const cv::Mat& input, std::vector<cv::Mat>& output,float sigma, float k, int min_size,
+                         int *numccs, std::vector<double>& percent_vec, double percent_th);
+    void universe2MatVector(universe *u, const cv::Mat& input, std::vector<cv::Mat>& out_vec,
+                            std::vector<double>& out_percent, double percent_th);
+}
 
-image<rgb>* convertMatToNativeImage(const cv::Mat& input);
-cv::Mat convertNativeToMat(image<rgb>* input);
-cv::Mat runEgbisOnMat(const cv::Mat& input, float sigma, float k, int min_size, int *numccs);
-void getEgbisSegment(const cv::Mat& input, std::vector<cv::Mat>& output,float sigma, float k, int min_size, int *numccs);
-void universe2MatVector(universe *u, const cv::Mat& input, std::vector<cv::Mat>& out_vec);
 #endif

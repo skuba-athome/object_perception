@@ -1,0 +1,47 @@
+<launch>
+
+    <node name="clothes_detection_node" pkg="clothing_type_classification" type="clothes_detection_node" output="screen">
+
+        <!--<param name="input_topic" type="string" value="/camera/depth_registered/points"/>-->
+        <param name="input_topic" type="string" value="/cloud_pcd"/>
+
+        <!-- White Color Threshold -->
+        <param name="threshold_sat_lower" type="int" value="0"/>
+        <param name="threshold_sat_upper" type="int" value="15"/>
+        <param name="threshold_value_lower" type="int" value="200"/>
+        <param name="threshold_value_upper" type="int" value="255"/>
+
+        <!-- EGBIS Constraints -->
+
+        <param name="egbis_sigma" type="double" value="2.0"/>
+        <param name="egbis_k" type="double" value="600"/>
+        <param name="egbis_min_size" type="double" value="2000"/>
+        <param name="egbis_percent_area_th" type="double" value="3.00"/>
+
+        <!-- Euclidean Clustering Extraction Constraints -->
+
+        <param name="ece_cluster_tolerance" type="double" value="0.02"/>
+        <param name="ece_min_cluster_size" type="double" value="10000"/>
+        <param name="ece_max_cluster_size" type="double" value="25000"/>
+
+        <!-- Passthrough Filter Scene Search Space -->
+
+        <param name="pass_scene_enable_y" type="boolean" value="false"/>
+        <param name="transform_range_to_base_link" type="boolean" value="false"/>
+        <param name="pass_through_min_z" type="double" value="0.3"/>
+        <param name="pass_through_max_z" type="double" value="2.0"/>
+        <param name="pass_through_min_y" type="double" value="0.0"/>
+        <param name="pass_through_max_y" type="double" value="2.0"/>
+
+        <!-- Cloud Waiting Time -->
+        <param name="cloud_waiting_time" type="double" value="20.0"/>
+
+
+        <!-- Algorithm : ANALYZE_FROM_PLANE 0 ,ANALYZE_FROM_CLUSTER 1-->
+        <param name="algorithm" type="int" value="1"/>
+
+
+        <!--<remap from="peoplearray" to="/people_detection/people_array"/>-->
+    </node>
+
+</launch>

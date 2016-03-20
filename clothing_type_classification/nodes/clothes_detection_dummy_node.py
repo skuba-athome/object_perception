@@ -59,6 +59,6 @@ class ClothesDetectionDummy(object):
         return tmp
 
 if __name__ == '__main__':
-    rospy.init_node('clothes_detection_dummy')
+    rospy.init_node('clothes_detection_node')
     ClothesDetectionDummy(rospy.get_name())
     rospy.spin()
