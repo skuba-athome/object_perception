@@ -4,6 +4,7 @@
 #include "ros/package.h"
 #include <tf/transform_listener.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/image_encodings.h>
 #include <cv_bridge/cv_bridge.h>
 #include <ClothesDetector.h>
 #include <actionlib/server/simple_action_server.h>

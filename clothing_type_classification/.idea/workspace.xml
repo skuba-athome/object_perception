@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BuildServerSettings">
+    <option name="LOGIN" value="" />
+    <option name="SERVER_URL" value="http://buildserver" />
+    <option name="PASSWORD" />
+    <option name="REMEMBER_ME" value="true" />
+    <option name="USE_IDEA_PROXY_SETTINGS" value="true" />
+    <option name="INSPECTIONS_BUILD_TYPE_IDS" />
+    <option name="DUPLICATES_BUILD_TYPE_IDS" />
+    <option name="COVERAGE_SETTINGS" />
+    <option name="TEST_STATUS_ENABLED" value="true" />
+    <option name="TEST_STATUS_SHOW_SUCCESSFUL" value="false" />
+    <option name="ARTIFACTS_BUILD_TYPE_IDS" />
+    <option name="PERFORM_COMMIT_IF_SUCCESSFUL" value="true" />
+    <option name="PERFORM_COMMIT_IF_NO_NEW_FAILED_TESTS" value="false" />
+    <option name="REQUEST_CONFIRMATON" value="false" />
+    <option name="PRE_TESTED_COMMIT" value="true" />
+    <option name="PROJECT_STATUS_DIALOG_SPLITTER_DIVIDER_LOCATION" value="500" />
+    <option name="CHANGES_STATUS_DIALOG_SPLITTER_DIVIDER_LOCATION" value="500" />
+    <option name="FILTER_BY_STATUS" value="false" />
+    <option name="FILTER_MARKED_AS_FIXED" value="false" />
+    <option name="SHOW_CLOSE_PROMPT" value="true" />
+    <option name="TOOL_WINDOW_SELECTED_CONTENT_INDEX" value="0" />
+    <option name="FILTER_BY_CURRENT_PROJECT" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" assignedExecutableTargets="true" buildAllGenerated="true">
+    <generated>
+      <config projectName="clothing_type_classification" targetName="geometry_msgs_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="tf_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="tf2_msgs_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="doxygen" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesActionFeedback" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesActionGoal" />
+      <config projectName="clothing_type_classification" targetName="nodelet_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="rosgraph_msgs_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="nodelet_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="dynamic_reconfigure_gencfg" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_Clothes" />
+      <config projectName="clothing_type_classification" targetName="roscpp_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="pcl_msgs_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="bond_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="actionlib_msgs_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="topic_tools_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="roscpp_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_ClothesArray" />
+      <config projectName="clothing_type_classification" targetName="std_msgs_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="bond_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="actionlib_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesFeedback" />
+      <config projectName="clothing_type_classification" targetName="clothing_type_classification_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="clothing_type_classification_genlisp" />
+      <config projectName="clothing_type_classification" targetName="sensor_msgs_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="clothing_type_classification_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="clean_test_results_clothing_type_classification" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesAction" />
+      <config projectName="clothing_type_classification" targetName="tf2_msgs_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="run_tests" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesActionResult" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesGoal" />
+      <config projectName="clothing_type_classification" targetName="geometry_msgs_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="gtest_main" />
+      <config projectName="clothing_type_classification" targetName="gtest" />
+      <config projectName="clothing_type_classification" targetName="tests" />
+      <config projectName="clothing_type_classification" targetName="pcl_msgs_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="bond_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="geometry_msgs_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="clean_test_results" />
+      <config projectName="clothing_type_classification" targetName="dynamic_reconfigure_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="roscpp_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="tf_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="tf_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="pcl_msgs_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="std_msgs_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="actionlib_msgs_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="sensor_msgs_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="rosgraph_msgs_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="actionlib_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="actionlib_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="download_extra_data" />
+      <config projectName="clothing_type_classification" targetName="actionlib_msgs_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="pcl_ros_gencfg" />
+      <config projectName="clothing_type_classification" targetName="clothing_type_classification_gencpp" />
+      <config projectName="clothing_type_classification" targetName="clothing_type_classification_generate_messages" />
+      <config projectName="clothing_type_classification" targetName="clothing_type_classification_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesResult" />
+      <config projectName="clothing_type_classification" targetName="rosgraph_msgs_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="dynamic_reconfigure_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="tf2_msgs_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="sensor_msgs_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="std_msgs_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="topic_tools_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="nodelet_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="dynamic_reconfigure_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="clothes_detection_node" />
+      <config projectName="clothing_type_classification" targetName="clothing_type_classification_genpy" />
+      <config projectName="clothing_type_classification" targetName="topic_tools_generate_messages_lisp" />
+    </generated>
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="false" GENERATION_PASS_SYSTEM_ENVIRONMENT="true">
+    <ADDITIONAL_GENERATION_ENVIRONMENT>
+      <envs />
+    </ADDITIONAL_GENERATION_ENVIRONMENT>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="49eeccac-4d67-4dc2-bfea-6ad17f934f4e" name="Default" comment="" />
+    <ignored path="clothing_type_classification.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="clothing_type_classification" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="clothes_detection_node.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/nodes/clothes_detection_node.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-6.7070065">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" />
+  <component name="JsBuildToolPackageJson" detection-done="true" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="65" />
+    <option name="y" value="1076" />
+    <option name="width" value="1855" />
+    <option name="height" value="1084" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nodes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="RunManager" selected="Application.Build All">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="_clothing_type_classification_generate_messages_check_deps_Clothes" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="Build All" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" CONFIG_NAME="Debug" EXPLICIT_BUILD_TARGET_NAME="all">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="_clothing_type_classification_generate_messages_check_deps_Clothes" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="_clothing_type_classification_generate_messages_check_deps_Clothes" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="_clothing_type_classification_generate_messages_check_deps_ClothesArray" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="_clothing_type_classification_generate_messages_check_deps_ClothesArray" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="_clothing_type_classification_generate_messages_check_deps_FindClothesAction" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="_clothing_type_classification_generate_messages_check_deps_FindClothesAction" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="_clothing_type_classification_generate_messages_check_deps_FindClothesActionFeedback" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="_clothing_type_classification_generate_messages_check_deps_FindClothesActionFeedback" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="_clothing_type_classification_generate_messages_check_deps_FindClothesActionGoal" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="_clothing_type_classification_generate_messages_check_deps_FindClothesActionGoal" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="_clothing_type_classification_generate_messages_check_deps_FindClothesActionResult" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="_clothing_type_classification_generate_messages_check_deps_FindClothesActionResult" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="_clothing_type_classification_generate_messages_check_deps_FindClothesFeedback" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="_clothing_type_classification_generate_messages_check_deps_FindClothesFeedback" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="_clothing_type_classification_generate_messages_check_deps_FindClothesGoal" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="_clothing_type_classification_generate_messages_check_deps_FindClothesGoal" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="_clothing_type_classification_generate_messages_check_deps_FindClothesResult" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="_clothing_type_classification_generate_messages_check_deps_FindClothesResult" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="actionlib_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="actionlib_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="actionlib_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="actionlib_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="actionlib_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="actionlib_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="actionlib_msgs_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="actionlib_msgs_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="actionlib_msgs_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="actionlib_msgs_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="actionlib_msgs_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="actionlib_msgs_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="bond_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="bond_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="bond_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="bond_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="bond_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="bond_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="clean_test_results" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="clean_test_results" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="clean_test_results_clothing_type_classification" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="clean_test_results_clothing_type_classification" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="clothes_detection_node" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="clothes_detection_node" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="clothing_type_classification" RUN_TARGET_NAME="clothes_detection_node">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="clothing_type_classification_gencpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="clothing_type_classification_gencpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="clothing_type_classification_generate_messages" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="clothing_type_classification_generate_messages" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="clothing_type_classification_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="clothing_type_classification_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="clothing_type_classification_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="clothing_type_classification_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="clothing_type_classification_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="clothing_type_classification_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="clothing_type_classification_genlisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="clothing_type_classification_genlisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="clothing_type_classification_genpy" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="clothing_type_classification_genpy" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="download_extra_data" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="download_extra_data" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="doxygen" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="doxygen" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="dynamic_reconfigure_gencfg" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="dynamic_reconfigure_gencfg" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="dynamic_reconfigure_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="dynamic_reconfigure_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="dynamic_reconfigure_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="dynamic_reconfigure_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="dynamic_reconfigure_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="dynamic_reconfigure_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="geometry_msgs_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="geometry_msgs_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="geometry_msgs_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="geometry_msgs_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="geometry_msgs_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="geometry_msgs_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="nodelet_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="nodelet_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="nodelet_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="nodelet_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="nodelet_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="nodelet_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="pcl_msgs_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="pcl_msgs_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="pcl_msgs_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="pcl_msgs_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="pcl_msgs_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="pcl_msgs_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="pcl_ros_gencfg" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="pcl_ros_gencfg" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="roscpp_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="roscpp_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="roscpp_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="roscpp_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="roscpp_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="roscpp_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="rosgraph_msgs_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="rosgraph_msgs_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="rosgraph_msgs_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="rosgraph_msgs_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="rosgraph_msgs_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="rosgraph_msgs_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="run_tests" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="run_tests" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="sensor_msgs_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="sensor_msgs_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="sensor_msgs_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="sensor_msgs_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="sensor_msgs_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="sensor_msgs_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="std_msgs_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="std_msgs_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="std_msgs_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="std_msgs_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="std_msgs_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="std_msgs_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="tests" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="tests" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="tf2_msgs_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="tf2_msgs_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="tf2_msgs_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="tf2_msgs_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="tf2_msgs_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="tf2_msgs_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="tf_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="tf_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="tf_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="tf_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="tf_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="tf_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="topic_tools_generate_messages_cpp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="topic_tools_generate_messages_cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="topic_tools_generate_messages_lisp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="topic_tools_generate_messages_lisp" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="topic_tools_generate_messages_py" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="topic_tools_generate_messages_py" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="gtest" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="gtest" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="gtest_main" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="clothing_type_classification" TARGET_NAME="gtest_main" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <list size="70">
+      <item index="0" class="java.lang.String" itemvalue="Application.Build All" />
+      <item index="1" class="java.lang.String" itemvalue="Application._clothing_type_classification_generate_messages_check_deps_Clothes" />
+      <item index="2" class="java.lang.String" itemvalue="Application._clothing_type_classification_generate_messages_check_deps_ClothesArray" />
+      <item index="3" class="java.lang.String" itemvalue="Application._clothing_type_classification_generate_messages_check_deps_FindClothesAction" />
+      <item index="4" class="java.lang.String" itemvalue="Application._clothing_type_classification_generate_messages_check_deps_FindClothesActionFeedback" />
+      <item index="5" class="java.lang.String" itemvalue="Application._clothing_type_classification_generate_messages_check_deps_FindClothesActionGoal" />
+      <item index="6" class="java.lang.String" itemvalue="Application._clothing_type_classification_generate_messages_check_deps_FindClothesActionResult" />
+      <item index="7" class="java.lang.String" itemvalue="Application._clothing_type_classification_generate_messages_check_deps_FindClothesFeedback" />
+      <item index="8" class="java.lang.String" itemvalue="Application._clothing_type_classification_generate_messages_check_deps_FindClothesGoal" />
+      <item index="9" class="java.lang.String" itemvalue="Application._clothing_type_classification_generate_messages_check_deps_FindClothesResult" />
+      <item index="10" class="java.lang.String" itemvalue="Application.actionlib_generate_messages_cpp" />
+      <item index="11" class="java.lang.String" itemvalue="Application.actionlib_generate_messages_lisp" />
+      <item index="12" class="java.lang.String" itemvalue="Application.actionlib_generate_messages_py" />
+      <item index="13" class="java.lang.String" itemvalue="Application.actionlib_msgs_generate_messages_cpp" />
+      <item index="14" class="java.lang.String" itemvalue="Application.actionlib_msgs_generate_messages_lisp" />
+      <item index="15" class="java.lang.String" itemvalue="Application.actionlib_msgs_generate_messages_py" />
+      <item index="16" class="java.lang.String" itemvalue="Application.bond_generate_messages_cpp" />
+      <item index="17" class="java.lang.String" itemvalue="Application.bond_generate_messages_lisp" />
+      <item index="18" class="java.lang.String" itemvalue="Application.bond_generate_messages_py" />
+      <item index="19" class="java.lang.String" itemvalue="Application.clean_test_results" />
+      <item index="20" class="java.lang.String" itemvalue="Application.clean_test_results_clothing_type_classification" />
+      <item index="21" class="java.lang.String" itemvalue="Application.clothes_detection_node" />
+      <item index="22" class="java.lang.String" itemvalue="Application.clothing_type_classification_gencpp" />
+      <item index="23" class="java.lang.String" itemvalue="Application.clothing_type_classification_generate_messages" />
+      <item index="24" class="java.lang.String" itemvalue="Application.clothing_type_classification_generate_messages_cpp" />
+      <item index="25" class="java.lang.String" itemvalue="Application.clothing_type_classification_generate_messages_lisp" />
+      <item index="26" class="java.lang.String" itemvalue="Application.clothing_type_classification_generate_messages_py" />
+      <item index="27" class="java.lang.String" itemvalue="Application.clothing_type_classification_genlisp" />
+      <item index="28" class="java.lang.String" itemvalue="Application.clothing_type_classification_genpy" />
+      <item index="29" class="java.lang.String" itemvalue="Application.download_extra_data" />
+      <item index="30" class="java.lang.String" itemvalue="Application.doxygen" />
+      <item index="31" class="java.lang.String" itemvalue="Application.dynamic_reconfigure_gencfg" />
+      <item index="32" class="java.lang.String" itemvalue="Application.dynamic_reconfigure_generate_messages_cpp" />
+      <item index="33" class="java.lang.String" itemvalue="Application.dynamic_reconfigure_generate_messages_lisp" />
+      <item index="34" class="java.lang.String" itemvalue="Application.dynamic_reconfigure_generate_messages_py" />
+      <item index="35" class="java.lang.String" itemvalue="Application.geometry_msgs_generate_messages_cpp" />
+      <item index="36" class="java.lang.String" itemvalue="Application.geometry_msgs_generate_messages_lisp" />
+      <item index="37" class="java.lang.String" itemvalue="Application.geometry_msgs_generate_messages_py" />
+      <item index="38" class="java.lang.String" itemvalue="Application.nodelet_generate_messages_cpp" />
+      <item index="39" class="java.lang.String" itemvalue="Application.nodelet_generate_messages_lisp" />
+      <item index="40" class="java.lang.String" itemvalue="Application.nodelet_generate_messages_py" />
+      <item index="41" class="java.lang.String" itemvalue="Application.pcl_msgs_generate_messages_cpp" />
+      <item index="42" class="java.lang.String" itemvalue="Application.pcl_msgs_generate_messages_lisp" />
+      <item index="43" class="java.lang.String" itemvalue="Application.pcl_msgs_generate_messages_py" />
+      <item index="44" class="java.lang.String" itemvalue="Application.pcl_ros_gencfg" />
+      <item index="45" class="java.lang.String" itemvalue="Application.roscpp_generate_messages_cpp" />
+      <item index="46" class="java.lang.String" itemvalue="Application.roscpp_generate_messages_lisp" />
+      <item index="47" class="java.lang.String" itemvalue="Application.roscpp_generate_messages_py" />
+      <item index="48" class="java.lang.String" itemvalue="Application.rosgraph_msgs_generate_messages_cpp" />
+      <item index="49" class="java.lang.String" itemvalue="Application.rosgraph_msgs_generate_messages_lisp" />
+      <item index="50" class="java.lang.String" itemvalue="Application.rosgraph_msgs_generate_messages_py" />
+      <item index="51" class="java.lang.String" itemvalue="Application.run_tests" />
+      <item index="52" class="java.lang.String" itemvalue="Application.sensor_msgs_generate_messages_cpp" />
+      <item index="53" class="java.lang.String" itemvalue="Application.sensor_msgs_generate_messages_lisp" />
+      <item index="54" class="java.lang.String" itemvalue="Application.sensor_msgs_generate_messages_py" />
+      <item index="55" class="java.lang.String" itemvalue="Application.std_msgs_generate_messages_cpp" />
+      <item index="56" class="java.lang.String" itemvalue="Application.std_msgs_generate_messages_lisp" />
+      <item index="57" class="java.lang.String" itemvalue="Application.std_msgs_generate_messages_py" />
+      <item index="58" class="java.lang.String" itemvalue="Application.tests" />
+      <item index="59" class="java.lang.String" itemvalue="Application.tf2_msgs_generate_messages_cpp" />
+      <item index="60" class="java.lang.String" itemvalue="Application.tf2_msgs_generate_messages_lisp" />
+      <item index="61" class="java.lang.String" itemvalue="Application.tf2_msgs_generate_messages_py" />
+      <item index="62" class="java.lang.String" itemvalue="Application.tf_generate_messages_cpp" />
+      <item index="63" class="java.lang.String" itemvalue="Application.tf_generate_messages_lisp" />
+      <item index="64" class="java.lang.String" itemvalue="Application.tf_generate_messages_py" />
+      <item index="65" class="java.lang.String" itemvalue="Application.topic_tools_generate_messages_cpp" />
+      <item index="66" class="java.lang.String" itemvalue="Application.topic_tools_generate_messages_lisp" />
+      <item index="67" class="java.lang.String" itemvalue="Application.topic_tools_generate_messages_py" />
+      <item index="68" class="java.lang.String" itemvalue="Application.gtest" />
+      <item index="69" class="java.lang.String" itemvalue="Application.gtest_main" />
+    </list>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="49eeccac-4d67-4dc2-bfea-6ad17f934f4e" name="Default" comment="" />
+      <created>1458472818862</created>
+      <option name="number" value="Default" />
+      <updated>1458472818862</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="65" y="1076" width="1855" height="1084" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24959569" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3299389" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="LuaJ" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="TeamCity" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/nodes/clothes_detection_node.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.7070065">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
