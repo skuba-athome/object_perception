@@ -379,8 +379,17 @@ class ClothesDetectionRunner
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 80)));
                 for(int i=0; i< out.size(); i++)
                     clothes_detector.findDominantColor(out[i], 2);
-
-                clothes_detector.saveOutputImages(out, (this->package_path + "/output/out") );
+                try
+                {
+                    //TODO -- FIXTHIS Error if pcl cluster > 1
+                    clothes_detector.saveOutputImages(out, (this->package_path + "/output/out") );
+                }
+                catch(cv::Exception& e)
+                {
+                    ROS_WARN("Error in saving Descriptors Files");
+                    ROS_WARN("%s", e.what());
+                }
+                
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 90)));
 
                 for(int i=0; i< out.size(); i++)

@@ -184,7 +184,7 @@ void ClothesDetector::extractClustersImages(pcl::PointCloud<PointT>::Ptr cloud, 
     remove_plane_cloud = this->removeNormalPlane(cloud_filtered);
     std::cout << "Complete Normal Plane Extraction" << std::endl;
     plane_area_cloud = this->cropCloudInArea(remove_plane_cloud);
-    //writer.write<PointT> (debug + "plane_area_cloud.pcd", *plane_area_cloud, false);
+    writer.write<PointT> (debug + "plane_area_cloud.pcd", *plane_area_cloud, false);
 
     //Finding Clusters and Extract its RGB
     // Creating the KdTree object for the search method of the extraction
