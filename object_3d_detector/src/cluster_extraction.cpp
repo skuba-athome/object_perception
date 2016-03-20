@@ -68,6 +68,7 @@ protected:
     std_msgs::Header generateHeader(){
         this->header.seq++;
         this->header.stamp = ros::Time::now();
+        this->header.frame_id = "base_link";
         return this->header;
     }
 
@@ -80,6 +81,8 @@ protected:
         vg.setInputCloud(cloud);
         vg.setLeafSize(0.01f, 0.01f, 0.01f);
         vg.filter(*cloud_filtered);
+        //ROS_INFO("Saved: %s%s", this->path.str().c_str(), "cloud.pcd");
+        //writer.write<pcl::PointXYZ>(this->path.str() + "cloud.pcd", *cloud, false);
         ROS_INFO("Saved: %s%s", this->path.str().c_str(), "cloud_filtered.pcd");
         writer.write<pcl::PointXYZ>(this->path.str() + "cloud_filtered.pcd", *cloud_filtered, false);
 //        delete *vg;
