@@ -31,15 +31,19 @@ class ClothesDetectionRunner
         std::string package_path;
         std::string cloud_topic;
         bool new_cloud_available;
+        bool offline_test;
         double cloud_waiting_time;
         int threshold_sv[4];
         double ece_constraint[3];
-        double egbis_constraint[3];
+        double egbis_coarse_constraint[3];
+        double egbis_fine_constraint[3];
         double pass_through_range[4];
         bool pass_scene_enable_y;
         bool transform_range_to_base_link;
-        double egbis_percent_area_th;
+        double egbis_coarse_percent_area_th;
+        double egbis_fine_percent_area_th;
         int algorithm;
+        int total_clothes;
         tf::TransformListener tf_listener;
 		actionlib::SimpleActionServer<clothing_type_classification::FindClothesAction> find_clothes_as_;
 		//-------Clothes Detector Instance-------
@@ -74,21 +78,33 @@ class ClothesDetectionRunner
             clothes_detector.setWhiteColorThreshold(this->threshold_sv[0], this->threshold_sv[1],
                                                     this->threshold_sv[2], this->threshold_sv[3]);
 
-            nh.param( "egbis_sigma", this->egbis_constraint[0], 2.0 );
-            ROS_INFO( "egbis_sigma: %lf", this->egbis_constraint[0] );
+            nh.param( "egbis_coarse_sigma", this->egbis_coarse_constraint[0], 2.0 );
+            ROS_INFO( "egbis_coarse_sigma: %lf", this->egbis_coarse_constraint[0] );
 
-            nh.param( "egbis_k", this->egbis_constraint[1], 600.00 );
-            ROS_INFO( "egbis_k: %lf", this->egbis_constraint[1] );
+            nh.param( "egbis_coarse_k", this->egbis_coarse_constraint[1], 600.00 );
+            ROS_INFO( "egbis_coarse_k: %lf", this->egbis_coarse_constraint[1] );
 
 
-            nh.param( "egbis_min_size", this->egbis_constraint[2], 2000.00 );
-            ROS_INFO( "egbis_min_size: %lf", this->egbis_constraint[2] );
+            nh.param( "egbis_coarse_min_size", this->egbis_coarse_constraint[2], 2000.00 );
+            ROS_INFO( "egbis_coarse_min_size: %lf", this->egbis_coarse_constraint[2] );
 
-            nh.param( "egbis_percent_area_th", this->egbis_percent_area_th, 3.00 );
-            ROS_INFO( "egbis_percent_area_th: %lf", this->egbis_percent_area_th );
+            nh.param("egbis_coarse_percent_area_th", this->egbis_coarse_percent_area_th, 3.00 );
+            ROS_INFO( "egbis_coarse_percent_area_th: %lf", this->egbis_coarse_percent_area_th);
 
-            clothes_detector.setEgbisConstraint((float)egbis_constraint[0],
-                                                (int)egbis_constraint[1], (int)egbis_constraint[2]);
+            //clothes_detector.setEgbisConstraint((float)egbis_coarse_constraint[0],
+            //                                    (int)egbis_coarse_constraint[1], (int)egbis_coarse_constraint[2]);
+            nh.param( "egbis_fine_sigma", this->egbis_fine_constraint[0], 1.5 );
+            ROS_INFO( "egbis_fine_sigma: %lf", this->egbis_fine_constraint[0] );
+
+            nh.param( "egbis_fine_k", this->egbis_fine_constraint[1], 300.00 );
+            ROS_INFO( "egbis_fine_k: %lf", this->egbis_fine_constraint[1] );
+
+
+            nh.param( "egbis_fine_min_size", this->egbis_fine_constraint[2], 2000.00 );
+            ROS_INFO( "egbis_fine_min_size: %lf", this->egbis_fine_constraint[2] );
+
+            nh.param("egbis_fine_percent_area_th", this->egbis_fine_percent_area_th, 3.00 );
+            ROS_INFO( "egbis_fine_percent_area_th: %lf", this->egbis_fine_percent_area_th);
 
             nh.param( "ece_cluster_tolerance", this->ece_constraint[0], 0.02 );
             ROS_INFO( "ece_cluster_tolerance: %lf", this->ece_constraint[0] );
@@ -124,6 +140,12 @@ class ClothesDetectionRunner
 
             nh.param( "cloud_waiting_time", this->cloud_waiting_time, 20.00 );
             ROS_INFO( "cloud_waiting_time: %lf", this->cloud_waiting_time );
+
+            nh.param( "offline_test", this->offline_test, false );
+            ROS_INFO( "offline_test: %d", this->offline_test );
+
+            nh.param( "total_clothes", this->total_clothes, 3 );
+            ROS_INFO( "total_clothes: %d", this->total_clothes );
 
             nh.param( "algorithm", this->algorithm, ANALYZE_FROM_CLUSTER );
             std::string algorithm_str = (this->algorithm)?("ANALYZE_FROM_CLUSTERS"):("ANALYZE_FROM_PLANE");
@@ -163,7 +185,7 @@ class ClothesDetectionRunner
             {
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 10)));
                 ROS_INFO("Extracting Plane");
-                if(this->transform_range_to_base_link)
+                if((this->transform_range_to_base_link) && (this->offline_test))
                 {
                     //TODO -- TF range from base_link to camera_rgb_optical_frame for pass through filter
                 }
@@ -178,7 +200,6 @@ class ClothesDetectionRunner
                 cv::Mat plane_img, original_img, egbis_img;
                 std::vector<pcl::PCLImage> cluster_pcl_img;
                 std::vector<cv::Mat> segment_img, bin_img, cluster_img;
-                std::vector<double> segment_area_percent;
                 ClothesDetector::ClothesContainer out;
                 //-------------------------------- Extract RGB from Plane / Clusters -------------------------
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 20)));
@@ -215,15 +236,67 @@ class ClothesDetectionRunner
                 cv::imwrite((this->package_path + "/output/original.jpg"), original_img);
 
                 //----------------------- EGBIS -----------------
-                //clothes_detector.setEgbisConstraint(2.0, 600, 2000);
-
                 if(this->algorithm == ANALYZE_FROM_CLUSTER)
                 {
+                    //Do Coarse EGBIS First to Extract + Denoise Cluster Image
+                    //Then Do Fine EGBIS to Get Each Clothes Image in cluster
+                    std::vector<cv::Mat> segment_coarse;
+                    ROS_INFO("--------Do Coarse EGBIS-------");
                     for(int i=0; i < cluster_img.size() ; i++)
                     {
                         std::vector<cv::Mat> segment_tmp;
+                        std::vector<double> segment_area_percent;
+                        clothes_detector.setEgbisConstraint((float)egbis_coarse_constraint[0],
+                                                            (int)egbis_coarse_constraint[1], (int)egbis_coarse_constraint[2]);
                         int normal_num = clothes_detector.getEgbisSegmentVisualize(cluster_img[i], egbis_img);
-                        clothes_detector.getEgbisSegment(cluster_img[i], segment_tmp, segment_area_percent, this->egbis_percent_area_th);
+                        segment_area_percent.clear();
+                        clothes_detector.getEgbisSegment(cluster_img[i], segment_tmp, segment_area_percent, this->egbis_coarse_percent_area_th);
+                        ROS_INFO("Total Segment of Cluster %d: %d", i,normal_num);
+                        ROS_INFO("Total Segment After Threshold of Cluster %d: %d", i,(int)segment_tmp.size());
+
+                        if(!segment_area_percent.empty())
+                        {
+                            //Deleting Max area Image -> Assuming that it is a Background
+                            int index = 0;
+                            index = (int)std::distance(segment_area_percent.begin(),
+                                                       std::max_element(segment_area_percent.begin(), segment_area_percent.end()));
+                            segment_area_percent.erase(segment_area_percent.begin() + index);
+                            segment_tmp.erase(segment_tmp.begin() + index);
+                        }
+
+                        int index_out = 0;
+                        if(!segment_area_percent.empty())
+                        {
+                            //FIX CODE : SELECT ONLY BIGGEST SEGMENT
+                            index_out = (int)std::distance(segment_area_percent.begin(),
+                                                       std::max_element(segment_area_percent.begin(), segment_area_percent.end()));
+                        }
+
+                        std::stringstream ss;
+                        ss << this->package_path << "/output/egbis_" << i << "_coarse.jpg";
+                        cv::imwrite(ss.str(), egbis_img);
+                        std::stringstream ss_1;
+                        ss_1 << "segment_cluster_" << i << "_coarse.jpg";
+                        //this->saveImagesToFolder(segment_tmp, ss_1.str());
+                        cv::imwrite((this->package_path + "/output/" + ss_1.str()), segment_tmp[index_out]);
+                        //segment_img.insert(segment_img.end(), segment_tmp.begin(), segment_tmp.end());
+                        segment_coarse.push_back(segment_tmp[index_out]);
+                    }
+                    ROS_INFO("--------Finish Coarse EGBIS-------");
+
+
+                    for(int i = 0 ; i < segment_coarse.size(); i++) //One Cluster will get only One Coarse
+                    {
+                        std::cout << "segment_coarse size = " << segment_coarse.size() << std::endl;
+                        std::vector<cv::Mat> segment_tmp, segment_out;
+                        std::vector<double> segment_area_percent;
+                        //---------- Do Fine EGBIS ---------
+                        clothes_detector.setEgbisConstraint((float)egbis_fine_constraint[0],
+                                                            (int)egbis_fine_constraint[1], (int)egbis_fine_constraint[2]);
+                        int normal_num = clothes_detector.getEgbisSegmentVisualize(segment_coarse[i], egbis_img);
+                        segment_area_percent.clear();
+                        clothes_detector.getEgbisSegment(segment_coarse[i], segment_tmp, segment_area_percent, this->egbis_fine_percent_area_th);
+
                         ROS_INFO("Total Segment of Cluster %d: %d", i,normal_num);
                         ROS_INFO("Total Segment After Threshold of Cluster %d: %d", i,(int)segment_tmp.size());
 
@@ -234,20 +307,45 @@ class ClothesDetectionRunner
                             index = (int)std::distance(segment_area_percent.begin(),
                                                        std::max_element(segment_area_percent.begin(), segment_area_percent.end()));
                             segment_tmp.erase(segment_tmp.begin() + index);
+                            segment_area_percent.erase(segment_area_percent.begin() + index);
+                        }
+
+                        std::vector<int> out;
+                        if(!segment_area_percent.empty())
+                        {
+                            //Select $(this->total_clothes) maximum area component to analyze
+                            int total_iteration = std::min(this->total_clothes, (int)segment_tmp.size());
+                            for(int i = 0; i < total_iteration ; i++)
+                            {
+                                int index = 0;
+                                index = (int)std::distance(segment_area_percent.begin(),
+                                                           std::max_element(segment_area_percent.begin(), segment_area_percent.end()));
+                                out.push_back(index);
+                                //segment_tmp.erase(segment_tmp.begin() + index);
+                                segment_area_percent.erase(segment_area_percent.begin() + index);
+                            }
+                        }
+                        for(int j = 0; j < out.size(); j ++)
+                        {
+                            segment_out.push_back(segment_tmp[out[j]]);
                         }
                         std::stringstream ss;
-                        ss << this->package_path << "/output/egbis_" << i << ".jpg";
+                        ss << this->package_path << "/output/egbis_" << i << "_fine.jpg";
                         cv::imwrite(ss.str(), egbis_img);
                         std::stringstream ss_1;
-                        ss_1 << "segment_cluster_" << i;
-                        this->saveImagesToFolder(segment_tmp, ss_1.str());
-                        segment_img.insert(segment_img.end(), segment_tmp.begin(), segment_tmp.end());
+                        ss_1 << "segment_cluster_" << i << "_fine";
+                        this->saveImagesToFolder(segment_out, ss_1.str());
+                        //segment_img.insert(segment_img.end(), segment_tmp.begin(), segment_tmp.end());
+                        segment_img.insert(segment_img.end(), segment_out.begin(), segment_out.end());
                     }
+                    ROS_INFO("--------Finish FINE EGBIS-------");
+
                 }
                 else if(this->algorithm == ANALYZE_FROM_PLANE)
                 {
+                    std::vector<double> segment_area_percent;
                     int normal_num = clothes_detector.getEgbisSegmentVisualize(plane_img, egbis_img);
-                    clothes_detector.getEgbisSegment(plane_img, segment_img, segment_area_percent, this->egbis_percent_area_th);
+                    clothes_detector.getEgbisSegment(plane_img, segment_img, segment_area_percent, this->egbis_coarse_percent_area_th);
                     ROS_INFO("Total Segment : %d", normal_num);
                     ROS_INFO("Total Segment After Threshold : %d", (int)segment_img.size());
                     if(!segment_area_percent.empty())
@@ -257,6 +355,7 @@ class ClothesDetectionRunner
                         index = (int)std::distance(segment_area_percent.begin(),
                                                    std::max_element(segment_area_percent.begin(), segment_area_percent.end()));
                         segment_img.erase(segment_img.begin() + index);
+
                     }
 
                     cv::imwrite((this->package_path + "/output/egbis.jpg"), egbis_img);
@@ -265,6 +364,7 @@ class ClothesDetectionRunner
                 else
                     ROS_WARN("No specified Algorithm");
 
+                ROS_INFO("Complete EGBIS");
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 60)));
                 //-------------------------- Detect Clothes --------------------------------
                 clothes_detector.setOriginalImage(original_img);
@@ -362,7 +462,12 @@ class ClothesDetectionRunner
                 centroid.x = data[i].position.x;
                 centroid.y = data[i].position.y;
                 centroid.z = data[i].position.z;
-                //clothes->centroid = this->transformCamera2Base(centroid);
+                
+                if(!this->offline_test)
+                {
+                    clothes.centroid = this->transformCamera2Base(centroid);
+                }
+                
                 clothes.centroid = centroid;
                 clothes.color = data[i].dominant_color;
                 clothes.type = data[i].type;
