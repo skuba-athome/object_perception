@@ -1,0 +1,62 @@
+<launch>
+
+	<include file="$(find object_recognition)/launch/verify_object_service.launch">
+        <param name="feature_directory" value="$(find object_recognition)/config/feature"/>
+        <param name="k_neighbors" value="50"/>
+        <param name="threshold_file" value="$(find object_recognition)/config/result_threshold.txt"/>
+    </include>
+	
+	<node pkg="object_recognition" type="findingCenter" name="findingCenter" output="screen">
+
+<!-- webcam resolution 640x480 -->
+
+        <param name="CENTER_IMAGE_X" value="320"/>
+        <param name="CENTER_IMAGE_Y" value="240"/>
+
+        <param name="CALIBRATED_CENTER_IMAGE_X" value="313.73619"/>
+        <param name="CALIBRATED_CENTER_IMAGE_Y" value="254.26251"/>
+
+        <param name="FOCAL_LENGTH_X" value="814.03512"/>
+        <param name="FOCAL_LENGTH_Y" value="815.46674"/>
+
+
+        <param name="TUNED_H_DISTANCE_TOP_LEFT" value="-45"/>
+        <param name="TUNED_V_DISTANCE_TOP_LEFT" value="45"/>
+
+        <param name="TUNED_H_DISTANCE_BOTTOM_RIGHT" value="-20"/>
+        <param name="TUNED_V_DISTANCE_BOTTOM_RIGHT" value="80"/>
+
+<!-- tmp webcam resolution 640x480
+
+        <param name="TUNED_H_DISTANCE_TOP_LEFT" value="-30"/>
+        <param name="TUNED_V_DISTANCE_TOP_LEFT" value="-15"/>
+
+        <param name="TUNED_H_DISTANCE_BOTTOM_RIGHT" value="0"/>
+        <param name="TUNED_V_DISTANCE_BOTTOM_RIGHT" value="25"/>
+
+
+-->
+
+<!-- webcam resolution 1280x720 -->
+<!--
+
+        <param name="CENTER_IMAGE_X" value="640"/>
+        <param name="CENTER_IMAGE_Y" value="360"/>
+
+        <param name="CALIBRATED_CENTER_IMAGE_X" value="618.86076"/>
+        <param name="CALIBRATED_CENTER_IMAGE_Y" value="354.19705"/>
+
+        <param name="FOCAL_LENGTH_X" value="1416.07692"/>
+        <param name="FOCAL_LENGTH_Y" value="1420.90281"/>
+
+        <param name="TUNED_H_DISTANCE_TOP_LEFT" value="-50"/>
+        <param name="TUNED_V_DISTANCE_TOP_LEFT" value="100"/>
+
+        <param name="TUNED_H_DISTANCE_BOTTOM_RIGHT" value="75"/>
+        <param name="TUNED_V_DISTANCE_BOTTOM_RIGHT" value="250"/>
+-->
+
+
+    <param name="ARM_RAIDUS" value="0.95"/>
+    </node>
+</launch>
