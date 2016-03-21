@@ -60,6 +60,7 @@ class ClothesDetector
         //Morphological Kernel MORPH_RECT,MORPH_CROSS,MORPH_ELLIPSE
         void setOriginalImage(cv::Mat img);
         void setPlaneSearchSpace(float min_z, float max_z, bool y_enable = false, float min_y = 0.0, float max_y = 0.0);
+        void setPlaneSearchSpaceCloudTF(float min_z, float max_z, float min_x = 0.0, float max_x = 0.0);
         void setWhiteColorThreshold(int sat_lower, int sat_upper, int value_lower, int value_upper);
         void setClusteringConstraint(float tolerance, int min_size, int max_size);
         void extractPlaneImage(pcl::PointCloud<PointT>::Ptr cloud, pcl::PCLImage& output, pcl::PCLImage& original_img);
@@ -88,6 +89,8 @@ class ClothesDetector
         float min_scene_z;
         float max_scene_y;
         float min_scene_y;
+        float max_scene_x;
+        float min_scene_x;
 
         float egbis_sigma;
         float egbis_k;
@@ -102,6 +105,8 @@ class ClothesDetector
         int min_cluster_size;
         int max_cluster_size;
         float cluster_tolerance;
+
+        bool is_cloud_transform;
 
 
         pcl::PassThrough<PointT>::Ptr pass_scene;
