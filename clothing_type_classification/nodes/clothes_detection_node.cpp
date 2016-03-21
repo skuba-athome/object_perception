@@ -10,6 +10,7 @@
 #include <actionlib/server/simple_action_server.h>
 #include <clothing_type_classification/FindClothesAction.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <pcl_ros/transforms.h>
 
 //#define DEFAULT_CLOUD_TOPIC "/camera/depth_registered/points"
 #define DEFAULT_CLOUD_TOPIC "/cloud_pcd"
@@ -39,7 +40,7 @@ class ClothesDetectionRunner
         double egbis_fine_constraint[3];
         double pass_through_range[4];
         bool pass_scene_enable_y;
-        bool transform_range_to_base_link;
+        bool transform_cloud_to_base_link;
         double egbis_coarse_percent_area_th;
         double egbis_fine_percent_area_th;
         int algorithm;
@@ -122,8 +123,8 @@ class ClothesDetectionRunner
             nh.param( "pass_scene_enable_y", this->pass_scene_enable_y, false );
             ROS_INFO( "pass_scene_enable_y: %d", this->pass_scene_enable_y );
 
-            nh.param( "transform_range_to_base_link", this->transform_range_to_base_link, false );
-            ROS_INFO( "transform_range_to_base_link: %d", this->transform_range_to_base_link );
+            nh.param("transform_cloud_to_base_link", this->transform_cloud_to_base_link, false );
+            ROS_INFO( "transform_cloud_to_base_link: %d", this->transform_cloud_to_base_link);
 
             nh.param( "pass_through_min_z", this->pass_through_range[0], 0.3 );
             ROS_INFO( "pass_through_min_z: %lf", this->pass_through_range[0] );
@@ -143,6 +144,12 @@ class ClothesDetectionRunner
 
             nh.param( "offline_test", this->offline_test, false );
             ROS_INFO( "offline_test: %d", this->offline_test );
+
+            if ((offline_test) && (transform_cloud_to_base_link))
+            {
+                ROS_WARN("OFFLINE TEST CANNOT TRANSFORM CLOUD : set transform_cloud_to_base_link = false");
+                this->transform_cloud_to_base_link = false;
+            }
 
             nh.param( "total_clothes", this->total_clothes, 3 );
             ROS_INFO( "total_clothes: %d", this->total_clothes );
@@ -185,11 +192,6 @@ class ClothesDetectionRunner
             {
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 10)));
                 ROS_INFO("Extracting Plane");
-                if((this->transform_range_to_base_link) && (this->offline_test))
-                {
-                    //TODO -- TF range from base_link to camera_rgb_optical_frame for pass through filter
-                }
-
                 clothes_detector.setPlaneSearchSpace((float)this->pass_through_range[0],
                                                      (float)this->pass_through_range[1],
                                                      this->pass_scene_enable_y,
@@ -287,7 +289,6 @@ class ClothesDetectionRunner
 
                     for(int i = 0 ; i < segment_coarse.size(); i++) //One Cluster will get only One Coarse
                     {
-                        std::cout << "segment_coarse size = " << segment_coarse.size() << std::endl;
                         std::vector<cv::Mat> segment_tmp, segment_out;
                         std::vector<double> segment_area_percent;
                         //---------- Do Fine EGBIS ---------
@@ -344,6 +345,8 @@ class ClothesDetectionRunner
                 else if(this->algorithm == ANALYZE_FROM_PLANE)
                 {
                     std::vector<double> segment_area_percent;
+                    clothes_detector.setEgbisConstraint((float)egbis_coarse_constraint[0],
+                                                        (int)egbis_coarse_constraint[1], (int)egbis_coarse_constraint[2]);
                     int normal_num = clothes_detector.getEgbisSegmentVisualize(plane_img, egbis_img);
                     clothes_detector.getEgbisSegment(plane_img, segment_img, segment_area_percent, this->egbis_coarse_percent_area_th);
                     ROS_INFO("Total Segment : %d", normal_num);
@@ -380,7 +383,11 @@ class ClothesDetectionRunner
                     clothes_detector.findDominantColor(out[i], 2);
                 try
                 {
+<<<<<<< HEAD
                     //TODO -- FIXTHIS Error if pcl cluster > 1
+=======
+                    //TODO -- FIX THIS ERROR
+>>>>>>> dd957e20fb9cfd577daf0bbffbfcc4a5fdcdcc84
                     clothes_detector.saveOutputImages(out, (this->package_path + "/output/out") );
                 }
                 catch(cv::Exception& e)
@@ -436,9 +443,16 @@ class ClothesDetectionRunner
 		void cloudCallback(const sensor_msgs::PointCloud2ConstPtr& cloud_in)
 		{
             ROS_INFO("Receiving Clouds");
+            PointCloudT::Ptr cloud(new pcl::PointCloud<PointT>());
             pcl::fromROSMsg (*cloud_in, *cloud_obj);
             //this->camera_frame.clear();
             this->camera_frame = cloud_in->header.frame_id;
+            //pcl_ros::transformPointCloud(robot_frame, *cloud, *cloud_obj, *listener);
+            if((this->transform_cloud_to_base_link) && (!this->offline_test))
+            {
+                pcl_ros::transformPointCloud(this->robot_base_frame, *cloud, *cloud_obj, this->tf_listener);
+            }
+
             this->new_cloud_available = true;
             this->cloub_sub.shutdown();
 		}
@@ -472,7 +486,7 @@ class ClothesDetectionRunner
                 centroid.y = data[i].position.y;
                 centroid.z = data[i].position.z;
                 
-                if(!this->offline_test)
+                if((!this->transform_cloud_to_base_link) && (!this->offline_test))
                 {
                     clothes.centroid = this->transformCamera2Base(centroid);
                 }
@@ -494,7 +508,15 @@ class ClothesDetectionRunner
         {
             std_msgs::Header tmp;
             //tmp.frame_id = this->camera_frame;
-            tmp.frame_id = frame_id;
+
+            if(this->offline_test)
+                tmp.frame_id = this->camera_frame;
+            else
+                tmp.frame_id = this->robot_base_frame;
+            //if(this->transform_cloud_to_base_link)
+                //tmp.frame_id = this->robot_base_frame;
+            //else
+                //tmp.frame_id = this->camera_frame;
             tmp.stamp = ros::Time::now();
             return tmp;
         }
@@ -523,7 +545,6 @@ class ClothesDetectionRunner
             {
                 this->tf_listener.waitForTransform(this->robot_base_frame, this->camera_frame,
                                                    ros::Time(0), ros::Duration(2.0));
-                //this->tf_listener.lookupTransform(this->robot_base_frame, this->camera_frame, ros::Time(0), transform);
                 this->tf_listener.transformPoint(this->robot_base_frame, stamped_msgs, stamped_out);
                 return stamped_out.point;
             }

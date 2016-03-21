@@ -20,14 +20,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <pcl/io/point_cloud_image_extractors.h>
+#include <pcl/io/pcd_io.h>
 #include "egbis.h"
 
-
-
 typedef pcl::PointXYZRGBA PointT;
-//typedef pcl::PointXYZRGBL PointT;
-//typedef pcl::PointXYZRGBL PointLabel;
 
 class ClothesDetector
 {
@@ -109,7 +105,7 @@ class ClothesDetector
 
 
         pcl::PassThrough<PointT>::Ptr pass_scene;
-        pcl::io::PointCloudImageExtractorFromRGBField<PointT>::Ptr rgb_extractor;
+        //pcl::io::PointCloudImageExtractorFromRGBField<PointT>::Ptr rgb_extractor;
         void computeDescriptors(cv::Mat images_th, DetectorDescriptors &out);
         void drawDescriptors(DetectorDescriptors& input, cv::Mat& output);
         void cropOriginal(ClothesContainer& out);
@@ -118,7 +114,7 @@ class ClothesDetector
         void findCroppedAreaFromCloud(const pcl::PointCloud<PointT>::Ptr &cloud );
         void changeNaN2Black(const pcl::PointCloud<PointT>::Ptr &cloud );
         pcl::PointCloud<PointT>::Ptr filterScene(const pcl::PointCloud<PointT>::Ptr &cloud);
-
+        bool extractRGBFromCloud(const pcl::PointCloud<PointT>& cloud, pcl::PCLImage& img);
 
 };
 
