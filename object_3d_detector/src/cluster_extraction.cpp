@@ -207,7 +207,7 @@ protected:
         std::vector <pcl::PointIndices> cluster_indices;
         pcl::EuclideanClusterExtraction <pcl::PointXYZ> ec;
         ec.setClusterTolerance(0.02); // 2cm
-        ec.setMinClusterSize(100);
+        ec.setMinClusterSize(50);
         ec.setMaxClusterSize(25000);
         ec.setSearchMethod(tree);
         ec.setInputCloud(cloud);
@@ -267,7 +267,8 @@ protected:
             if (pos_z_plane >= neg_z
                 // && neg_z_plane <= neg_z
                 && left_x_plane <= left_x
-                && right_x_plane >= right_x) {
+                && right_x_plane >= right_x
+                && std::abs(left_x - right_x) <= 0.15) {
                 object_3d_detector::Object3D::Ptr object(new object_3d_detector::Object3D);
                 object->header = generateHeader();
                 geometry_msgs::PointStamped pointStamped;
