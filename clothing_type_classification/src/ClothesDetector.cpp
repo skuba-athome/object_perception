@@ -3,15 +3,15 @@
 //
 
 #include <ClothesDetector.h>
-#include <pcl/io/pcd_io.h>
+
 
 
 using namespace cv;
 
 
 ClothesDetector::ClothesDetector():
-        pass_scene(new pcl::PassThrough<PointT>()),
-        rgb_extractor(new pcl::io::PointCloudImageExtractorFromRGBField<PointT>())
+        pass_scene(new pcl::PassThrough<PointT>())
+        //rgb_extractor(new pcl::io::PointCloudImageExtractorFromRGBField<PointT>())
 {
     this->sat_lower_th = 0;
     this->sat_upper_th = 15;
@@ -117,7 +117,8 @@ void ClothesDetector::extractPlaneImage(pcl::PointCloud<PointT>::Ptr cloud, pcl:
     pcl::PassThrough<PointT>::Ptr pass(new pcl::PassThrough<PointT>());
     float Max_x = -9999, Max_y = -9999, Max_z = -9999;
     float Min_x = 9999, Min_y = 9999, Min_z = 9999;
-    rgb_extractor->extract(*cloud, original_img);
+    //rgb_extractor->extract(*cloud, original_img);
+    this->extractRGBFromCloud(*cloud, original_img);
     // Build a passthrough filter to remove spurious NaNs
     cloud_filtered = this->filterScene(cloud);
 
@@ -155,7 +156,8 @@ void ClothesDetector::extractPlaneImage(pcl::PointCloud<PointT>::Ptr cloud, pcl:
     std::cout << "Segmented Cloud Size = " << cloud_plane3->size() << " x " << cloud_plane3->height << std::endl;
     //If NaN change rgb to Black Color;
     this->changeNaN2Black(cloud_plane3);
-    rgb_extractor->extract(*cloud_plane3, output);
+    //rgb_extractor->extract(*cloud_plane3, output);
+    this->extractRGBFromCloud(*cloud_plane3, output);
 }
 
 void ClothesDetector::extractClustersImages(pcl::PointCloud<PointT>::Ptr cloud, std::vector<pcl::PCLImage>& output,
@@ -172,7 +174,8 @@ void ClothesDetector::extractClustersImages(pcl::PointCloud<PointT>::Ptr cloud, 
     pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>());
     pcl::PointCloud<PointT>::Ptr cloud_filtered(new pcl::PointCloud<PointT>());
 
-    rgb_extractor->extract(*cloud, original_img);
+    //rgb_extractor->extract(*cloud, original_img);
+    this->extractRGBFromCloud(*cloud, original_img);
     // Build a passthrough filter to remove spurious NaNs
     cloud_filtered = this->filterScene(cloud);
 
@@ -221,7 +224,8 @@ void ClothesDetector::extractClustersImages(pcl::PointCloud<PointT>::Ptr cloud, 
         cropped = this->cropCloudInArea(cloud, true);
         this->changeNaN2Black(cropped);
         pcl::PCLImage out;
-        rgb_extractor->extract(*cropped, out);
+        //rgb_extractor->extract(*cropped, out);
+        this->extractRGBFromCloud(*cropped, out);
         output.push_back(out);
 
 
@@ -563,11 +567,18 @@ void ClothesDetector::computeDescriptors(cv::Mat images_th, DetectorDescriptors 
 void ClothesDetector::drawDescriptors(DetectorDescriptors& input, cv::Mat& output)
 {
     this->original.copyTo(output);
-    std::vector<std::vector<Point> > contours_poly(1);
-    approxPolyDP( Mat(input.contour), contours_poly[0], 3, true );
     Scalar color = Scalar( 0, 0, 255);
+    std::vector<std::vector<Point> > contours_poly(input.contour.size());
+    try
+    {
+        approxPolyDP( Mat(input.contour), contours_poly, 3, true );
+        drawContours( output, contours_poly, 0, color, 1, 8, std::vector<Vec4i>(), 0, Point() );
+    }
+    catch (cv::Exception &e)
+    {
+        std::cout << "Error drawing Contour : " << e.what() <<std::endl;
+    }
     circle(output, input.centroid, 3, color,4); //Marking Centroid of main segment
-    drawContours( output, contours_poly, 0, color, 1, 8, std::vector<Vec4i>(), 0, Point() );
     rectangle( output, input.rect.tl(), input.rect.br(), color, 2, 8, 0 );
     std::string print = "Type: ";
     if(input.type == TABLE)
@@ -757,4 +768,34 @@ pcl::PointCloud<PointT>::Ptr ClothesDetector::filterScene(const pcl::PointCloud<
         this->pass_scene->filter (*temp);
     }
     return temp;
+}
+
+bool ClothesDetector::extractRGBFromCloud(const pcl::PointCloud<PointT>& cloud, pcl::PCLImage& img)
+{
+    if (!cloud.isOrganized () || cloud.points.size () != cloud.width * cloud.height)
+        return (false);
+
+    std::vector<pcl::PCLPointField> fields;
+    int field_idx = pcl::getFieldIndex (cloud, "rgba", fields);
+    if (field_idx == -1)
+            return (false);
+
+    const size_t offset = fields[field_idx].offset;
+
+    img.encoding = "rgb8";
+    img.width = cloud.width;
+    img.height = cloud.height;
+    img.step = img.width * sizeof (unsigned char) * 3;
+    img.data.resize (img.step * img.height);
+
+    for (size_t i = 0; i < cloud.points.size (); ++i)
+    {
+        uint32_t val;
+        pcl::getFieldValue<PointT, uint32_t> (cloud.points[i], offset, val);
+        img.data[i * 3 + 0] = (val >> 16) & 0x0000ff;
+        img.data[i * 3 + 1] = (val >> 8) & 0x0000ff;
+        img.data[i * 3 + 2] = (val) & 0x0000ff;
+    }
+
+    return (true);
 }

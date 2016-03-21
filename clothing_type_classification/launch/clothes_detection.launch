@@ -32,7 +32,7 @@
         <!-- Passthrough Filter Scene Search Space -->
 
         <param name="pass_scene_enable_y" type="boolean" value="False"/>
-        <param name="transform_range_to_base_link" type="boolean" value="False"/>
+        <param name="transform_cloud_to_base_link" type="boolean" value="False"/>
         <param name="pass_through_min_z" type="double" value="0.3"/>
         <param name="pass_through_max_z" type="double" value="1.5"/>
         <param name="pass_through_min_y" type="double" value="0.0"/>
