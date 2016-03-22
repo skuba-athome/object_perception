@@ -2,8 +2,8 @@
 
     <node name="clothes_detection_node" pkg="clothing_type_classification" type="clothes_detection_node" output="screen">
 
-        <!--<param name="input_topic" type="string" value="/camera/depth_registered/points"/>-->
-        <param name="input_topic" type="string" value="/cloud_pcd"/>
+        <param name="input_topic" type="string" value="/camera/depth_registered/points"/>
+        <!--<param name="input_topic" type="string" value="/cloud_pcd"/>-->
 
         <!-- White Color Threshold -->
         <param name="threshold_sat_lower" type="int" value="0"/>
@@ -32,11 +32,12 @@
         <!-- Passthrough Filter Scene Search Space -->
 
         <param name="pass_scene_enable_y" type="boolean" value="False"/>
-        <param name="transform_cloud_to_base_link" type="boolean" value="False"/>
-        <param name="pass_through_min_z" type="double" value="0.3"/>
+        //This one
+        <param name="transform_cloud_to_base_link" type="boolean" value="True"/>
+        <param name="pass_through_min_z" type="double" value="0.73"/>
         <param name="pass_through_max_z" type="double" value="1.5"/>
         <param name="pass_through_min_y" type="double" value="0.0"/>
-        <param name="pass_through_max_y" type="double" value="2.0"/>
+        <param name="pass_through_max_y" type="double" value="1.5"/>
 
         <!-- Cloud Waiting Time -->
         <param name="cloud_waiting_time" type="double" value="20.0"/>
