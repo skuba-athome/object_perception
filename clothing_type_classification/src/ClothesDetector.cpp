@@ -34,6 +34,7 @@ ClothesDetector::ClothesDetector():
     this->max_scene_y = -2.0f;
     this->min_scene_y = 0.0;
     this->scene_enable_y = false;
+    this->is_cloud_transform = false;
 }
 
 ClothesDetector::DetectorDescriptors::DetectorDescriptors()
@@ -65,6 +66,7 @@ void ClothesDetector::setEgbisConstraint(float sigma, float k, int min_size)
 
 void ClothesDetector::setPlaneSearchSpace(float min_z, float max_z, bool y_enable, float min_y, float max_y)
 {
+    this->is_cloud_transform = false;
     this->min_scene_z = min_z;
     this->max_scene_z = max_z;
     this->scene_enable_y = y_enable;
@@ -73,6 +75,16 @@ void ClothesDetector::setPlaneSearchSpace(float min_z, float max_z, bool y_enabl
         this->min_scene_y = min_y;
         this->max_scene_y = max_y;
     }
+}
+
+void ClothesDetector::setPlaneSearchSpaceCloudTF(float min_z, float max_z, float min_x, float max_x)
+{
+    this->is_cloud_transform = true;
+    this->min_scene_z = min_z;
+    this->max_scene_z = max_z;
+    this->min_scene_x = min_x;
+    this->min_scene_x = max_x;
+
 }
 
 void ClothesDetector::DetectorDescriptors::copyTo(DetectorDescriptors &target)
@@ -760,13 +772,25 @@ pcl::PointCloud<PointT>::Ptr ClothesDetector::filterScene(const pcl::PointCloud<
     this->pass_scene->setFilterFieldName ("z");
     this->pass_scene->setFilterLimits (this->min_scene_z, this->max_scene_z);
     this->pass_scene->filter (*temp);
-    if(this->scene_enable_y)
+
+    if(this->is_cloud_transform)
     {
         this->pass_scene->setInputCloud (temp);
-        this->pass_scene->setFilterFieldName ("y");
-        this->pass_scene->setFilterLimits (this->min_scene_y, this->min_scene_y);
+        this->pass_scene->setFilterFieldName ("x");
+        this->pass_scene->setFilterLimits (this->min_scene_x, this->max_scene_x);
         this->pass_scene->filter (*temp);
     }
+    else
+    {
+        if(this->scene_enable_y)
+        {
+            this->pass_scene->setInputCloud (temp);
+            this->pass_scene->setFilterFieldName ("y");
+            this->pass_scene->setFilterLimits (this->min_scene_y, this->max_scene_y);
+            this->pass_scene->filter (*temp);
+        }
+    }
+
     return temp;
 }
 

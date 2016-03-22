@@ -37,7 +37,13 @@
         <param name="pass_through_min_z" type="double" value="0.73"/>
         <param name="pass_through_max_z" type="double" value="1.5"/>
         <param name="pass_through_min_y" type="double" value="0.0"/>
+<<<<<<< HEAD
         <param name="pass_through_max_y" type="double" value="1.5"/>
+=======
+        <param name="pass_through_max_y" type="double" value="2.0"/>
+        <param name="pass_through_min_x" type="double" value="0.0"/>
+        <param name="pass_through_max_x" type="double" value="2.0"/>
+>>>>>>> 30408875e0cf1b1d6a88b2a20e10ea6772780b57
 
         <!-- Cloud Waiting Time -->
         <param name="cloud_waiting_time" type="double" value="20.0"/>

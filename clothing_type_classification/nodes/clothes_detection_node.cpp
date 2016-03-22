@@ -38,7 +38,7 @@ class ClothesDetectionRunner
         double ece_constraint[3];
         double egbis_coarse_constraint[3];
         double egbis_fine_constraint[3];
-        double pass_through_range[4];
+        double pass_through_range[6];
         bool pass_scene_enable_y;
         bool transform_cloud_to_base_link;
         double egbis_coarse_percent_area_th;
@@ -76,8 +76,6 @@ class ClothesDetectionRunner
             nh.param( "threshold_value_upper", this->threshold_sv[3], 255 );
             ROS_INFO( "threshold_value_upper: %d", this->threshold_sv[3] );
 
-            clothes_detector.setWhiteColorThreshold(this->threshold_sv[0], this->threshold_sv[1],
-                                                    this->threshold_sv[2], this->threshold_sv[3]);
 
             nh.param( "egbis_coarse_sigma", this->egbis_coarse_constraint[0], 2.0 );
             ROS_INFO( "egbis_coarse_sigma: %lf", this->egbis_coarse_constraint[0] );
@@ -116,10 +114,6 @@ class ClothesDetectionRunner
             nh.param( "ece_max_cluster_size", this->ece_constraint[2], 25000.00 );
             ROS_INFO( "ece_max_cluster_size: %lf", this->ece_constraint[2] );
 
-            clothes_detector.setClusteringConstraint( (float)this->ece_constraint[0],
-                                                      (int)this->ece_constraint[1], (int)this->ece_constraint[2]);
-
-
             nh.param( "pass_scene_enable_y", this->pass_scene_enable_y, false );
             ROS_INFO( "pass_scene_enable_y: %d", this->pass_scene_enable_y );
 
@@ -138,6 +132,11 @@ class ClothesDetectionRunner
             nh.param( "pass_through_max_y", this->pass_through_range[3], 2.0 );
             ROS_INFO( "pass_through_max_y: %lf", this->pass_through_range[3] );
 
+            nh.param( "pass_through_min_x", this->pass_through_range[4], 0.0 );
+            ROS_INFO( "pass_through_min_x: %lf", this->pass_through_range[4] );
+
+            nh.param( "pass_through_max_x", this->pass_through_range[5], 2.0 );
+            ROS_INFO( "pass_through_max_x: %lf", this->pass_through_range[5] );
 
             nh.param( "cloud_waiting_time", this->cloud_waiting_time, 20.00 );
             ROS_INFO( "cloud_waiting_time: %lf", this->cloud_waiting_time );
@@ -153,6 +152,12 @@ class ClothesDetectionRunner
 
             nh.param( "total_clothes", this->total_clothes, 3 );
             ROS_INFO( "total_clothes: %d", this->total_clothes );
+
+            clothes_detector.setWhiteColorThreshold(this->threshold_sv[0], this->threshold_sv[1],
+                                                    this->threshold_sv[2], this->threshold_sv[3]);
+
+            clothes_detector.setClusteringConstraint( (float)this->ece_constraint[0],
+                                                      (int)this->ece_constraint[1], (int)this->ece_constraint[2]);
 
             nh.param( "algorithm", this->algorithm, ANALYZE_FROM_CLUSTER );
             std::string algorithm_str = (this->algorithm)?("ANALYZE_FROM_CLUSTERS"):("ANALYZE_FROM_PLANE");
@@ -192,11 +197,22 @@ class ClothesDetectionRunner
             {
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 10)));
                 ROS_INFO("Extracting Plane");
-                clothes_detector.setPlaneSearchSpace((float)this->pass_through_range[0],
-                                                     (float)this->pass_through_range[1],
-                                                     this->pass_scene_enable_y,
-                                                     (float)this->pass_through_range[2],
-                                                     (float)this->pass_through_range[3]);
+                if(this->transform_cloud_to_base_link)
+                {
+                    clothes_detector.setPlaneSearchSpaceCloudTF((float)this->pass_through_range[0],
+                                                                (float)this->pass_through_range[1],
+                                                                (float)this->pass_through_range[4],
+                                                                (float)this->pass_through_range[5]);
+                }
+                else
+                {
+                    clothes_detector.setPlaneSearchSpace((float)this->pass_through_range[0],
+                                                         (float)this->pass_through_range[1],
+                                                         this->pass_scene_enable_y,
+                                                         (float)this->pass_through_range[2],
+                                                         (float)this->pass_through_range[3]);
+                }
+
 
                 pcl::PCLImage plane_pcl_img, original_pcl_img;
                 cv::Mat plane_img, original_img, egbis_img;
