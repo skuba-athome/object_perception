@@ -185,15 +185,11 @@ void ClothesDetector::extractClustersImages(pcl::PointCloud<PointT>::Ptr cloud, 
     this->neg_z_plane = 9999;
     pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>());
     pcl::PointCloud<PointT>::Ptr cloud_filtered(new pcl::PointCloud<PointT>());
-
     //rgb_extractor->extract(*cloud, original_img);
     this->extractRGBFromCloud(*cloud, original_img);
     // Build a passthrough filter to remove spurious NaNs
     cloud_filtered = this->filterScene(cloud);
-
-
     std::cout << "PassThrough; PointCloud after filtering has: " << cloud_filtered->points.size () << " data points." << std::endl;
-
     pcl::PointCloud<PointT>::Ptr remove_plane_cloud(new pcl::PointCloud<PointT>());
     pcl::PointCloud<PointT>::Ptr plane_area_cloud(new pcl::PointCloud<PointT>());
     remove_plane_cloud = this->removeNormalPlane(cloud_filtered);

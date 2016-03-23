@@ -456,13 +456,24 @@ class ClothesDetectionRunner
 		{
             ROS_INFO("Receiving Clouds");
             PointCloudT::Ptr cloud(new pcl::PointCloud<PointT>());
-            pcl::fromROSMsg (*cloud_in, *cloud_obj);
+            //pcl::fromROSMsg (*cloud_in, *cloud_obj);
+            pcl::fromROSMsg (*cloud_in, *cloud);
             //this->camera_frame.clear();
             this->camera_frame = cloud_in->header.frame_id;
             //pcl_ros::transformPointCloud(robot_frame, *cloud, *cloud_obj, *listener);
             if((this->transform_cloud_to_base_link) && (!this->offline_test))
             {
-                pcl_ros::transformPointCloud(this->robot_base_frame, *cloud, *cloud_obj, this->tf_listener);
+                tf::StampedTransform  transform;
+                this->tf_listener.waitForTransform(this->robot_base_frame, cloud_in->header.frame_id,
+                                                   cloud_in->header.stamp, ros::Duration(1.0));
+                //this->tf_listener.lookupTransform();
+                this->tf_listener.lookupTransform(this->robot_base_frame, cloud_in->header.frame_id, ros::Time(0), transform);
+                //pcl_ros::transformPointCloud(this->robot_base_frame,*cloud, *cloud_obj, this->tf_listener);
+                pcl_ros::transformPointCloud(*cloud, *cloud_obj, transform);
+            }
+            else
+            {
+                this->cloud_obj = cloud;
             }
 
             this->new_cloud_available = true;

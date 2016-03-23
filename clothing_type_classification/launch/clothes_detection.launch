@@ -33,17 +33,16 @@
 
         <param name="pass_scene_enable_y" type="boolean" value="False"/>
         //This one
-        <param name="transform_cloud_to_base_link" type="boolean" value="True"/>
-        <param name="pass_through_min_z" type="double" value="0.73"/>
+        <param name="transform_cloud_to_base_link" type="boolean" value="False"/>
+        <param name="pass_through_min_z" type="double" value="0.0"/>
         <param name="pass_through_max_z" type="double" value="1.5"/>
         <param name="pass_through_min_y" type="double" value="0.0"/>
         <param name="pass_through_max_y" type="double" value="2.0"/>
         <param name="pass_through_min_x" type="double" value="0.0"/>
-        <param name="pass_through_max_x" type="double" value="2.0"/>
+        <param name="pass_through_max_x" type="double" value="3.0"/>
 
         <!-- Cloud Waiting Time -->
         <param name="cloud_waiting_time" type="double" value="20.0"/>
-
 
         <!-- Algorithm : ANALYZE_FROM_PLANE 0 ,ANALYZE_FROM_CLUSTER 1-->
         <param name="algorithm" type="int" value="1"/>
@@ -52,7 +51,7 @@
         <param name="total_clothes" type="int" value="3"/>
 
         <!-- Offline Test (Whether To Use TF in test)-->
-        <param name="offline_test" type="boolean" value="True"/>
+        <param name="offline_test" type="boolean" value="False"/>
 
 
         <!--<remap from="peoplearray" to="/people_detection/people_array"/>-->
