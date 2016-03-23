@@ -399,11 +399,7 @@ class ClothesDetectionRunner
                     clothes_detector.findDominantColor(out[i], 2);
                 try
                 {
-<<<<<<< HEAD
-                    //TODO -- FIXTHIS Error if pcl cluster > 1
-=======
                     //TODO -- FIX THIS ERROR
->>>>>>> dd957e20fb9cfd577daf0bbffbfcc4a5fdcdcc84
                     clothes_detector.saveOutputImages(out, (this->package_path + "/output/out") );
                 }
                 catch(cv::Exception& e)
