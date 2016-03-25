@@ -33,11 +33,11 @@
 
         <param name="pass_scene_enable_y" type="boolean" value="False"/>
         //This one
-        <param name="transform_cloud_to_base_link" type="boolean" value="True"/>
-        <param name="pass_through_min_z" type="double" value="0.0"/>
-        <param name="pass_through_max_z" type="double" value="1.3"/>
-        <param name="pass_through_min_y" type="double" value="0.0"/>
-        <param name="pass_through_max_y" type="double" value="2.0"/>
+        <param name="transform_cloud_to_base_link" type="boolean" value="False"/>
+        <param name="pass_through_min_z" type="double" value="0.3"/>
+        <param name="pass_through_max_z" type="double" value="1.0"/>
+        <param name="pass_through_min_y" type="double" value="0.73"/>
+        <param name="pass_through_max_y" type="double" value="1.5"/>
         <param name="pass_through_min_x" type="double" value="0.0"/>
         <param name="pass_through_max_x" type="double" value="3.0"/>
 
