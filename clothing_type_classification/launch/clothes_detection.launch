@@ -8,7 +8,7 @@
         <!-- White Color Threshold -->
         <param name="threshold_sat_lower" type="int" value="0"/>
         <param name="threshold_sat_upper" type="int" value="15"/>
-        <param name="threshold_value_lower" type="int" value="200"/>
+        <param name="threshold_value_lower" type="int" value="150"/>
         <param name="threshold_value_upper" type="int" value="255"/>
 
         <!-- EGBIS Constraints -->
@@ -26,7 +26,7 @@
         <!-- Euclidean Clustering Extraction Constraints -->
 
         <param name="ece_cluster_tolerance" type="double" value="0.05"/>
-        <param name="ece_min_cluster_size" type="double" value="10000"/>
+        <param name="ece_min_cluster_size" type="double" value="12000"/>
         <param name="ece_max_cluster_size" type="double" value="100000"/>
 
         <!-- Passthrough Filter Scene Search Space -->
@@ -34,10 +34,10 @@
         <param name="pass_scene_enable_y" type="boolean" value="False"/>
         //This one
         <param name="transform_cloud_to_base_link" type="boolean" value="False"/>
-        <param name="pass_through_min_z" type="double" value="0.0"/>
-        <param name="pass_through_max_z" type="double" value="1.3"/>
-        <param name="pass_through_min_y" type="double" value="0.0"/>
-        <param name="pass_through_max_y" type="double" value="2.0"/>
+        <param name="pass_through_min_z" type="double" value="0.3"/>
+        <param name="pass_through_max_z" type="double" value="1.0"/>
+        <param name="pass_through_min_y" type="double" value="0.73"/>
+        <param name="pass_through_max_y" type="double" value="1.5"/>
         <param name="pass_through_min_x" type="double" value="0.0"/>
         <param name="pass_through_max_x" type="double" value="3.0"/>
 

@@ -11,7 +11,6 @@
 #include <clothing_type_classification/FindClothesAction.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/transforms.h>
-#include <pcl/io/png_io.h>
 
 //#define DEFAULT_CLOUD_TOPIC "/camera/depth_registered/points"
 #define DEFAULT_CLOUD_TOPIC "/cloud_pcd"
@@ -613,20 +612,6 @@ class ClothesDetectionRunner
                 std::stringstream ss;
                 ss << directory << filename << '_' << i << ".jpg";
                 cv::imwrite(ss.str().c_str(), input[i]);
-            }
-        }
-
-        void saveImagesToFolderPCL(std::vector<pcl::PCLImage>& input, std::string filename)
-        {
-            std::string directory;
-            directory = this->package_path + "/output/";
-
-            for(int i = 0; i < input.size(); i++)
-            {
-                std::stringstream ss;
-                ss << directory << filename << '_' << i << ".png";
-                //cv::imwrite(ss.str().c_str(), input[i]);
-                pcl::io::savePNGFile(ss.str(), input[i]);
             }
         }
 
