@@ -26,9 +26,9 @@
   </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" assignedExecutableTargets="true" buildAllGenerated="true">
     <generated>
-      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesResult" />
+      <config projectName="clothing_type_classification" targetName="roscpp_generate_messages_cpp" />
       <config projectName="clothing_type_classification" targetName="roscpp_generate_messages_py" />
-      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesGoal" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesFeedback" />
       <config projectName="clothing_type_classification" targetName="topic_tools_generate_messages_py" />
       <config projectName="clothing_type_classification" targetName="clothing_type_classification_gencpp" />
       <config projectName="clothing_type_classification" targetName="tests" />
@@ -39,20 +39,19 @@
       <config projectName="clothing_type_classification" targetName="pcl_ros_gencfg" />
       <config projectName="clothing_type_classification" targetName="doxygen" />
       <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesActionResult" />
-      <config projectName="clothing_type_classification" targetName="clothing_type_classification_generate_messages" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesGoal" />
       <config projectName="clothing_type_classification" targetName="actionlib_generate_messages_lisp" />
       <config projectName="clothing_type_classification" targetName="tf_generate_messages_cpp" />
       <config projectName="clothing_type_classification" targetName="sensor_msgs_generate_messages_py" />
       <config projectName="clothing_type_classification" targetName="tf2_msgs_generate_messages_lisp" />
-      <config projectName="clothing_type_classification" targetName="rosgraph_msgs_generate_messages_lisp" />
+      <config projectName="clothing_type_classification" targetName="actionlib_msgs_generate_messages_py" />
       <config projectName="clothing_type_classification" targetName="gtest_main" />
       <config projectName="clothing_type_classification" targetName="topic_tools_generate_messages_cpp" />
       <config projectName="clothing_type_classification" targetName="nodelet_generate_messages_lisp" />
       <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesActionGoal" />
       <config projectName="clothing_type_classification" targetName="std_msgs_generate_messages_py" />
-      <config projectName="clothing_type_classification" targetName="roscpp_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="nodelet_generate_messages_py" />
       <config projectName="clothing_type_classification" targetName="clothing_type_classification_generate_messages_lisp" />
-      <config projectName="clothing_type_classification" targetName="actionlib_msgs_generate_messages_py" />
       <config projectName="clothing_type_classification" targetName="gtest" />
       <config projectName="clothing_type_classification" targetName="clothing_type_classification_generate_messages_py" />
       <config projectName="clothing_type_classification" targetName="geometry_msgs_generate_messages_lisp" />
@@ -65,15 +64,15 @@
       <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesActionFeedback" />
       <config projectName="clothing_type_classification" targetName="actionlib_msgs_generate_messages_lisp" />
       <config projectName="clothing_type_classification" targetName="sensor_msgs_generate_messages_cpp" />
-      <config projectName="clothing_type_classification" targetName="nodelet_generate_messages_py" />
       <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_ClothesArray" />
       <config projectName="clothing_type_classification" targetName="topic_tools_generate_messages_lisp" />
       <config projectName="clothing_type_classification" targetName="actionlib_generate_messages_py" />
       <config projectName="clothing_type_classification" targetName="nodelet_generate_messages_cpp" />
       <config projectName="clothing_type_classification" targetName="clothing_type_classification_generate_messages_cpp" />
-      <config projectName="clothing_type_classification" targetName="tf_generate_messages_py" />
+      <config projectName="clothing_type_classification" targetName="rosgraph_msgs_generate_messages_lisp" />
       <config projectName="clothing_type_classification" targetName="clean_test_results" />
       <config projectName="clothing_type_classification" targetName="bond_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="clothing_type_classification_generate_messages" />
       <config projectName="clothing_type_classification" targetName="rosgraph_msgs_generate_messages_py" />
       <config projectName="clothing_type_classification" targetName="clothes_detection_node" />
       <config projectName="clothing_type_classification" targetName="std_msgs_generate_messages_cpp" />
@@ -81,7 +80,7 @@
       <config projectName="clothing_type_classification" targetName="std_msgs_generate_messages_lisp" />
       <config projectName="clothing_type_classification" targetName="rosgraph_msgs_generate_messages_cpp" />
       <config projectName="clothing_type_classification" targetName="tf_generate_messages_lisp" />
-      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesFeedback" />
+      <config projectName="clothing_type_classification" targetName="tf_generate_messages_py" />
       <config projectName="clothing_type_classification" targetName="actionlib_generate_messages_cpp" />
       <config projectName="clothing_type_classification" targetName="geometry_msgs_generate_messages_cpp" />
       <config projectName="clothing_type_classification" targetName="geometry_msgs_generate_messages_py" />
@@ -90,6 +89,7 @@
       <config projectName="clothing_type_classification" targetName="dynamic_reconfigure_gencfg" />
       <config projectName="clothing_type_classification" targetName="bond_generate_messages_lisp" />
       <config projectName="clothing_type_classification" targetName="actionlib_msgs_generate_messages_cpp" />
+      <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesResult" />
       <config projectName="clothing_type_classification" targetName="_clothing_type_classification_generate_messages_check_deps_FindClothesAction" />
       <config projectName="clothing_type_classification" targetName="roscpp_generate_messages_lisp" />
       <config projectName="clothing_type_classification" targetName="run_tests" />
@@ -122,12 +122,12 @@
     <favorites_list name="clothing_type_classification" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+    <leaf>
       <file leaf-file-name="clothes_detection_node.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nodes/clothes_detection_node.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-18.096775">
-              <caret line="320" column="25" selection-start-line="320" selection-start-column="25" selection-end-line="320" selection-end-column="25" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="254" column="75" selection-start-line="254" selection-start-column="75" selection-end-line="254" selection-end-column="75" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -138,18 +138,8 @@
       <file leaf-file-name="ClothesDetector.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ClothesDetector.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.9426752">
-              <caret line="483" column="12" selection-start-line="483" selection-start-column="12" selection-end-line="483" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="clothes_detection.launch" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/launch/clothes_detection.launch">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-16.25926">
-              <caret line="53" column="45" selection-start-line="53" selection-start-column="45" selection-end-line="53" selection-end-column="45" />
+            <state vertical-scroll-proportion="7.767516">
+              <caret line="418" column="9" selection-start-line="418" selection-start-column="9" selection-end-line="418" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -159,7 +149,7 @@
         <entry file="file://$PROJECT_DIR$/include/ClothesDetector.h">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="128" column="20" selection-start-line="128" selection-start-column="20" selection-end-line="128" selection-end-column="20" />
+              <caret line="80" column="20" selection-start-line="80" selection-start-column="20" selection-end-line="80" selection-end-column="20" />
               <folding>
                 <element signature="e#134#151#0" expanded="true" />
               </folding>
@@ -172,10 +162,10 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/include/ClothesDetector.h" />
-        <option value="$PROJECT_DIR$/src/ClothesDetector.cpp" />
         <option value="$PROJECT_DIR$/launch/clothes_detection.launch" />
+        <option value="$PROJECT_DIR$/include/ClothesDetector.h" />
         <option value="$PROJECT_DIR$/nodes/clothes_detection_node.cpp" />
+        <option value="$PROJECT_DIR$/src/ClothesDetector.cpp" />
       </list>
     </option>
   </component>
@@ -185,10 +175,10 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-1855" />
-    <option name="y" value="1104" />
+    <option name="x" value="65" />
+    <option name="y" value="-4" />
     <option name="width" value="1855" />
-    <option name="height" value="1056" />
+    <option name="height" value="1084" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -244,6 +234,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clothing_type_classification" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -701,8 +709,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1855" y="1104" width="1855" height="1056" extended-state="6" />
-    <editor active="true" />
+    <frame x="65" y="-4" width="1855" height="1084" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24959569" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -984,28 +992,36 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/launch/clothes_detection.launch">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7004992">
+          <caret line="52" column="37" selection-start-line="52" selection-start-column="37" selection-end-line="52" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/include/ClothesDetector.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="128" column="20" selection-start-line="128" selection-start-column="20" selection-end-line="128" selection-end-column="20" />
+          <caret line="80" column="20" selection-start-line="80" selection-start-column="20" selection-end-line="80" selection-end-column="20" />
           <folding>
             <element signature="e#134#151#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/launch/clothes_detection.launch">
+    <entry file="file:///usr/include/x86_64-linux-gnu/c++/4.8/bits/c++config.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-16.25926">
-          <caret line="53" column="45" selection-start-line="53" selection-start-column="45" selection-end-line="53" selection-end-column="45" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="185" column="28" selection-start-line="185" selection-start-column="28" selection-end-line="185" selection-end-column="28" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nodes/clothes_detection_node.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-18.096775">
-          <caret line="320" column="25" selection-start-line="320" selection-start-column="25" selection-end-line="320" selection-end-column="25" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="254" column="75" selection-start-line="254" selection-start-column="75" selection-end-line="254" selection-end-column="75" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
@@ -1014,8 +1030,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ClothesDetector.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.9426752">
-          <caret line="483" column="12" selection-start-line="483" selection-start-column="12" selection-end-line="483" selection-end-column="12" />
+        <state vertical-scroll-proportion="7.767516">
+          <caret line="418" column="9" selection-start-line="418" selection-start-column="9" selection-end-line="418" selection-end-column="9" />
           <folding />
         </state>
       </provider>
