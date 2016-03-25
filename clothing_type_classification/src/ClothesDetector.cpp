@@ -298,6 +298,7 @@ void ClothesDetector::extractClustersFineCroppedImages(pcl::PointCloud<PointT>::
     pcl::PCDWriter writer;
     unsigned long max_size_cluster = 0;
     unsigned long max_size_index = 0;
+    unsigned long total_clusters = 0;
     this->down_y_plane = 9999;
     this->up_y_plane = -9999;
     this->right_x_plane = -9999;
@@ -381,10 +382,11 @@ void ClothesDetector::extractClustersFineCroppedImages(pcl::PointCloud<PointT>::
                 extract.filter (*cluster);
                 this->changeNaN2Black(cluster);
                 clusters.push_back(*cluster);
+
                 if((find_only_max_clusters) && (euclidean_label_indices[i].indices.size() > max_size_cluster))
                 {
                     max_size_cluster = euclidean_label_indices[i].indices.size();
-                    max_size_index = i;
+                    max_size_index = total_clusters++;
                 }
             }
         }
@@ -411,7 +413,6 @@ void ClothesDetector::extractClustersFineCroppedImages(pcl::PointCloud<PointT>::
             {
                 pcl::PCLImage tmp;
                 pcl::PointCloud<PointT>::Ptr ptr(new pcl::PointCloud<PointT>(clusters[i]));
-                std::cout << "Clusters " << i << " Images Size = " << clusters[i].width << " x " << clusters[i].height << std::endl;
                 this->changeNaN2Black(ptr);
                 this->extractRGBFromCloud(clusters[i], tmp);
                 output.push_back(tmp);

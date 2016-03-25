@@ -26,7 +26,7 @@
         <!-- Euclidean Clustering Extraction Constraints -->
 
         <param name="ece_cluster_tolerance" type="double" value="0.05"/>
-        <param name="ece_min_cluster_size" type="double" value="12000"/>
+        <param name="ece_min_cluster_size" type="double" value="1000"/>
         <param name="ece_max_cluster_size" type="double" value="100000"/>
 
         <!-- Passthrough Filter Scene Search Space -->
