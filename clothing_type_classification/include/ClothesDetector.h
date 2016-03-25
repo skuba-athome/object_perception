@@ -21,6 +21,17 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <pcl/io/pcd_io.h>
+#include <pcl/features/integral_image_normal.h>
+#include <pcl/segmentation/organized_multi_plane_segmentation.h>
+#include <pcl/segmentation/planar_polygon_fusion.h>
+#include <pcl/common/transforms.h>
+#include <pcl/segmentation/plane_coefficient_comparator.h>
+#include <pcl/segmentation/euclidean_plane_coefficient_comparator.h>
+#include <pcl/segmentation/rgb_plane_coefficient_comparator.h>
+#include <pcl/segmentation/edge_aware_plane_comparator.h>
+#include <pcl/segmentation/euclidean_cluster_comparator.h>
+#include <pcl/segmentation/organized_connected_component_segmentation.h>
+
 #include "egbis.h"
 
 typedef pcl::PointXYZRGBA PointT;
@@ -64,7 +75,10 @@ class ClothesDetector
         void setWhiteColorThreshold(int sat_lower, int sat_upper, int value_lower, int value_upper);
         void setClusteringConstraint(float tolerance, int min_size, int max_size);
         void extractPlaneImage(pcl::PointCloud<PointT>::Ptr cloud, pcl::PCLImage& output, pcl::PCLImage& original_img);
+        pcl::PointCloud<PointT>::Ptr extractPlaneCloud(pcl::PointCloud<PointT>::Ptr cloud);
         void extractClustersImages(pcl::PointCloud<PointT>::Ptr cloud, std::vector<pcl::PCLImage>& output, pcl::PCLImage& original_img , std::string debug= "");
+        void extractClustersFineCroppedImages(pcl::PointCloud<PointT>::Ptr cloud, std::vector<pcl::PCLImage>& output,
+                                           pcl::PCLImage& original_img , std::string debug= "");
         void map2DPointToPointCloud(pcl::PointCloud<PointT>::Ptr cloud, DetectorDescriptors& input, int window = 3);
         void setEgbisConstraint(float sigma, float k, int min_size);
         int  getEgbisSegmentVisualize(cv::Mat &input, cv::Mat& output);
@@ -115,11 +129,13 @@ class ClothesDetector
         void drawDescriptors(DetectorDescriptors& input, cv::Mat& output);
         void cropOriginal(ClothesContainer& out);
         pcl::PointCloud<PointT>::Ptr removeNormalPlane(const pcl::PointCloud<PointT>::Ptr &cloud);
+        pcl::PointIndices::Ptr getNormalPlaneInliers(const pcl::PointCloud<PointT>::Ptr &cloud);
         pcl::PointCloud<PointT>::Ptr cropCloudInArea(const pcl::PointCloud<PointT>::Ptr &cloud, bool keep_organized = false);
         void findCroppedAreaFromCloud(const pcl::PointCloud<PointT>::Ptr &cloud );
         void changeNaN2Black(const pcl::PointCloud<PointT>::Ptr &cloud );
         pcl::PointCloud<PointT>::Ptr filterScene(const pcl::PointCloud<PointT>::Ptr &cloud);
         bool extractRGBFromCloud(const pcl::PointCloud<PointT>& cloud, pcl::PCLImage& img);
+
 
 };
 

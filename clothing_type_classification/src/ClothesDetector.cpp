@@ -172,6 +172,54 @@ void ClothesDetector::extractPlaneImage(pcl::PointCloud<PointT>::Ptr cloud, pcl:
     this->extractRGBFromCloud(*cloud_plane3, output);
 }
 
+pcl::PointCloud<PointT>::Ptr ClothesDetector::extractPlaneCloud(pcl::PointCloud<PointT>::Ptr cloud)
+{
+    pcl::NormalEstimation<PointT, pcl::Normal>::Ptr ne(new pcl::NormalEstimation<PointT, pcl::Normal>());
+    boost::shared_ptr<pcl::SACSegmentationFromNormals<PointT, pcl::Normal> > seg(new pcl::SACSegmentationFromNormals<PointT, pcl::Normal>());
+    pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>());
+    pcl::ExtractIndices<PointT>::Ptr extract(new pcl::ExtractIndices<PointT>());
+    pcl::PointCloud<PointT>::Ptr cloud_plane(new pcl::PointCloud<PointT>());
+    pcl::PointCloud<PointT>::Ptr cloud_filtered(new pcl::PointCloud<PointT>());
+    pcl::PointCloud<pcl::Normal>::Ptr cloud_normals(new pcl::PointCloud<pcl::Normal>());
+    pcl::ModelCoefficients::Ptr coefficients_plane(new  pcl::ModelCoefficients());
+    pcl::PointIndices::Ptr inliers_plane(new pcl::PointIndices());
+    pcl::PassThrough<PointT>::Ptr pass(new pcl::PassThrough<PointT>());
+    float Max_x = -9999, Max_y = -9999, Max_z = -9999;
+    float Min_x = 9999, Min_y = 9999, Min_z = 9999;
+    //rgb_extractor->extract(*cloud, original_img);
+    //this->extractRGBFromCloud(*cloud, original_img);
+    // Build a passthrough filter to remove spurious NaNs
+    cloud_filtered = this->filterScene(cloud);
+
+    std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size () << " data points." << std::endl;
+
+    ne->setSearchMethod (tree);
+    ne->setKSearch (50);
+    // Estimate point normals
+    ne->setInputCloud (cloud_filtered);
+    ne->compute (*cloud_normals);
+
+    // Create the segmentation object for the planar model and set all the parameters
+    seg->setInputCloud (cloud_filtered);
+    seg->setInputNormals (cloud_normals);
+    seg->setOptimizeCoefficients (true);
+    seg->setModelType (pcl::SACMODEL_NORMAL_PLANE);
+    seg->setNormalDistanceWeight (0.1);
+    seg->setMethodType (pcl::SAC_RANSAC);
+    seg->setMaxIterations (100);
+    seg->setDistanceThreshold (0.03);
+    // Obtain the plane inliers and coefficients
+    seg->segment (*inliers_plane, *coefficients_plane);
+
+    // Extract the planar inliers from the input cloud
+    extract->setInputCloud (cloud_filtered);
+    extract->setIndices (inliers_plane);
+    extract->setNegative (false);
+    extract->setKeepOrganized(true);
+    extract->filter (*cloud_plane);
+    return cloud_plane;
+}
+
 void ClothesDetector::extractClustersImages(pcl::PointCloud<PointT>::Ptr cloud, std::vector<pcl::PCLImage>& output,
                                             pcl::PCLImage& original_img, std::string debug)
 {
@@ -239,6 +287,120 @@ void ClothesDetector::extractClustersImages(pcl::PointCloud<PointT>::Ptr cloud, 
 
         std::cout << "Cluster " << l <<", total pointcloud size: " << cloud_cluster->points.size () << " data points." << std::endl;
         l++;
+    }
+}
+
+void ClothesDetector::extractClustersFineCroppedImages(pcl::PointCloud<PointT>::Ptr cloud, std::vector<pcl::PCLImage>& output,
+                                            pcl::PCLImage& original_img, std::string debug)
+{
+    output.clear();
+    pcl::PCDWriter writer;
+    this->down_y_plane = 9999;
+    this->up_y_plane = -9999;
+    this->right_x_plane = -9999;
+    this->left_x_plane = 9999;
+    this->pos_z_plane = -9999;
+    this->neg_z_plane = 9999;
+
+    this->extractRGBFromCloud(*cloud, original_img);
+    cloud = this->filterScene(cloud);
+    // Estimate Normals
+    pcl::PointCloud<pcl::Normal>::Ptr normal_cloud (new pcl::PointCloud<pcl::Normal>);
+    pcl::EdgeAwarePlaneComparator<PointT, pcl::Normal>::Ptr edge_aware_comparator_(new pcl::EdgeAwarePlaneComparator<PointT, pcl::Normal>());
+    pcl::IntegralImageNormalEstimation<PointT, pcl::Normal> ne;
+    ne.setInputCloud (cloud);
+    ne.compute (*normal_cloud);
+    float* distance_map = ne.getDistanceMap ();
+    boost::shared_ptr<pcl::EdgeAwarePlaneComparator<PointT,pcl::Normal> > eapc = boost::dynamic_pointer_cast<pcl::EdgeAwarePlaneComparator<PointT,pcl::Normal> >(edge_aware_comparator_);
+    eapc->setDistanceMap (distance_map);
+    eapc->setDistanceThreshold (0.01f, false);
+
+    // Segment Planes
+    std::vector<pcl::PlanarRegion<PointT>, Eigen::aligned_allocator<pcl::PlanarRegion<PointT> > > regions;
+    std::vector<pcl::ModelCoefficients> model_coefficients;
+    std::vector<pcl::PointIndices> inlier_indices;
+    pcl::PointCloud<pcl::Label>::Ptr labels (new pcl::PointCloud<pcl::Label>);
+    std::vector<pcl::PointIndices> label_indices;
+    std::vector<pcl::PointIndices> boundary_indices;
+    pcl::OrganizedMultiPlaneSegmentation<PointT, pcl::Normal, pcl::Label> mps;
+    //pcl::OrganizedConnectedComponentSegmentation
+    mps.setInputNormals (normal_cloud);
+    mps.setInputCloud (cloud);
+
+    //mps.segment (regions);
+    mps.segmentAndRefine (regions, model_coefficients, inlier_indices, labels, label_indices, boundary_indices);
+
+
+    //Segment Objects
+    pcl::PointCloud<PointT>::CloudVectorType clusters;
+    pcl::EuclideanClusterComparator<PointT, pcl::Normal, pcl::Label>::Ptr
+            euclidean_cluster_comparator_(new pcl::EuclideanClusterComparator<PointT, pcl::Normal, pcl::Label>());
+
+    if (regions.size () > 0)
+    {
+        std::vector<bool> plane_labels;
+        plane_labels.resize (label_indices.size (), false);
+        std::cout << "label indices = " << label_indices.size() << std::endl;
+        for (size_t i = 0; i < label_indices.size (); i++)
+        {
+            if (label_indices[i].indices.size () > 10000) // Minimum Plane Size
+            {
+                plane_labels[i] = true;
+            }
+        }
+        std::cout << "HELLO ---------------1" << std::endl;
+        euclidean_cluster_comparator_->setInputCloud (cloud);
+        euclidean_cluster_comparator_->setLabels (labels);
+        euclidean_cluster_comparator_->setExcludeLabels (plane_labels);
+        euclidean_cluster_comparator_->setDistanceThreshold (this->cluster_tolerance, false);
+
+        std::cout << "HELLO ---------------2" << std::endl;
+        pcl::PointCloud<pcl::Label> euclidean_labels;
+        std::vector<pcl::PointIndices> euclidean_label_indices;
+        pcl::OrganizedConnectedComponentSegmentation<PointT,pcl::Label> euclidean_segmentation (euclidean_cluster_comparator_);
+
+        euclidean_segmentation.setInputCloud (cloud);
+        euclidean_segmentation.segment (euclidean_labels, euclidean_label_indices);
+
+        for (size_t i = 0; i < euclidean_label_indices.size (); i++)
+        {
+            if ((euclidean_label_indices[i].indices.size () > this->min_cluster_size)
+                        && (euclidean_label_indices[i].indices.size () < this->max_cluster_size))
+            {
+
+                pcl::PointCloud<PointT>::Ptr cluster(new pcl::PointCloud<PointT>());
+
+                pcl::ExtractIndices<PointT> extract;
+                extract.setInputCloud (cloud);
+                pcl::IndicesPtr indices_ptr(new std::vector<int>(euclidean_label_indices[i].indices));
+                //*indices_ptr = euclidean_label_indices[i].indices;
+                extract.setIndices(indices_ptr);
+                extract.setKeepOrganized(true);
+                //extract.setNegative(false);
+                extract.filter (*cluster);
+                this->changeNaN2Black(cluster);
+                clusters.push_back(*cluster);
+            }
+        }
+
+        PCL_INFO ("Got %d euclidean clusters!\n", clusters.size ());
+
+    }
+    else
+        PCL_WARN("Cannot Find Clusters on normals");
+
+    if(!clusters.empty())
+    {
+        for(int i =  0; i < clusters.size() ; i++)
+        {
+            pcl::PCLImage tmp;
+            pcl::PointCloud<PointT>::Ptr ptr(new pcl::PointCloud<PointT>(clusters[i]));
+            std::cout << "Clusters " << i << " Images Size = " << clusters[i].width << " x " << clusters[i].height << std::endl;
+            this->changeNaN2Black(ptr);
+            this->extractRGBFromCloud(clusters[i], tmp);
+            output.push_back(tmp);
+        }
+
     }
 }
 
@@ -584,7 +746,8 @@ void ClothesDetector::drawDescriptors(DetectorDescriptors& input, cv::Mat& outpu
     }
     catch (cv::Exception &e)
     {
-        std::cout << "Error drawing Contour : " << e.what() <<std::endl;
+        PCL_WARN("Drawing Contour Error in Output Descriptor Image\n");
+        //std::cout << "Error drawing Contour : " << e.what() <<std::endl;
     }
     circle(output, input.centroid, 3, color,4); //Marking Centroid of main segment
     rectangle( output, input.rect.tl(), input.rect.br(), color, 2, 8, 0 );
@@ -688,6 +851,74 @@ pcl::PointCloud<PointT>::Ptr ClothesDetector::removeNormalPlane(const pcl::Point
 
     return cloud_filtered;
 }
+
+pcl::PointIndices::Ptr ClothesDetector::getNormalPlaneInliers(const pcl::PointCloud<PointT>::Ptr &cloud) {
+
+    //Find Plane Indices and its Boundary
+    pcl::SACSegmentationFromNormals <PointT, pcl::Normal> seg;
+    pcl::ModelCoefficients::Ptr coefficients_plane(new pcl::ModelCoefficients);
+    pcl::PointIndices::Ptr inliers_plane(new pcl::PointIndices);
+    pcl::ExtractIndices <PointT> extract;
+    pcl::NormalEstimation <PointT, pcl::Normal> ne;
+    pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>());
+    pcl::PointCloud<pcl::Normal>::Ptr cloud_normals(new pcl::PointCloud <pcl::Normal>);
+
+    // Estimate point normals
+    ne.setSearchMethod(tree);
+    ne.setInputCloud(cloud);
+    ne.setKSearch(50);
+    ne.compute(*cloud_normals);
+
+
+    seg.setNormalDistanceWeight(0.1);
+    seg.setOptimizeCoefficients(true);
+    seg.setModelType(pcl::SACMODEL_NORMAL_PLANE);
+    seg.setMethodType(pcl::SAC_RANSAC);
+    seg.setMaxIterations(10000);
+    seg.setDistanceThreshold(0.05);
+    seg.setProbability(0.99);
+    seg.setInputCloud(cloud);
+    seg.setInputNormals(cloud_normals);
+
+    seg.segment(*inliers_plane, *coefficients_plane);
+
+//        delete seg;
+
+    extract.setInputCloud(cloud);
+    extract.setIndices(inliers_plane);
+    extract.setNegative(false);
+
+    pcl::PointCloud<PointT>::Ptr cloud_plane(new pcl::PointCloud<PointT>());
+    extract.filter(*cloud_plane);
+
+
+    for (int i = 0; i < cloud_plane->points.size(); i++) {
+        float x = std::abs(cloud_plane->points[i].x);
+        float y = std::abs(cloud_plane->points[i].y);
+        float z = std::abs(cloud_plane->points[i].z);
+
+        left_x_plane = std::min(left_x_plane, cloud_plane->points[i].x);
+        down_y_plane = std::min(down_y_plane, cloud_plane->points[i].y);
+        neg_z_plane = std::min(neg_z_plane, cloud_plane->points[i].z);
+
+        right_x_plane = std::max(right_x_plane, cloud_plane->points[i].x);
+        up_y_plane = std::max(up_y_plane, cloud_plane->points[i].y);
+        pos_z_plane = std::max(pos_z_plane, cloud_plane->points[i].z);
+    }
+    std::cout << "width_plane  " << std::abs(left_x_plane - right_x_plane) << std::endl;
+    std::cout << "height_plane   " << std::abs(down_y_plane - up_y_plane) << std::endl;
+    std::cout << "depth_plane   " << std::abs(neg_z_plane - pos_z_plane) << std::endl;
+    std::cout << "down_y_plane  " << down_y_plane << std::endl;
+    std::cout << "up_y_plane  " << up_y_plane << std::endl;
+    std::cout << "right_x_plane  " << right_x_plane << std::endl;
+    std::cout << "left_x_plane  " << left_x_plane << std::endl;
+    std::cout << "pos_z_plane  " << pos_z_plane << std::endl;
+    std::cout << "neg_z_plane  " << neg_z_plane << std::endl;
+
+
+    return inliers_plane;
+}
+
 
 
 pcl::PointCloud<PointT>::Ptr ClothesDetector::cropCloudInArea(const pcl::PointCloud<PointT>::Ptr &cloud, bool keep_organized)
@@ -819,3 +1050,5 @@ bool ClothesDetector::extractRGBFromCloud(const pcl::PointCloud<PointT>& cloud, 
 
     return (true);
 }
+
+

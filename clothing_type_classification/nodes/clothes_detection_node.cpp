@@ -11,11 +11,13 @@
 #include <clothing_type_classification/FindClothesAction.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/transforms.h>
+#include <pcl/io/png_io.h>
 
 //#define DEFAULT_CLOUD_TOPIC "/camera/depth_registered/points"
 #define DEFAULT_CLOUD_TOPIC "/cloud_pcd"
 #define ANALYZE_FROM_PLANE 0
 #define ANALYZE_FROM_CLUSTER 1
+#define ANALYZE_FROM_FINE_CROPPED_CLUSTER 2
 
 
 //typedef pcl::PointXYZRGBA PointT;
@@ -160,7 +162,17 @@ class ClothesDetectionRunner
                                                       (int)this->ece_constraint[1], (int)this->ece_constraint[2]);
 
             nh.param( "algorithm", this->algorithm, ANALYZE_FROM_CLUSTER );
-            std::string algorithm_str = (this->algorithm)?("ANALYZE_FROM_CLUSTERS"):("ANALYZE_FROM_PLANE");
+            //std::string algorithm_str = (this->algorithm)?("ANALYZE_FROM_CLUSTERS"):("ANALYZE_FROM_PLANE");
+            std::string algorithm_str;
+            switch(this->algorithm)
+            {
+                case (ANALYZE_FROM_PLANE): algorithm_str = "ANALYZE_FROM_PLANE"; break;
+                case (ANALYZE_FROM_CLUSTER): algorithm_str = "ANALYZE_FROM_CLUSTER"; break;
+                case (ANALYZE_FROM_FINE_CROPPED_CLUSTER): algorithm_str = "ANALYZE_FROM_FINE_CROPPED_CLUSTER"; break;
+                default: algorithm_str = "UNKNOWN"; break;
+            }
+
+
             ROS_INFO( "algorithm: %s", algorithm_str.c_str());
 
             this->find_clothes_as_.start();
@@ -235,6 +247,24 @@ class ClothesDetectionRunner
                     }
                     this->saveImagesToFolder(cluster_img, "cluster");
                 }
+                else if(this->algorithm == ANALYZE_FROM_FINE_CROPPED_CLUSTER)
+                {
+                    clothes_detector.extractClustersFineCroppedImages(this->cloud_obj,
+                                                                      cluster_pcl_img,
+                                                                      original_pcl_img,
+                                                                      (this->package_path + "/output/") );
+
+                    ROS_INFO("Total Clusters : %d", (int)cluster_pcl_img.size());
+                    for(int i=0 ; i < cluster_pcl_img.size() ; i++)
+                    {
+                        cv::Mat tmp;
+                        this->convertPCLImage2CVMat(cluster_pcl_img[i], tmp);
+                        cluster_img.push_back(tmp);
+                    }
+                    ROS_INFO("Saving CLUSTERS IMAGES");
+                    this->saveImagesToFolder(cluster_img, "cluster");
+                    //this->saveImagesToFolderPCL(cluster_pcl_img, "cluster");
+                }
                 else if(this->algorithm == ANALYZE_FROM_PLANE)
                 {
                     clothes_detector.extractPlaneImage(this->cloud_obj, plane_pcl_img,
@@ -250,7 +280,7 @@ class ClothesDetectionRunner
                 this->convertPCLImage2CVMat(original_pcl_img, original_img);
 
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 40)));
-                ROS_INFO("Finish Extracing Plane");
+                ROS_INFO("Finish PointCloud Processing");
                 cv::imwrite((this->package_path + "/output/original.jpg"), original_img);
 
                 //----------------------- EGBIS -----------------
@@ -380,16 +410,42 @@ class ClothesDetectionRunner
                     cv::imwrite((this->package_path + "/output/egbis.jpg"), egbis_img);
                     this->saveImagesToFolder(segment_img, "segment");
                 }
+                else if(this->algorithm == ANALYZE_FROM_FINE_CROPPED_CLUSTER)
+                {
+                    std::vector<double> segment_area_percent;
+                    clothes_detector.setEgbisConstraint((float)egbis_fine_constraint[0],
+                                                        (int)egbis_fine_constraint[1], (int)egbis_fine_constraint[2]);
+                    for(int i =0 ; i < cluster_img.size(); i++)
+                    {
+                        int normal_num = clothes_detector.getEgbisSegmentVisualize(cluster_img[i], egbis_img);
+                        clothes_detector.getEgbisSegment(cluster_img[i], segment_img, segment_area_percent, this->egbis_fine_percent_area_th);
+                        ROS_INFO("Total Segment : %d", normal_num);
+                        ROS_INFO("Total Segment After Threshold : %d", (int)segment_img.size());
+                        if(!segment_area_percent.empty())
+                        {
+                            //Deleting Max area Image -> Assuming that it is a Background
+                            int index = 0;
+                            index = (int)std::distance(segment_area_percent.begin(),
+                                                       std::max_element(segment_area_percent.begin(), segment_area_percent.end()));
+                            segment_img.erase(segment_img.begin() + index);
+
+                        }
+                    }
+
+
+                    cv::imwrite((this->package_path + "/output/egbis.jpg"), egbis_img);
+                    this->saveImagesToFolder(segment_img, "segment");
+                }
                 else
                     ROS_WARN("No specified Algorithm");
 
-                ROS_INFO("Complete EGBIS");
+                ROS_INFO("-----Complete EGBIS-----");
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 60)));
                 //-------------------------- Detect Clothes --------------------------------
                 clothes_detector.setOriginalImage(original_img);
                 clothes_detector.getBinaryImage(segment_img, bin_img, 0);
 
-                if(this->algorithm == ANALYZE_FROM_CLUSTER)
+                if((this->algorithm == ANALYZE_FROM_CLUSTER) ||(this->algorithm == ANALYZE_FROM_FINE_CROPPED_CLUSTER) )
                     clothes_detector.detectClothesObjects(bin_img, out, false);
                 else if(this->algorithm == ANALYZE_FROM_PLANE)
                     clothes_detector.detectClothesObjects(bin_img, out, true);
@@ -399,13 +455,13 @@ class ClothesDetectionRunner
                     clothes_detector.findDominantColor(out[i], 2);
                 try
                 {
-                    //TODO -- FIX THIS ERROR
+                    //TODO -- FIX ERROR IN DRAWING Contour Descriptors
                     clothes_detector.saveOutputImages(out, (this->package_path + "/output/out") );
                 }
                 catch(cv::Exception& e)
                 {
                     ROS_WARN("Error in saving Descriptors Files");
-                    ROS_WARN("%s", e.what());
+                    //ROS_WARN("%s", e.what());
                 }
                 
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack((current_percent = 90)));
@@ -416,7 +472,6 @@ class ClothesDetectionRunner
                     ROS_INFO("OUTPUT[%d] POSITION: x = %lf, y = %lf, z = %lf", i, out[i].position.x,
                                 out[i].position.y, out[i].position.z);
                 }
-
                 ROS_INFO("Saving File to %s", this->package_path.c_str());
                 find_clothes_as_.publishFeedback(this->generateActionFeedBack(current_percent = 100));
                 find_clothes_as_.setSucceeded(*this->generateActionResult(out), "Complete");
@@ -508,13 +563,16 @@ class ClothesDetectionRunner
                 centroid.x = data[i].position.x;
                 centroid.y = data[i].position.y;
                 centroid.z = data[i].position.z;
-                
-                if((!this->transform_cloud_to_base_link) && (!this->offline_test))
+
+                if(!this->offline_test)
                 {
                     clothes.centroid = this->transformCamera2Base(centroid);
                 }
-                
-                clothes.centroid = centroid;
+                else
+                {
+                    clothes.centroid = centroid;
+                }
+
                 clothes.color = data[i].dominant_color;
                 clothes.type = data[i].type;
                 /*cv_bridge::CvImage img_msg;
@@ -554,6 +612,20 @@ class ClothesDetectionRunner
                 std::stringstream ss;
                 ss << directory << filename << '_' << i << ".jpg";
                 cv::imwrite(ss.str().c_str(), input[i]);
+            }
+        }
+
+        void saveImagesToFolderPCL(std::vector<pcl::PCLImage>& input, std::string filename)
+        {
+            std::string directory;
+            directory = this->package_path + "/output/";
+
+            for(int i = 0; i < input.size(); i++)
+            {
+                std::stringstream ss;
+                ss << directory << filename << '_' << i << ".png";
+                //cv::imwrite(ss.str().c_str(), input[i]);
+                pcl::io::savePNGFile(ss.str(), input[i]);
             }
         }
 
