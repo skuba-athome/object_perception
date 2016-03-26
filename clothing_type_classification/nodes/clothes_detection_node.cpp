@@ -557,6 +557,9 @@ class ClothesDetectionRunner
             tmp->result.header = this->generateHeader();
             for(int i=0 ; i < data.size() ; i++)
             {
+                if(data[i].dominant_color == ClothesDetector::UNKNOWN)
+                    break;
+
                 clothing_type_classification::Clothes clothes;
                 clothes.area = data[i].contour_area;
                 geometry_msgs::Point centroid;
