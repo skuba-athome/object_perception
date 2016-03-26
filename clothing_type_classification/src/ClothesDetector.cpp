@@ -629,7 +629,7 @@ bool ClothesDetector::findDominantColor(DetectorDescriptors &input, int cluster_
 
 
     cv::Mat color(1,1, CV_8UC3);
-    /*int fix_code_index = 0;
+    int fix_code_index = 0;
     float max_not_black = 0;
     for(int i=0; i < centers.rows ; i++ )
     {
@@ -643,7 +643,7 @@ bool ClothesDetector::findDominantColor(DetectorDescriptors &input, int cluster_
             fix_code_index = i;
         }
     }
-    idx = fix_code_index;*/
+    idx = fix_code_index;
 
     //get_center from argmax
     //-------------------------------------- END FIX CODE

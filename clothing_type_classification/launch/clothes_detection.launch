@@ -21,18 +21,13 @@
         <param name="egbis_fine_sigma" type="double" value="1.5"/>
         <param name="egbis_fine_k" type="double" value="300"/>
         <param name="egbis_fine_min_size" type="double" value="2000"/>
-        <param name="egbis_fine_percent_area_th" type="double" value="3.00"/>
+        <param name="egbis_fine_percent_area_th" type="double" value="2.50"/>
 
         <!-- Euclidean Clustering Extraction Constraints -->
 
         <param name="ece_cluster_tolerance" type="double" value="0.05"/>
-<<<<<<< HEAD
         <param name="ece_min_cluster_size" type="double" value="8000"/>
         <param name="ece_max_cluster_size" type="double" value="200000"/>
-=======
-        <param name="ece_min_cluster_size" type="double" value="1000"/>
-        <param name="ece_max_cluster_size" type="double" value="100000"/>
->>>>>>> aec8818c88f67d78cc1077c7ad30e5c8950721fe
 
         <!-- Passthrough Filter Scene Search Space -->
 
@@ -42,7 +37,7 @@
         <param name="pass_through_min_z" type="double" value="0.0"/>
         <param name="pass_through_max_z" type="double" value="1.5"/>
         <param name="pass_through_min_y" type="double" value="0.0"/>
-        <param name="pass_through_max_y" type="double" value="1.5"/>
+        <param name="pass_through_max_y" type="double" value="2.5"/>
         <param name="pass_through_min_x" type="double" value="0.0"/>
         <param name="pass_through_max_x" type="double" value="3.0"/>
 
@@ -53,7 +48,7 @@
         <param name="algorithm" type="int" value="2"/>
 
         <!-- Total Clothes in Pile-->
-        <param name="total_clothes" type="int" value="2"/>
+        <param name="total_clothes" type="int" value="5"/>
 
         <!-- Offline Test (Whether To Use TF in test)-->
         <param name="offline_test" type="int" value="0"/>
