@@ -77,8 +77,10 @@ class ClothesDetector
         void extractPlaneImage(pcl::PointCloud<PointT>::Ptr cloud, pcl::PCLImage& output, pcl::PCLImage& original_img);
         pcl::PointCloud<PointT>::Ptr extractPlaneCloud(pcl::PointCloud<PointT>::Ptr cloud);
         void extractClustersImages(pcl::PointCloud<PointT>::Ptr cloud, std::vector<pcl::PCLImage>& output, pcl::PCLImage& original_img , std::string debug= "");
+
         void extractClustersFineCroppedImages(pcl::PointCloud<PointT>::Ptr cloud, std::vector<pcl::PCLImage>& output,
-                                           pcl::PCLImage& original_img , std::string debug= "");
+                                           pcl::PCLImage& original_img , bool find_only_max_clusters = false, std::string debug= "");
+
         void map2DPointToPointCloud(pcl::PointCloud<PointT>::Ptr cloud, DetectorDescriptors& input, int window = 3);
         void setEgbisConstraint(float sigma, float k, int min_size);
         int  getEgbisSegmentVisualize(cv::Mat &input, cv::Mat& output);

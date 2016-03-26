@@ -291,10 +291,14 @@ void ClothesDetector::extractClustersImages(pcl::PointCloud<PointT>::Ptr cloud, 
 }
 
 void ClothesDetector::extractClustersFineCroppedImages(pcl::PointCloud<PointT>::Ptr cloud, std::vector<pcl::PCLImage>& output,
-                                            pcl::PCLImage& original_img, std::string debug)
+                       pcl::PCLImage& original_img , bool find_only_max_clusters, std::string debug)
+
 {
     output.clear();
     pcl::PCDWriter writer;
+    unsigned long max_size_cluster = 0;
+    unsigned long max_size_index = 0;
+    unsigned long total_clusters = 0;
     this->down_y_plane = 9999;
     this->up_y_plane = -9999;
     this->right_x_plane = -9999;
@@ -343,18 +347,16 @@ void ClothesDetector::extractClustersFineCroppedImages(pcl::PointCloud<PointT>::
         std::cout << "label indices = " << label_indices.size() << std::endl;
         for (size_t i = 0; i < label_indices.size (); i++)
         {
-            if (label_indices[i].indices.size () > 10000) // Minimum Plane Size
+            if(label_indices[i].indices.size () > 10000) // Minimum Plane Size
             {
                 plane_labels[i] = true;
             }
         }
-        std::cout << "HELLO ---------------1" << std::endl;
         euclidean_cluster_comparator_->setInputCloud (cloud);
         euclidean_cluster_comparator_->setLabels (labels);
         euclidean_cluster_comparator_->setExcludeLabels (plane_labels);
         euclidean_cluster_comparator_->setDistanceThreshold (this->cluster_tolerance, false);
 
-        std::cout << "HELLO ---------------2" << std::endl;
         pcl::PointCloud<pcl::Label> euclidean_labels;
         std::vector<pcl::PointIndices> euclidean_label_indices;
         pcl::OrganizedConnectedComponentSegmentation<PointT,pcl::Label> euclidean_segmentation (euclidean_cluster_comparator_);
@@ -380,6 +382,12 @@ void ClothesDetector::extractClustersFineCroppedImages(pcl::PointCloud<PointT>::
                 extract.filter (*cluster);
                 this->changeNaN2Black(cluster);
                 clusters.push_back(*cluster);
+
+                if((find_only_max_clusters) && (euclidean_label_indices[i].indices.size() > max_size_cluster))
+                {
+                    max_size_cluster = euclidean_label_indices[i].indices.size();
+                    max_size_index = total_clusters++;
+                }
             }
         }
 
@@ -391,16 +399,25 @@ void ClothesDetector::extractClustersFineCroppedImages(pcl::PointCloud<PointT>::
 
     if(!clusters.empty())
     {
-        for(int i =  0; i < clusters.size() ; i++)
+        if(find_only_max_clusters)
         {
             pcl::PCLImage tmp;
-            pcl::PointCloud<PointT>::Ptr ptr(new pcl::PointCloud<PointT>(clusters[i]));
-            std::cout << "Clusters " << i << " Images Size = " << clusters[i].width << " x " << clusters[i].height << std::endl;
+            pcl::PointCloud<PointT>::Ptr ptr(new pcl::PointCloud<PointT>(clusters[max_size_index]));
             this->changeNaN2Black(ptr);
-            this->extractRGBFromCloud(clusters[i], tmp);
+            this->extractRGBFromCloud(clusters[max_size_index], tmp);
             output.push_back(tmp);
         }
-
+        else
+        {
+            for(int i =  0; i < clusters.size() ; i++)
+            {
+                pcl::PCLImage tmp;
+                pcl::PointCloud<PointT>::Ptr ptr(new pcl::PointCloud<PointT>(clusters[i]));
+                this->changeNaN2Black(ptr);
+                this->extractRGBFromCloud(clusters[i], tmp);
+                output.push_back(tmp);
+            }
+        }
     }
 }
 

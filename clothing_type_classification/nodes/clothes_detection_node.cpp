@@ -251,6 +251,7 @@ class ClothesDetectionRunner
                     clothes_detector.extractClustersFineCroppedImages(this->cloud_obj,
                                                                       cluster_pcl_img,
                                                                       original_pcl_img,
+                                                                      true,
                                                                       (this->package_path + "/output/") );
 
                     ROS_INFO("Total Clusters : %d", (int)cluster_pcl_img.size());
