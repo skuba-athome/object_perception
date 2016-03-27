@@ -673,7 +673,7 @@ bool ClothesDetector::findDominantColor(DetectorDescriptors &input, int cluster_
 
 void ClothesDetector::map2DPointToPointCloud(pcl::PointCloud<PointT>::Ptr cloud, DetectorDescriptors& input, int window)
 {
-    if((!cloud->isOrganized())&& (input.dominant_color == UNKNOWN)) 
+    if((!cloud->isOrganized()) || (input.dominant_color == UNKNOWN)) 
         return;
 
     int center_x = (int)input.centroid.x;

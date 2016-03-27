@@ -2,8 +2,8 @@
 
     <node name="clothes_detection_node" pkg="clothing_type_classification" type="clothes_detection_node" output="screen">
 
-        <param name="input_topic" type="string" value="/camera/depth_registered/points"/>
-        <!--<param name="input_topic" type="string" value="/cloud_pcd"/>-->
+        <!--<param name="input_topic" type="string" value="/camera/depth_registered/points"/>-->
+        <param name="input_topic" type="string" value="/cloud_pcd"/>
 
         <!-- White Color Threshold -->
         <param name="threshold_sat_lower" type="int" value="0"/>
