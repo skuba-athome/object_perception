@@ -49,6 +49,7 @@ class XYZPoint:
                     thing.centriod.x = point_tf.point.x
                     thing.centriod.y = point_tf.point.y
                     thing.centriod.z = point_tf.point.z
+                    thing.header =  point_tf.header
                     break
             if thing.centriod.x == 0 and thing.centriod.y == 0 and thing.centriod.z == 0:
                 thing.centriod.x = np.nan

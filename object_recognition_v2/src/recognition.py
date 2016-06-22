@@ -42,6 +42,7 @@ class HOGReconition:
         self.history_location = None
         self.image_subscriber = None
         self.init_node()
+        self.seq = 0
 
     def load_ymls(self, location):
         yml = open(location, "r")
@@ -171,6 +172,10 @@ class HOGReconition:
             except rospy.ServiceException, e:
                 rospy.logerr("XYZ Service call failed: %s"%e)
         # rospy.Publisher("/object_recognition", ObjectRecognitions, things, queue_size=1)
+        things.stamp = rospy.Time(0)
+        things.seq = self.seq
+        things.frame_id = "external_cam"
+        self.seq += 1
         self.server.set_succeeded(things)
         # cv2.putText(frame, ""+str(things.objects[0].centriod), (630, 350),
         #                     cv2.FONT_HERSHEY_PLAIN, 1.3, (47, 211, 25),2)
