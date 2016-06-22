@@ -160,7 +160,7 @@ class HOGReconition:
         for area in temp_object:
             center = (float(round(area.x1+1.0*area.x2/2)),
                         float(round(area.y1+1.0*area.y2/2)))
-            thing = ObjectRecognition(name=String(area.name), point=Pose2D(x=center[0], y=center[1]))
+            thing = ObjectRecognition(name=String(area.name), point=Pose2D(x=center[0], y=center[1]), image=frame[area.x1:area.x2, area.y1:area.y2])
             things.objects.append(thing)
         filename = os.path.join(self.history_location, datetime.today().isoformat(" ") + ".jpg")
         cv2.imwrite(os.path.join(self.history_location, filename), frame)
