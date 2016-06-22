@@ -1,6 +1,6 @@
 <launch>
   <group ns="object_recognition_v2">
     <node name="xyz_point_service" pkg="object_recognition_v2" type="xyz_point.py" output="screen"/>
-    <node name="object_recognition" pkg="object_recognition_v2" type="reconition.py" output="screen"/>
+    <node name="object_recognition" pkg="object_recognition_v2" type="recognition.py" output="screen"/>
   </group>
 </launch>

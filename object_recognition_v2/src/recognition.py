@@ -172,9 +172,9 @@ class HOGReconition:
             except rospy.ServiceException, e:
                 rospy.logerr("XYZ Service call failed: %s"%e)
         # rospy.Publisher("/object_recognition", ObjectRecognitions, things, queue_size=1)
-        things.stamp = rospy.Time(0)
-        things.seq = self.seq
-        things.frame_id = "external_cam"
+        things.header.stamp = rospy.Time(0)
+        things.header.seq = self.seq
+        things.header.frame_id = "external_cam"
         self.seq += 1
         self.server.set_succeeded(things)
         # cv2.putText(frame, ""+str(things.objects[0].centriod), (630, 350),
