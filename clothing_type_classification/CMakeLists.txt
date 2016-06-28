@@ -119,7 +119,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-   CATKIN_DEPENDS roscpp rospy std_msgs sensor_msgs tf pcl_ros pcl_conversions geometry_msgs actionlib_msgs
+   CATKIN_DEPENDS roscpp rospy std_msgs sensor_msgs tf pcl_ros pcl_conversions geometry_msgs actionlib_msgs message_runtime
 #  DEPENDS system_lib
 )
 
