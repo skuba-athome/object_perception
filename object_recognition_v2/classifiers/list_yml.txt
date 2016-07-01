@@ -1,5 +1,10 @@
-/home/konen/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/aw--64x144--.yml	ON
-/home/konen/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/lay--64x144--.yml	ON
-/home/konen/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/orio--96x120--.yml	ON
-/home/konen/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/hiyen--64x144--.yml	ON
-/home/konen/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/pri--64x144--.yml	ON
+/home/lubricant/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/bisquits--96x144--.yml	ON
+/home/lubricant/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/beer--72x144--.yml	ON
+/home/lubricant/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/pringle--72x144--.yml	ON
+/home/lubricant/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/coconut_milk--96x144--.yml	ON
+/home/lubricant/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/tea--96x144--.yml	ON
+/home/lubricant/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/soap--96x96--.yml	ON
+/home/lubricant/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/coke--72x144--.yml	ON
+/home/lubricant/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/choco_syrup--72x144--.yml	ON
+/home/lubricant/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/shampoo--72x144--.yml	ON
+/home/lubricant/skuba_athome/src/object_perception/object_recognition_v2/classifiers/hog/pumper_nickel--72x144--.yml	ON

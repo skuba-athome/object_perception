@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+	<node ns="z_bar" name="barcode_reader" pkg="zbar_ros" type="barcode_reader_node">
+    	<remap from="image" to="/external_cam/image_raw"/>
+  	</node>
+</launch>
