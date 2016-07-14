@@ -1,0 +1,5 @@
+<launch>
+
+  <node pkg="object_cluster" type="guess_object.py" name="guess_detection" output="screen"/>
+
+</launch>
